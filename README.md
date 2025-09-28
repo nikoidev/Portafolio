@@ -42,9 +42,9 @@ cd Portafolio
 docker-compose -f docker/docker-compose.dev.yml up -d
 
 # 3. Acceder a los servicios
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+# Frontend: http://localhost:3004
+# Backend API: http://localhost:8004
+# API Docs: http://localhost:8004/docs
 # PgAdmin: http://localhost:5055
 ```
 

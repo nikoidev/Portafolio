@@ -2,9 +2,9 @@
 Configuración de la base de datos con SQLAlchemy
 """
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base  # Ya no necesario
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
 from app.core.config import settings
 
@@ -17,14 +17,13 @@ async_engine = create_async_engine(
     settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://"),
     echo=settings.DEBUG
 )
-AsyncSessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     async_engine, 
-    class_=AsyncSession, 
     expire_on_commit=False
 )
 
-# Base para los modelos
-Base = declarative_base()
+# Importar Base desde models
+from app.models.base import Base
 
 
 def get_db():
