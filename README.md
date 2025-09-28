@@ -45,7 +45,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d
 # Frontend: http://localhost:3000
 # Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/docs
-# PgAdmin: http://localhost:5050
+# PgAdmin: http://localhost:5055
 ```
 
 ### Opción 2: Instalación Manual

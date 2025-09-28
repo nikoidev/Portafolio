@@ -41,6 +41,6 @@
     "eslint": "^8.0.0",
     "eslint-config-next": "^14.0.0",
     "@tailwindcss/typography": "^0.5.0",
-    "@types/react-markdown": "^6.0.0"
+    "tailwindcss-animate": "^1.0.0"
   }
 }

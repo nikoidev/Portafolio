@@ -25,7 +25,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 - Documentación API: http://localhost:8000/docs
-- PgAdmin: http://localhost:5050
+- PgAdmin: http://localhost:5055
 
 ### Instalación Manual
 
@@ -141,13 +141,13 @@ docker-compose up --build
 
 ### Conexión a PostgreSQL
 - Host: localhost
-- Puerto: 5432
+- Puerto: 5440
 - Usuario: portfolio_user
 - Contraseña: portfolio_pass
 - Base de datos: portfolio_db
 
 ### PgAdmin
-- URL: http://localhost:5050
+- URL: http://localhost:5055
 - Email: admin@portfolio.com
 - Contraseña: admin123
 
@@ -155,7 +155,7 @@ docker-compose up --build
 
 ### Backend (.env)
 ```env
-DATABASE_URL=postgresql://portfolio_user:portfolio_pass@localhost:5432/portfolio_db
+DATABASE_URL=postgresql://portfolio_user:portfolio_pass@localhost:5440/portfolio_db
 SECRET_KEY=your-secret-key
 DEBUG=True
 ENVIRONMENT=development
