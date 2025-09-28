@@ -15,7 +15,7 @@ class ProjectBase(BaseSchema):
     content: Optional[str] = None
     github_url: Optional[str] = None
     live_demo_url: Optional[str] = None
-    demo_type: Optional[str] = Field(None, regex="^(iframe|link|video|images)$")
+    demo_type: Optional[str] = Field(None, pattern="^(iframe|link|video|images)$")
     thumbnail_url: Optional[str] = None
     images: Optional[List[str]] = []
     demo_files: Optional[List[dict]] = []
@@ -40,7 +40,7 @@ class ProjectUpdate(BaseSchema):
     content: Optional[str] = None
     github_url: Optional[str] = None
     live_demo_url: Optional[str] = None
-    demo_type: Optional[str] = Field(None, regex="^(iframe|link|video|images)$")
+    demo_type: Optional[str] = Field(None, pattern="^(iframe|link|video|images)$")
     thumbnail_url: Optional[str] = None
     images: Optional[List[str]] = None
     demo_files: Optional[List[dict]] = None
