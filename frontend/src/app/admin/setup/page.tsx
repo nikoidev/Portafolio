@@ -70,7 +70,7 @@ export default function AdminSetupPage() {
                         </h3>
                         <div className="text-sm text-blue-800 space-y-1">
                             <p><strong>Email:</strong> admin@portfolio.com</p>
-                            <p><strong>Contraseña:</strong> adminpassword</p>
+                            <p><strong>Contraseña:</strong> admin123</p>
                         </div>
                     </div>
 

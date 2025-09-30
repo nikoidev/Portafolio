@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                             Email: admin@portfolio.com<br />
-                            Contraseña: adminpassword
+                            Contraseña: admin123
                         </p>
                     </div>
                 </CardContent>

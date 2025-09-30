@@ -28,10 +28,42 @@ Portafolio/
 ### Prerrequisitos
 - Python 3.11+
 - Node.js 18+
-- Docker & Docker Compose
+- Docker & Docker Compose (opcional)
 - Git
 
-### Opción 1: Docker (Recomendado)
+### ⚡ Inicio Rápido (Recomendado)
+
+```bash
+# Terminal 1 - Backend
+cd backend
+pipenv install
+pipenv shell
+pipenv run dev
+
+# Terminal 2 - Frontend  
+cd frontend
+npm install
+npm run dev
+
+# Navegador:
+# 1. Configuración inicial (solo primera vez):
+#    http://localhost:3000/admin/setup
+#    → Click en "Crear Usuario Administrador"
+#
+# 2. Login:
+#    http://localhost:3000/admin/login
+#    Email: admin@portfolio.com
+#    Contraseña: admin123
+#
+# 3. ¡Listo! Ya puedes crear proyectos:
+#    http://localhost:3000/admin/projects
+```
+
+Ver **[COMO_EMPEZAR.md](COMO_EMPEZAR.md)** para guía detallada paso a paso.
+
+---
+
+### Opción 2: Docker (Alternativa)
 
 ```bash
 # 1. Clonar repositorio
@@ -74,9 +106,22 @@ npm run dev
 
 ## 📖 Documentación
 
-- [Guía de Desarrollo](docs/DEVELOPMENT.md)
-- [API Documentation](docs/API.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
+### 🚀 Inicio
+- **[COMO_EMPEZAR.md](COMO_EMPEZAR.md)** - 3 pasos simples para empezar
+- **[RESUMEN_FINAL.md](RESUMEN_FINAL.md)** - Resumen completo del proyecto
+- [Inicio Rápido Detallado](docs/INICIO_RAPIDO.md) - Guía paso a paso
+
+### 🎬 Sistema de Demos
+- [Sistema de Demos](docs/DEMO_SYSTEM.md) - Guía completa de demos interactivos
+
+### 🚢 Deployment
+- [Deployment Railway](docs/RAILWAY_DEPLOYMENT.md) - Backend en Railway
+- [Deployment Guide](docs/DEPLOYMENT.md) - Guía completa de deployment
+
+### 📋 Técnico
+- [Resumen Técnico](docs/RESUMEN_IMPLEMENTACION.md) - Todo lo implementado
+- [Guía de Desarrollo](docs/DEVELOPMENT.md) - Desarrollo local
+- API Documentation - `/docs` cuando el backend está corriendo
 
 ## 🎯 Características
 
