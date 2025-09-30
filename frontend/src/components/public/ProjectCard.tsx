@@ -18,9 +18,9 @@ export function ProjectCard({ project, showViewCount = true }: ProjectCardProps)
         <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
             {/* Imagen del proyecto */}
             <div className="relative aspect-video overflow-hidden">
-                {project.thumbnail_url ? (
+                {(project.thumbnail_url || (project.image_urls && project.image_urls.length > 0)) ? (
                     <Image
-                        src={project.thumbnail_url}
+                        src={project.thumbnail_url || project.image_urls?.[0] || ''}
                         alt={project.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"

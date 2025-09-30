@@ -46,10 +46,13 @@ export interface Project extends BaseEntity {
     demo_type?: 'iframe' | 'link' | 'video' | 'images';
     thumbnail_url?: string;
     images?: string[];
+    image_urls?: string[];
     technologies: string[];
     tags?: string[];
     is_featured: boolean;
+    is_published?: boolean;
     view_count: number;
+    order_index?: number;
 }
 
 export interface ProjectCreate {
@@ -63,6 +66,7 @@ export interface ProjectCreate {
     demo_type?: 'iframe' | 'link' | 'video' | 'images';
     thumbnail_url?: string;
     images?: string[];
+    image_urls?: string[];
     technologies: string[];
     tags?: string[];
     is_featured?: boolean;

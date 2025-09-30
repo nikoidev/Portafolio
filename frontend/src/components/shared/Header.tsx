@@ -20,6 +20,32 @@ export function Header({ variant = 'public' }: HeaderProps) {
                             <Link href="/admin" className="text-xl font-bold">
                                 Panel Admin
                             </Link>
+                            <nav className="flex items-center space-x-4 ml-8">
+                                <Link
+                                    href="/admin"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Dashboard
+                                </Link>
+                                <Link
+                                    href="/admin/projects"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Proyectos
+                                </Link>
+                                <Link
+                                    href="/admin/cv"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    CV
+                                </Link>
+                                <Link
+                                    href="/admin/uploads"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Archivos
+                                </Link>
+                            </nav>
                         </div>
 
                         <div className="flex items-center space-x-4">

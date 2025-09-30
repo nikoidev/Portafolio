@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { ImageSelector } from './ImageSelector';
 
 const projectSchema = z.object({
     title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
@@ -22,6 +23,7 @@ const projectSchema = z.object({
     live_demo_url: z.string().url('URL inválida').optional().or(z.literal('')),
     demo_type: z.enum(['iframe', 'link', 'video', 'images']).optional(),
     thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
+    images: z.array(z.string()).default([]),
     technologies: z.string(),
     tags: z.string().optional(),
     is_featured: z.boolean().default(false),
@@ -52,6 +54,7 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             live_demo_url: project?.live_demo_url || '',
             demo_type: project?.demo_type || 'link',
             thumbnail_url: project?.thumbnail_url || '',
+            images: project?.images || [],
             technologies: project?.technologies?.join(', ') || '',
             tags: project?.tags?.join(', ') || '',
             is_featured: project?.is_featured || false,
@@ -76,7 +79,8 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                 : [],
             github_url: values.github_url || undefined,
             live_demo_url: values.live_demo_url || undefined,
-            thumbnail_url: values.thumbnail_url || undefined,
+            thumbnail_url: values.thumbnail_url || (values.images.length > 0 ? values.images[0] : undefined),
+            image_urls: values.images,
         };
 
         const success = await onSubmit(processedData);
@@ -210,13 +214,39 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
 
                                 <FormField
                                     control={form.control}
+                                    name="images"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Imágenes del Proyecto</FormLabel>
+                                            <FormControl>
+                                                <ImageSelector
+                                                    selectedImages={field.value}
+                                                    onImagesChange={field.onChange}
+                                                    maxImages={5}
+                                                    title="Seleccionar Imágenes del Proyecto"
+                                                    description="Elige hasta 5 imágenes para mostrar en tu proyecto"
+                                                />
+                                            </FormControl>
+                                            <FormDescription>
+                                                La primera imagen será la imagen principal del proyecto
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
                                     name="thumbnail_url"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>URL de la Imagen</FormLabel>
+                                            <FormLabel>URL de Imagen Manual (Opcional)</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="https://ejemplo.com/imagen.jpg" {...field} />
                                             </FormControl>
+                                            <FormDescription>
+                                                Solo si quieres usar una imagen externa en lugar de las subidas
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
