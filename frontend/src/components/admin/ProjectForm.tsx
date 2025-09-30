@@ -207,6 +207,37 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                             <FormControl>
                                                 <Input placeholder="https://mi-proyecto.vercel.app" {...field} />
                                             </FormControl>
+                                            <FormDescription>
+                                                URL del proyecto desplegado o demo en vivo
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="demo_type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Tipo de Demo</FormLabel>
+                                            <FormControl>
+                                                <select
+                                                    {...field}
+                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                                >
+                                                    <option value="iframe">Iframe (Interactivo)</option>
+                                                    <option value="link">Enlace Externo</option>
+                                                    <option value="video">Video</option>
+                                                    <option value="images">Solo Imágenes</option>
+                                                </select>
+                                            </FormControl>
+                                            <FormDescription>
+                                                Iframe: Muestra el proyecto en un modal interactivo<br />
+                                                Enlace: Abre en nueva pestaña<br />
+                                                Video: Muestra un video del demo<br />
+                                                Imágenes: Solo muestra las capturas de pantalla
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}

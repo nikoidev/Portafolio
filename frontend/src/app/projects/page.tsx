@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+import { Navbar } from '@/components/layout/Navbar';
 import ProjectsClient from '@/components/pages/ProjectsClient';
+import { Footer } from '@/components/shared/Footer';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Proyectos',
@@ -11,5 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default function ProjectsPage() {
-    return <ProjectsClient />;
+  return (
+    <>
+      <Navbar />
+      <ProjectsClient />
+      <Footer />
+    </>
+  );
 }

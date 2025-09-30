@@ -1,12 +1,14 @@
 'use client';
 
+import { DemoModal } from '@/components/shared/DemoModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Project } from '@/types/api';
-import { ExternalLink, Eye, Github } from 'lucide-react';
+import { Eye, Github, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 interface ProjectCardProps {
     project: Project;
@@ -15,6 +17,8 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, showViewCount = true, variant = 'vertical' }: ProjectCardProps) {
+    const [isDemoOpen, setIsDemoOpen] = useState(false);
+
     if (variant === 'horizontal') {
         return (
             <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -97,16 +101,13 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                                 )}
 
                                 {project.live_demo_url && (
-                                    <Button asChild size="sm" variant="outline">
-                                        <a
-                                            href={project.live_demo_url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center"
-                                        >
-                                            <ExternalLink className="w-4 h-4 mr-1" />
-                                            Demo
-                                        </a>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setIsDemoOpen(true)}
+                                    >
+                                        <Play className="w-4 h-4 mr-1" />
+                                        Ver Demo
                                     </Button>
                                 )}
                             </div>
@@ -200,16 +201,13 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                     )}
 
                     {project.live_demo_url && (
-                        <Button asChild size="sm" variant="outline">
-                            <a
-                                href={project.live_demo_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center"
-                            >
-                                <ExternalLink className="w-4 h-4 mr-1" />
-                                Demo
-                            </a>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setIsDemoOpen(true)}
+                        >
+                            <Play className="w-4 h-4 mr-1" />
+                            Ver Demo
                         </Button>
                     )}
                 </div>
@@ -220,6 +218,17 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                     </Link>
                 </Button>
             </CardFooter>
+
+            {/* Modal de Demo */}
+            {project.live_demo_url && (
+                <DemoModal
+                    isOpen={isDemoOpen}
+                    onClose={() => setIsDemoOpen(false)}
+                    demoUrl={project.live_demo_url}
+                    projectTitle={project.title}
+                    demoType={project.demo_type as 'iframe' | 'link' | 'video' | 'images'}
+                />
+            )}
         </Card>
     );
 }

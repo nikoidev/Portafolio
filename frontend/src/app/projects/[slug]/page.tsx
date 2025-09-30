@@ -1,6 +1,8 @@
+import { Navbar } from '@/components/layout/Navbar';
+import ProjectDetailClient from '@/components/pages/ProjectDetailClient';
+import { Footer } from '@/components/shared/Footer';
 import { api } from '@/lib/api';
 import type { Metadata } from 'next';
-import ProjectDetailClient from '@/components/pages/ProjectDetailClient';
 
 type Props = {
     params: { slug: string }
@@ -42,5 +44,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function ProjectDetailPage() {
-    return <ProjectDetailClient />;
+    return (
+        <>
+            <Navbar />
+            <ProjectDetailClient />
+            <Footer />
+        </>
+    );
 }

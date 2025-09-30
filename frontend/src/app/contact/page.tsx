@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+import { Navbar } from '@/components/layout/Navbar';
 import ContactClient from '@/components/pages/ContactClient';
+import { Footer } from '@/components/shared/Footer';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Contacto',
@@ -11,6 +13,12 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-    return <ContactClient />;
+  return (
+    <>
+      <Navbar />
+      <ContactClient />
+      <Footer />
+    </>
+  );
 }
 

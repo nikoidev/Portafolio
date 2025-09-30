@@ -1,12 +1,13 @@
 'use client';
 
+import { DemoModal } from '@/components/shared/DemoModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { api } from '@/lib/api';
 import { Project } from '@/types/api';
-import { ArrowLeft, Calendar, ExternalLink, Eye, Github, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, ExternalLink, Eye, Github, Play, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -19,6 +20,7 @@ export default function ProjectDetailClient() {
     const [project, setProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isDemoOpen, setIsDemoOpen] = useState(false);
 
     useEffect(() => {
         const loadProject = async () => {
@@ -118,7 +120,7 @@ export default function ProjectDetailClient() {
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-4">{project.title}</h1>
                             <p className="text-xl text-muted-foreground mb-6">{project.description}</p>
-                            
+
                             <div className="flex flex-wrap items-center gap-4 mb-6">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                     <Calendar className="w-4 h-4" />
@@ -153,12 +155,13 @@ export default function ProjectDetailClient() {
                                         </a>
                                     </Button>
                                 )}
-                                {((project as any).demo_url || (project as any).demoUrl) && (
-                                    <Button asChild variant="outline">
-                                        <a href={(project as any).demo_url || (project as any).demoUrl} target="_blank" rel="noopener noreferrer">
-                                            <ExternalLink className="w-4 h-4 mr-2" />
-                                            Ver demo
-                                        </a>
+                                {(project.live_demo_url || (project as any).demo_url || (project as any).demoUrl) && (
+                                    <Button
+                                        variant="default"
+                                        onClick={() => setIsDemoOpen(true)}
+                                    >
+                                        <Play className="w-4 h-4 mr-2" />
+                                        Ver Demo en Vivo
                                     </Button>
                                 )}
                             </div>
@@ -182,7 +185,7 @@ export default function ProjectDetailClient() {
                                                 priority
                                             />
                                         </div>
-                                        
+
                                         {/* Miniaturas */}
                                         {images.length > 1 && (
                                             <div className="flex gap-2 overflow-x-auto pb-2">
@@ -241,7 +244,7 @@ export default function ProjectDetailClient() {
                                         {(project as any).isPublished || (project as any).is_published ? "Publicado" : "En desarrollo"}
                                     </Badge>
                                 </div>
-                                
+
                                 {((project as any).isFeatured || (project as any).is_featured) && (
                                     <div>
                                         <h4 className="font-medium mb-2">Destacado</h4>
@@ -320,6 +323,17 @@ export default function ProjectDetailClient() {
                         </Card>
                     </div>
                 </div>
+
+                {/* Modal de Demo */}
+                {(project.live_demo_url || (project as any).demo_url || (project as any).demoUrl) && (
+                    <DemoModal
+                        isOpen={isDemoOpen}
+                        onClose={() => setIsDemoOpen(false)}
+                        demoUrl={project.live_demo_url || (project as any).demo_url || (project as any).demoUrl || ''}
+                        projectTitle={project.title}
+                        demoType={project.demo_type as 'iframe' | 'link' | 'video' | 'images'}
+                    />
+                )}
             </div>
         </div>
     );

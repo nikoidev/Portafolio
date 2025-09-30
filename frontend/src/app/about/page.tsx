@@ -1,5 +1,7 @@
-import type { Metadata } from 'next';
+import { Navbar } from '@/components/layout/Navbar';
 import AboutClient from '@/components/pages/AboutClient';
+import { Footer } from '@/components/shared/Footer';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Sobre Mí',
@@ -11,6 +13,12 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
-    return <AboutClient />;
+  return (
+    <>
+      <Navbar />
+      <AboutClient />
+      <Footer />
+    </>
+  );
 }
 

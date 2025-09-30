@@ -82,11 +82,23 @@ npm run dev
 
 - ✅ Panel de administración completo
 - ✅ Editor de CV con generación de PDF
-- ✅ Galería de proyectos con demos
+- ✅ **Sistema de demos interactivos** (Iframe, Video, Enlaces)
+- ✅ Galería de proyectos con filtros avanzados
 - ✅ Sistema de autenticación seguro
 - ✅ Responsive design
 - ✅ SEO optimizado
 - ✅ Analytics integrado
+
+### 🎬 Sistema de Demos
+
+El portafolio incluye un sistema avanzado para mostrar tus proyectos **en vivo**:
+
+- **Iframe Interactivo**: Los reclutadores pueden interactuar con tu proyecto directamente desde el portafolio
+- **Video Demo**: Muestra videos demostración de tus apps móviles o de escritorio
+- **Enlaces Externos**: Abre proyectos en nuevas pestañas
+- **Modal Full-Screen**: Experiencia inmersiva con controles de navegación
+
+Ver [Documentación de Demos](docs/DEMO_SYSTEM.md) para más detalles.
 
 ## 📄 Licencia
 
