@@ -1,13 +1,14 @@
 """
 Dependencias de FastAPI
 """
-from typing import Generator, Optional
+from typing import Generator, Optional, Callable
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import verify_token
 from app.models.user import User
+from app.models.enums import Permission, UserRole
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -56,13 +57,46 @@ def get_current_active_user(
 def get_current_admin_user(
     current_user: User = Depends(get_current_active_user)
 ) -> User:
-    """Obtener usuario admin actual"""
-    if not current_user.is_admin:
+    """Obtener usuario admin actual (usando el nuevo sistema de roles)"""
+    if not current_user.is_admin_role():
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes permisos de administrador"
         )
     return current_user
+
+
+def get_current_super_admin(
+    current_user: User = Depends(get_current_active_user)
+) -> User:
+    """Obtener usuario super admin actual"""
+    if not current_user.is_super_admin():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo los super administradores pueden realizar esta acción"
+        )
+    return current_user
+
+
+class PermissionChecker:
+    """Dependency para verificar permisos específicos"""
+    
+    def __init__(self, required_permission: Permission):
+        self.required_permission = required_permission
+    
+    def __call__(self, current_user: User = Depends(get_current_active_user)) -> User:
+        if not current_user.has_permission(self.required_permission):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"No tienes el permiso requerido: {self.required_permission.value}"
+            )
+        return current_user
+
+
+# Helpers para crear checkers de permisos comunes
+def require_permission(permission: Permission) -> Callable:
+    """Helper para requerir un permiso específico"""
+    return PermissionChecker(permission)
 
 
 def get_optional_user(

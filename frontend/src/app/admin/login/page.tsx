@@ -120,11 +120,11 @@ export default function AdminLoginPage() {
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">
-                            Credenciales por defecto:
+                            Usa las credenciales configuradas en backend/.env
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                            Email: admin@portfolio.com<br />
-                            Contraseña: admin123
+                            Por defecto: admin@portfolio.com / changeme123<br />
+                            <span className="text-destructive">(Cámbialas en producción)</span>
                         </p>
                     </div>
                 </CardContent>

@@ -13,18 +13,18 @@ export default function AdminSetupPage() {
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
-    const createAdminUser = async () => {
+    const createSuperAdmin = async () => {
         setIsLoading(true);
         setError(null);
 
         try {
-            await api.createAdminUser();
+            await api.createSuperAdmin();
             setIsSuccess(true);
             setTimeout(() => {
                 router.push('/admin/login');
             }, 2000);
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Error al crear usuario administrador');
+            setError(err.response?.data?.detail || 'Error al crear super administrador');
         } finally {
             setIsLoading(false);
         }
@@ -60,18 +60,22 @@ export default function AdminSetupPage() {
                         Configuración Inicial
                     </CardTitle>
                     <CardDescription>
-                        Crea tu usuario administrador para acceder al panel de control
+                        Crea el super administrador del sistema. Las credenciales se toman del archivo .env del backend.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h3 className="font-semibold text-blue-900 mb-2">
-                            Credenciales por defecto:
+                            Credenciales desde backend/.env:
                         </h3>
                         <div className="text-sm text-blue-800 space-y-1">
-                            <p><strong>Email:</strong> admin@portfolio.com</p>
-                            <p><strong>Contraseña:</strong> admin123</p>
+                            <p><strong>SUPER_ADMIN_EMAIL</strong></p>
+                            <p><strong>SUPER_ADMIN_PASSWORD</strong></p>
+                            <p><strong>SUPER_ADMIN_NAME</strong></p>
                         </div>
+                        <p className="text-xs text-blue-700 mt-2">
+                            Por defecto: admin@portfolio.com / changeme123 (CÁMBIALO en producción)
+                        </p>
                     </div>
 
                     {error && (
@@ -81,7 +85,7 @@ export default function AdminSetupPage() {
                     )}
 
                     <Button
-                        onClick={createAdminUser}
+                        onClick={createSuperAdmin}
                         disabled={isLoading}
                         className="w-full"
                         size="lg"
@@ -89,12 +93,12 @@ export default function AdminSetupPage() {
                         {isLoading ? (
                             <>
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Creando usuario...
+                                Creando super administrador...
                             </>
                         ) : (
                             <>
                                 <UserPlus className="mr-2 h-4 w-4" />
-                                Crear Usuario Administrador
+                                Crear Super Administrador
                             </>
                         )}
                     </Button>

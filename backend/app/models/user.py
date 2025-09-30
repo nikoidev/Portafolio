@@ -1,13 +1,14 @@
 """
 Modelo de Usuario para el sistema de administración
 """
-from sqlalchemy import Column, String, Boolean, Text
+from sqlalchemy import Column, String, Boolean, Text, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from .base import BaseModel
+from .enums import UserRole, Permission, has_permission
 
 
 class User(BaseModel):
-    """Modelo de Usuario (Admin del portafolio)"""
+    """Modelo de Usuario con sistema de roles y permisos"""
     __tablename__ = "users"
     
     # Información básica
@@ -15,9 +16,19 @@ class User(BaseModel):
     name = Column(String(100), nullable=False)
     hashed_password = Column(String(255), nullable=False)
     
+    # Rol y permisos
+    role = Column(
+        SQLEnum(UserRole, name='user_role', create_constraint=True),
+        default=UserRole.EDITOR,
+        nullable=False,
+        index=True
+    )
+    
     # Estado del usuario
     is_active = Column(Boolean, default=True, nullable=False)
-    is_admin = Column(Boolean, default=True, nullable=False)  # Por defecto admin
+    
+    # Mantener is_admin por compatibilidad (deprecated)
+    is_admin = Column(Boolean, default=False, nullable=False)
     
     # Información del perfil
     bio = Column(Text, nullable=True)
@@ -33,5 +44,17 @@ class User(BaseModel):
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
     cv_data = relationship("CV", back_populates="user", uselist=False, cascade="all, delete-orphan")
     
+    def has_permission(self, permission: Permission) -> bool:
+        """Verificar si el usuario tiene un permiso específico"""
+        return has_permission(self.role, permission)
+    
+    def is_super_admin(self) -> bool:
+        """Verificar si el usuario es super admin"""
+        return self.role == UserRole.SUPER_ADMIN
+    
+    def is_admin_role(self) -> bool:
+        """Verificar si el usuario tiene rol de admin o superior"""
+        return self.role in [UserRole.SUPER_ADMIN, UserRole.ADMIN]
+    
     def __repr__(self):
-        return f"<User(email={self.email}, name={self.name})>"
+        return f"<User(email={self.email}, name={self.name}, role={self.role})>"

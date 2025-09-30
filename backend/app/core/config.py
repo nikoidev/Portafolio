@@ -1,7 +1,7 @@
 """
 Configuración de la aplicación usando Pydantic Settings
 """
-from typing import List
+from typing import List, Optional
 from pydantic_settings import BaseSettings
 from pydantic import validator
 import os
@@ -36,10 +36,36 @@ class Settings(BaseSettings):
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
     
-    # Admin User
-    ADMIN_EMAIL: str = "admin@portfolio.com"
-    ADMIN_PASSWORD: str = "admin123"
-    ADMIN_NAME: str = "Administrator"
+    # Super Admin User (primer usuario del sistema)
+    SUPER_ADMIN_EMAIL: str = "admin@portfolio.com"
+    SUPER_ADMIN_PASSWORD: str = "changeme123"  # CAMBIAR EN PRODUCCIÓN
+    SUPER_ADMIN_NAME: str = "Super Admin"
+    
+    # Mantener compatibilidad con variables antiguas (deprecated)
+    ADMIN_EMAIL: Optional[str] = None
+    ADMIN_PASSWORD: Optional[str] = None  
+    ADMIN_NAME: Optional[str] = None
+    
+    @validator('SUPER_ADMIN_EMAIL', pre=True, always=True)
+    def set_super_admin_email(cls, v, values):
+        """Usar ADMIN_EMAIL si SUPER_ADMIN_EMAIL no está definido (compatibilidad)"""
+        if v == "admin@portfolio.com" and values.get('ADMIN_EMAIL'):
+            return values.get('ADMIN_EMAIL')
+        return v
+    
+    @validator('SUPER_ADMIN_PASSWORD', pre=True, always=True)
+    def set_super_admin_password(cls, v, values):
+        """Usar ADMIN_PASSWORD si SUPER_ADMIN_PASSWORD no está definido (compatibilidad)"""
+        if v == "changeme123" and values.get('ADMIN_PASSWORD'):
+            return values.get('ADMIN_PASSWORD')
+        return v
+    
+    @validator('SUPER_ADMIN_NAME', pre=True, always=True)
+    def set_super_admin_name(cls, v, values):
+        """Usar ADMIN_NAME si SUPER_ADMIN_NAME no está definido (compatibilidad)"""
+        if v == "Super Admin" and values.get('ADMIN_NAME'):
+            return values.get('ADMIN_NAME')
+        return v
     
     @validator('ALLOWED_ORIGINS', pre=True)
     def parse_cors_origins(cls, v):

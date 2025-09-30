@@ -6,7 +6,8 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, Token
+from app.models.enums import UserRole, get_permissions_for_role
+from app.schemas.user import UserCreate, UserLogin, Token, UserUpdate
 from app.core.security import (
     verify_password, 
     get_password_hash, 
@@ -57,8 +58,9 @@ class AuthService:
             linkedin_url=user_data.linkedin_url,
             twitter_url=user_data.twitter_url,
             website_url=user_data.website_url,
+            role=user_data.role,
             is_active=True,
-            is_admin=True  # Por defecto admin (es un portafolio personal)
+            is_admin=user_data.role in [UserRole.SUPER_ADMIN, UserRole.ADMIN]  # Compatibilidad
         )
         
         self.db.add(db_user)
@@ -103,17 +105,69 @@ class AuthService:
         """Obtener usuario por email"""
         return self.db.query(User).filter(User.email == email).first()
     
-    def create_admin_user(self) -> User:
-        """Crear usuario administrador inicial"""
-        admin_data = UserCreate(
-            email=settings.ADMIN_EMAIL,
-            name=settings.ADMIN_NAME,
-            password=settings.ADMIN_PASSWORD
-        )
-        
+    def create_super_admin(self) -> User:
+        """Crear usuario super administrador inicial desde variables de entorno"""
         # Verificar si ya existe
-        existing_admin = self.get_user_by_email(settings.ADMIN_EMAIL)
+        existing_admin = self.get_user_by_email(settings.SUPER_ADMIN_EMAIL)
         if existing_admin:
             return existing_admin
         
-        return self.create_user(admin_data)
+        # Crear super admin desde .env
+        super_admin_data = UserCreate(
+            email=settings.SUPER_ADMIN_EMAIL,
+            name=settings.SUPER_ADMIN_NAME,
+            password=settings.SUPER_ADMIN_PASSWORD,
+            role=UserRole.SUPER_ADMIN
+        )
+        
+        return self.create_user(super_admin_data)
+    
+    def update_user(self, user_id: int, user_update: UserUpdate) -> User:
+        """Actualizar usuario"""
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+        
+        # Actualizar campos
+        update_data = user_update.model_dump(exclude_unset=True)
+        
+        # Si se actualiza la contraseña, hashearla
+        if "password" in update_data and update_data["password"]:
+            update_data["hashed_password"] = get_password_hash(update_data["password"])
+            del update_data["password"]
+        
+        # Actualizar is_admin si cambia el rol
+        if "role" in update_data:
+            update_data["is_admin"] = update_data["role"] in [UserRole.SUPER_ADMIN, UserRole.ADMIN]
+        
+        for field, value in update_data.items():
+            setattr(user, field, value)
+        
+        self.db.commit()
+        self.db.refresh(user)
+        
+        return user
+    
+    def delete_user(self, user_id: int) -> bool:
+        """Eliminar usuario"""
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+        
+        # No permitir eliminar super admins
+        if user.role == UserRole.SUPER_ADMIN:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No se puede eliminar un super administrador"
+            )
+        
+        self.db.delete(user)
+        self.db.commit()
+        
+        return True

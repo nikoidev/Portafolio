@@ -48,21 +48,19 @@ async def get_current_user_info(
     return UserResponse.model_validate(current_user)
 
 
-@router.post("/create-admin", response_model=UserResponse)
-async def create_admin_user(db: Session = Depends(get_db)):
-    """Crear usuario administrador inicial (solo si no existe)"""
-    from app.models.user import User
-    
+@router.post("/create-super-admin", response_model=UserResponse)
+async def create_super_admin_user(db: Session = Depends(get_db)):
+    """Crear usuario super administrador inicial desde .env (solo si no existe)"""
     auth_service = AuthService(db)
     
     try:
-        admin_user = auth_service.create_admin_user()
-        return UserResponse.model_validate(admin_user)
+        super_admin = auth_service.create_super_admin()
+        return UserResponse.model_validate(super_admin)
     except HTTPException as e:
         if "ya está registrado" in str(e.detail):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El usuario administrador ya existe"
+                detail="El usuario super administrador ya existe"
             )
         raise e
 

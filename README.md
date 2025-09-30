@@ -1,16 +1,14 @@
-# 🚀 Portafolio Personal
+# 🚀 Portafolio Personal Profesional
 
-Un portafolio web moderno y editable para desarrolladores, construido con las mejores tecnologías del mercado.
+Un portafolio web moderno y completo con sistema de gestión de contenido, autenticación avanzada y demos interactivos.
 
 ## 🛠️ Stack Tecnológico
 
 - **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
-- **Backend**: FastAPI + Python 3.11
-- **Base de Datos**: PostgreSQL (Supabase)
-- **Autenticación**: JWT + OAuth2
-- **Deployment**: Vercel (Frontend) + Railway (Backend)
-- **CDN**: Cloudflare
-- **Containerización**: Docker + Docker Compose
+- **Backend**: FastAPI + Python 3.11  
+- **Base de Datos**: PostgreSQL
+- **Autenticación**: JWT con sistema de roles y permisos
+- **Deployment**: Cloudflare (DNS) + Vercel (Frontend) + Railway (Backend)
 
 ## 📁 Estructura del Proyecto
 
@@ -19,132 +17,231 @@ Portafolio/
 ├── frontend/          # Next.js + TypeScript
 ├── backend/           # FastAPI + Python
 ├── docker/            # Configuraciones Docker
-├── .github/           # CI/CD workflows
 └── docs/              # Documentación
 ```
+
+## 🔐 Sistema de Usuarios y Roles
+
+El proyecto incluye un **sistema completo de autenticación con 4 niveles de roles**:
+
+### Roles Disponibles:
+- **SUPER_ADMIN**: Control total del sistema
+- **ADMIN**: Gestión completa (proyectos, CV, usuarios)
+- **EDITOR**: Solo edición de contenido
+- **VIEWER**: Solo lectura
+
+Ver [SISTEMA_USUARIOS_ROLES.md](SISTEMA_USUARIOS_ROLES.md) para documentación completa.
 
 ## 🚀 Inicio Rápido
 
 ### Prerrequisitos
 - Python 3.11+
 - Node.js 18+
-- Docker & Docker Compose (opcional)
-- Git
+- PostgreSQL (o Docker)
 
-### ⚡ Inicio Rápido (Recomendado)
+### 1. Backend
 
-```bash
-# Terminal 1 - Backend
-cd backend
-pipenv install
-pipenv shell
-pipenv run dev
-
-# Terminal 2 - Frontend  
-cd frontend
-npm install
-npm run dev
-
-# Navegador:
-# 1. Configuración inicial (solo primera vez):
-#    http://localhost:3000/admin/setup
-#    → Click en "Crear Usuario Administrador"
-#
-# 2. Login:
-#    http://localhost:3000/admin/login
-#    Email: admin@portfolio.com
-#    Contraseña: admin123
-#
-# 3. ¡Listo! Ya puedes crear proyectos:
-#    http://localhost:3000/admin/projects
-```
-
-Ver **[COMO_EMPEZAR.md](COMO_EMPEZAR.md)** para guía detallada paso a paso.
-
----
-
-### Opción 2: Docker (Alternativa)
-
-```bash
-# 1. Clonar repositorio
-git clone <tu-repositorio>
-cd Portafolio
-
-# 2. Iniciar todos los servicios
-docker-compose -f docker/docker-compose.dev.yml up -d
-
-# 3. Acceder a los servicios
-# Frontend: http://localhost:3004
-# Backend API: http://localhost:8004
-# API Docs: http://localhost:8004/docs
-# PgAdmin: http://localhost:5055
-```
-
-### Opción 2: Instalación Manual
-
-#### Backend Setup
 ```bash
 cd backend
-pip install pipenv
-pipenv install
+
+# Configurar variables de entorno
 cp env.example .env
+
+# Editar .env con tus credenciales de super admin:
+# SUPER_ADMIN_EMAIL=tu-email@ejemplo.com
+# SUPER_ADMIN_PASSWORD=tu-contraseña-segura
+# SUPER_ADMIN_NAME=Tu Nombre
+
+# Instalar dependencias
+pipenv install
+
+# Activar entorno virtual
 pipenv shell
+
+# Migrar base de datos
+pipenv run alembic upgrade head
+
+# Iniciar servidor
 pipenv run dev
 ```
 
-#### Frontend Setup
+### 2. Frontend
+
 ```bash
 cd frontend
+
+# Instalar dependencias
 npm install
-cp .env.example .env.local
+
+# Configurar variables de entorno
+cp .env.local.example .env.local
+
+# Editar .env.local:
+# NEXT_PUBLIC_API_URL=http://localhost:8000
+
+# Iniciar servidor
 npm run dev
 ```
 
-### Credenciales por Defecto
-- **PgAdmin**: admin@portfolio.com / admin123
-- **Base de Datos**: portfolio_user / portfolio_pass
+### 3. Configuración Inicial
 
-## 📖 Documentación
+1. **Crear Super Admin** (solo primera vez):
+   ```
+   http://localhost:3000/admin/setup
+   ```
+   Click en "Crear Super Administrador"
+   
+   Las credenciales se toman del archivo `backend/.env`:
+   - SUPER_ADMIN_EMAIL
+   - SUPER_ADMIN_PASSWORD
+   - SUPER_ADMIN_NAME
 
-### 🚀 Inicio
-- **[COMO_EMPEZAR.md](COMO_EMPEZAR.md)** - 3 pasos simples para empezar
-- **[RESUMEN_FINAL.md](RESUMEN_FINAL.md)** - Resumen completo del proyecto
-- [Inicio Rápido Detallado](docs/INICIO_RAPIDO.md) - Guía paso a paso
+2. **Iniciar Sesión**:
+   ```
+   http://localhost:3000/admin/login
+   ```
+   Usa las credenciales configuradas en el .env
 
-### 🎬 Sistema de Demos
-- [Sistema de Demos](docs/DEMO_SYSTEM.md) - Guía completa de demos interactivos
-
-### 🚢 Deployment
-- [Deployment Railway](docs/RAILWAY_DEPLOYMENT.md) - Backend en Railway
-- [Deployment Guide](docs/DEPLOYMENT.md) - Guía completa de deployment
-
-### 📋 Técnico
-- [Resumen Técnico](docs/RESUMEN_IMPLEMENTACION.md) - Todo lo implementado
-- [Guía de Desarrollo](docs/DEVELOPMENT.md) - Desarrollo local
-- API Documentation - `/docs` cuando el backend está corriendo
+3. **Panel de Administración**:
+   ```
+   http://localhost:3000/admin
+   ```
 
 ## 🎯 Características
 
-- ✅ Panel de administración completo
-- ✅ Editor de CV con generación de PDF
-- ✅ **Sistema de demos interactivos** (Iframe, Video, Enlaces)
-- ✅ Galería de proyectos con filtros avanzados
-- ✅ Sistema de autenticación seguro
-- ✅ Responsive design
-- ✅ SEO optimizado
-- ✅ Analytics integrado
+### ✅ Sistema de Autenticación Avanzado
+- Roles y permisos granulares
+- Super Admin configurable desde .env
+- CRUD completo de usuarios
+- Protecciones de seguridad integradas
 
-### 🎬 Sistema de Demos
+### ✅ Gestión de Proyectos
+- CRUD completo con permisos
+- **Sistema de demos interactivos** (Iframe, Video, Enlaces)
+- Galería de imágenes
+- Filtros y búsqueda avanzada
+- Proyectos destacados
 
-El portafolio incluye un sistema avanzado para mostrar tus proyectos **en vivo**:
+### ✅ Editor de CV
+- Generación de PDF
+- Múltiples templates
+- Vista previa en tiempo real
 
-- **Iframe Interactivo**: Los reclutadores pueden interactuar con tu proyecto directamente desde el portafolio
-- **Video Demo**: Muestra videos demostración de tus apps móviles o de escritorio
+### ✅ Gestión de Archivos
+- Upload de imágenes
+- Galería de medios
+- Gestor de archivos
+
+### ✅ Demo Interactivo
+El portafolio incluye un sistema avanzado para mostrar proyectos **en vivo**:
+- **Iframe Interactivo**: Los visitantes pueden interactuar con tu proyecto desde el portafolio
+- **Video Demo**: Muestra videos de apps móviles o escritorio
 - **Enlaces Externos**: Abre proyectos en nuevas pestañas
-- **Modal Full-Screen**: Experiencia inmersiva con controles de navegación
+- **Modal Full-Screen**: Experiencia inmersiva
 
-Ver [Documentación de Demos](docs/DEMO_SYSTEM.md) para más detalles.
+## 📚 Documentación
+
+- **[SISTEMA_USUARIOS_ROLES.md](SISTEMA_USUARIOS_ROLES.md)** - Sistema de autenticación completo
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Guía de deployment
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) - Guía de desarrollo
+
+## 🔌 API Endpoints
+
+### Autenticación
+```
+POST /api/v1/auth/login
+POST /api/v1/auth/create-super-admin
+GET  /api/v1/auth/me
+```
+
+### Usuarios (Nuevo)
+```
+GET    /api/v1/users/              # Listar usuarios
+POST   /api/v1/users/              # Crear usuario
+PUT    /api/v1/users/{id}          # Actualizar usuario
+DELETE /api/v1/users/{id}          # Eliminar usuario
+GET    /api/v1/users/roles/available  # Roles disponibles
+```
+
+### Proyectos
+```
+GET    /api/v1/projects/           # Listar proyectos
+POST   /api/v1/projects/           # Crear proyecto
+PUT    /api/v1/projects/{id}       # Actualizar proyecto
+DELETE /api/v1/projects/{id}       # Eliminar proyecto
+```
+
+Ver documentación completa en: `http://localhost:8000/docs`
+
+## 🌐 Deployment
+
+### Stack Recomendado:
+- **Dominio**: Cloudflare (DNS + CDN)
+- **Frontend**: Vercel
+- **Backend**: Railway
+- **Base de Datos**: Supabase (PostgreSQL)
+
+**Costo estimado**: ~$5/mes
+
+Ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) para instrucciones detalladas.
+
+## 🔒 Seguridad
+
+- Autenticación JWT
+- Sistema de roles y permisos
+- Validación con Pydantic
+- CORS configurado
+- Protección contra CSRF
+- Sanitización de inputs
+- Rate limiting (producción)
+
+## 🛡️ Variables de Entorno Importantes
+
+### Backend (`backend/.env`)
+```env
+# Super Admin (CAMBIAR EN PRODUCCIÓN)
+SUPER_ADMIN_EMAIL=admin@portfolio.com
+SUPER_ADMIN_PASSWORD=changeme123
+SUPER_ADMIN_NAME=Super Admin
+
+# Seguridad
+SECRET_KEY=tu-secret-key-super-seguro-64-caracteres
+DATABASE_URL=postgresql://user:pass@localhost:5432/db
+
+# CORS
+ALLOWED_ORIGINS=["http://localhost:3000"]
+```
+
+### Frontend (`frontend/.env.local`)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+## 🧪 Testing
+
+```bash
+# Backend
+cd backend
+pipenv run pytest
+
+# Frontend
+cd frontend
+npm test
+```
+
+## 📝 Próximos Pasos
+
+1. Configurar variables de entorno en `backend/.env`
+2. Crear super admin desde `/admin/setup`
+3. Crear usuarios adicionales con diferentes roles
+4. Agregar proyectos con demos interactivos
+5. Personalizar tu perfil y CV
+6. Deploy a producción
 
 ## 📄 Licencia
 
 MIT License - ver [LICENSE](LICENSE) para más detalles.
+
+---
+
+**Desarrollado con ❤️ usando Next.js y FastAPI**
