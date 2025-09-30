@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 import os
 
 from app.core.config import settings
-from app.api.v1 import auth, projects, cv, admin
+from app.api.v1 import auth, projects, cv, admin, uploads
 
 # Crear instancia de FastAPI
 app = FastAPI(
@@ -38,6 +38,7 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(projects.router, prefix="/api/v1/projects", tags=["Projects"])
 app.include_router(cv.router, prefix="/api/v1/cv", tags=["CV"])
+app.include_router(uploads.router, prefix="/api/v1/uploads", tags=["Uploads"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 
 
