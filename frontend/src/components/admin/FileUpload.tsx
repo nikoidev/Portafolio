@@ -52,11 +52,11 @@ export function FileUpload({
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept,
+        accept: accept as any,
         maxFiles,
         maxSize,
         disabled: isUploading
-    });
+    } as any);
 
     const uploadFiles = async (filesToUpload: UploadedFile[]) => {
         setIsUploading(true);
@@ -71,16 +71,12 @@ export function FileUpload({
                         formData.append('file', fileData.file);
                         formData.append('optimize', 'true');
 
-                        const result = await api.post('/api/v1/uploads/images', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
+                        const result = await api.uploadImage(formData);
 
                         // Actualizar estado del archivo
                         setFiles(prev => prev.map(f =>
                             f.file === fileData.file
-                                ? { ...f, status: 'success', result: result.data }
+                                ? { ...f, status: 'success', result: (result as any) }
                                 : f
                         ));
                     } catch (error: any) {
@@ -102,17 +98,13 @@ export function FileUpload({
                     try {
                         const formData = new FormData();
                         formData.append('file', fileData.file);
-                        formData.append('file_type', 'general');
+                        formData.append('file_type', 'files');
 
-                        const result = await api.post('/api/v1/uploads/files', formData, {
-                            headers: {
-                                'Content-Type': 'multipart/form-data',
-                            },
-                        });
+                        const result = await api.uploadFile(formData);
 
                         setFiles(prev => prev.map(f =>
                             f.file === fileData.file
-                                ? { ...f, status: 'success', result: result.data }
+                                ? { ...f, status: 'success', result: (result as any) }
                                 : f
                         ));
                     } catch (error: any) {
@@ -196,7 +188,7 @@ export function FileUpload({
                         ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
                     `}
                 >
-                    <input {...getInputProps()} />
+                    <input {...(getInputProps() as any)} />
                     <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     {isDragActive ? (
                         <p className="text-primary font-medium">Suelta los archivos aquí...</p>

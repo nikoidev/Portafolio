@@ -19,6 +19,7 @@ interface ProjectsState {
         limit?: number;
         featured_only?: boolean;
         search?: string;
+        include_unpublished?: boolean;
     }) => Promise<void>;
     fetchFeaturedProjects: (limit?: number) => Promise<void>;
     fetchProject: (identifier: string) => Promise<void>;
@@ -76,7 +77,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const project = await api.getProject(identifier);
+            const project = await api.getProject(identifier) as any;
             set({
                 currentProject: project,
                 isLoading: false,
@@ -93,7 +94,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const stats = await api.getProjectStats();
+            const stats = await api.getProjectStats() as any;
             set({
                 stats,
                 isLoading: false,
@@ -110,7 +111,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const newProject = await api.createProject(data);
+            const newProject = await api.createProject(data) as any;
             set((state) => ({
                 projects: [newProject, ...state.projects],
                 isLoading: false,
@@ -129,7 +130,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
         set({ isLoading: true, error: null });
 
         try {
-            const updatedProject = await api.updateProject(id, data);
+            const updatedProject = await api.updateProject(id, data) as any;
             set((state) => ({
                 projects: state.projects.map(p => p.id === id ? updatedProject : p),
                 currentProject: state.currentProject?.id === id ? updatedProject : state.currentProject,

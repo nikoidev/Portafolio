@@ -150,9 +150,9 @@ export default function CVManagementPage() {
     useEffect(() => {
         const loadCV = async () => {
             try {
-                const cvData = await api.getCV();
+                const cvData = await api.getCV() as any;
                 setCvExists(true);
-                setPdfUrl(cvData.pdf_url);
+                setPdfUrl(cvData.pdf_url || '');
 
                 // Llenar el formulario con los datos existentes
                 form.reset({
@@ -182,8 +182,8 @@ export default function CVManagementPage() {
                     api.getCVTemplates(),
                     api.getCVColorSchemes(),
                 ]);
-                setTemplates(templatesData.templates || []);
-                setColorSchemes(schemesData.color_schemes || []);
+                setTemplates((templatesData as any).templates || []);
+                setColorSchemes((schemesData as any).color_schemes || []);
             } catch (error) {
                 console.error('Error cargando plantillas:', error);
             }
@@ -214,7 +214,7 @@ export default function CVManagementPage() {
     const handleGeneratePDF = async () => {
         setIsGeneratingPDF(true);
         try {
-            const result = await api.generateCVPDF(selectedTemplate, selectedColorScheme);
+            const result = await api.generateCVPDF(selectedTemplate, selectedColorScheme) as any;
             setPdfUrl(result.pdf_url);
             toast.success('PDF generado correctamente');
         } catch (error: any) {

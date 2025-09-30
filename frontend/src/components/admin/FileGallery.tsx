@@ -47,10 +47,10 @@ export function FileGallery({
                 ? '/api/v1/uploads/images'
                 : `/api/v1/uploads/files?file_type=${fileType}`;
 
-            const response = await api.get(endpoint);
+            const response = await api.get(endpoint) as any;
             const fileList = fileType === 'images'
-                ? response.data.images
-                : response.data.files;
+                ? response.data?.images || response
+                : response.data?.files || response;
 
             setFiles(fileList || []);
         } catch (error) {

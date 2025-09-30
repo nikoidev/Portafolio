@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
                     const tokenData: Token = await api.login(email, password);
 
                     // Obtener información del usuario
-                    const userData: User = await api.getCurrentUser();
+                    const userData: User = await api.getCurrentUser() as any;
 
                     set({
                         user: userData,
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
                 set({ isLoading: true });
 
                 try {
-                    const userData: User = await api.getCurrentUser();
+                    const userData: User = await api.getCurrentUser() as any;
                     set({
                         user: userData,
                         isAuthenticated: true,
