@@ -150,6 +150,52 @@ class UploadService:
             "uploaded_at": datetime.now().isoformat()
         }
     
+    def delete_file(self, file_url: str) -> bool:
+        """
+        Eliminar un archivo del sistema
+        
+        Args:
+            file_url: URL del archivo (ej: /uploads/images/archivo.jpg)
+            
+        Returns:
+            bool: True si se eliminó correctamente
+        """
+        try:
+            # Convertir URL a ruta del sistema
+            if file_url.startswith("/uploads/"):
+                file_path = self.upload_dir / file_url.replace("/uploads/", "")
+            else:
+                # Asumir que es una ruta relativa
+                file_path = Path(file_url)
+            
+            # Verificar que el archivo existe
+            if file_path.exists() and file_path.is_file():
+                file_path.unlink()
+                print(f"Archivo eliminado: {file_path}")
+                return True
+            else:
+                print(f"Archivo no encontrado: {file_path}")
+                return False
+        except Exception as e:
+            print(f"Error al eliminar archivo {file_url}: {e}")
+            return False
+    
+    def delete_files(self, file_urls: List[str]) -> int:
+        """
+        Eliminar múltiples archivos
+        
+        Args:
+            file_urls: Lista de URLs de archivos
+            
+        Returns:
+            int: Cantidad de archivos eliminados exitosamente
+        """
+        deleted_count = 0
+        for file_url in file_urls:
+            if self.delete_file(file_url):
+                deleted_count += 1
+        return deleted_count
+    
     async def upload_file(self, file: UploadFile, file_type: str = "general") -> dict:
         """
         Subir archivo general

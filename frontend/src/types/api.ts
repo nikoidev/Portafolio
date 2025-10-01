@@ -45,13 +45,13 @@ export interface Project extends BaseEntity {
     github_url?: string;
 
     // DEMO CONFIGURATION
-    demo_type?: string;
-    demo_video_type?: string;
+    // VIDEO DEMO
+    demo_video_type?: string;  // 'youtube' | 'local'
     demo_video_url?: string;
     demo_video_thumbnail?: string;
+
+    // GALLERY DEMO
     demo_images?: Array<{ url: string; title?: string; order?: number }>;
-    live_demo_url?: string;
-    live_demo_type?: string;
 
     // Legacy fields
     thumbnail_url?: string;
@@ -75,13 +75,13 @@ export interface ProjectCreate {
     github_url?: string;
 
     // DEMO CONFIGURATION
-    demo_type?: string;
+    // VIDEO DEMO
     demo_video_type?: string;
     demo_video_url?: string;
     demo_video_thumbnail?: string;
+
+    // GALLERY DEMO
     demo_images?: Array<{ url: string; title?: string; order?: number }>;
-    live_demo_url?: string;
-    live_demo_type?: string;
 
     // Legacy fields
     thumbnail_url?: string;

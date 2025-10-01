@@ -20,8 +20,6 @@ const projectSchema = z.object({
     short_description: z.string().optional(),
     content: z.string().optional(),
     github_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    live_demo_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    demo_type: z.enum(['iframe', 'link', 'video', 'images']).optional(),
     thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
     images: z.array(z.string()).default([]),
     technologies: z.string(),
@@ -51,8 +49,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             short_description: project?.short_description || '',
             content: project?.content || '',
             github_url: project?.github_url || '',
-            live_demo_url: project?.live_demo_url || '',
-            demo_type: project?.demo_type || 'link',
             thumbnail_url: project?.thumbnail_url || '',
             images: project?.images || [],
             technologies: project?.technologies?.join(', ') || '',
@@ -78,7 +74,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                     .filter(tag => tag.length > 0)
                 : [],
             github_url: values.github_url || undefined,
-            live_demo_url: values.live_demo_url || undefined,
             thumbnail_url: values.thumbnail_url || (values.images.length > 0 ? values.images[0] : undefined),
             // Mantener images para compatibilidad
             images: values.images,
@@ -87,7 +82,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             demo_video_url: undefined,
             demo_video_thumbnail: undefined,
             demo_images: [],
-            live_demo_type: values.live_demo_url ? 'external' : undefined,
         };
 
         const success = await onSubmit(processedData);
@@ -205,50 +199,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name="live_demo_url"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>URL del Demo</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="https://mi-proyecto.vercel.app" {...field} />
-                                            </FormControl>
-                                            <FormDescription>
-                                                URL del proyecto desplegado o demo en vivo
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <FormField
-                                    control={form.control}
-                                    name="demo_type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tipo de Demo</FormLabel>
-                                            <FormControl>
-                                                <select
-                                                    {...field}
-                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <option value="iframe">Iframe (Interactivo)</option>
-                                                    <option value="link">Enlace Externo</option>
-                                                    <option value="video">Video</option>
-                                                    <option value="images">Solo Imágenes</option>
-                                                </select>
-                                            </FormControl>
-                                            <FormDescription>
-                                                Iframe: Muestra el proyecto en un modal interactivo<br />
-                                                Enlace: Abre en nueva pestaña<br />
-                                                Video: Muestra un video del demo<br />
-                                                Imágenes: Solo muestra las capturas de pantalla
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
                                 <FormField
                                     control={form.control}

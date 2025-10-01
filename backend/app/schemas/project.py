@@ -17,19 +17,13 @@ class ProjectBase(BaseSchema):
     github_url: Optional[str] = None
     
     # DEMO CONFIGURATION
-    demo_type: Optional[str] = None
-    
     # VIDEO DEMO
-    demo_video_type: Optional[str] = None
+    demo_video_type: Optional[str] = None  # 'youtube' o 'local'
     demo_video_url: Optional[str] = None
     demo_video_thumbnail: Optional[str] = None
     
-    # GALLERY DEMO
-    demo_images: Optional[List[dict]] = None
-    
-    # LIVE DEMO
-    live_demo_url: Optional[str] = None
-    live_demo_type: Optional[str] = None
+    # GALLERY DEMO (screenshots)
+    demo_images: Optional[List[dict]] = None  # [{"url": "...", "title": "...", "order": 1}]
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None
@@ -58,8 +52,6 @@ class ProjectUpdate(BaseSchema):
     github_url: Optional[str] = None
     
     # DEMO CONFIGURATION
-    demo_type: Optional[str] = None
-    
     # VIDEO DEMO
     demo_video_type: Optional[str] = None
     demo_video_url: Optional[str] = None
@@ -67,10 +59,6 @@ class ProjectUpdate(BaseSchema):
     
     # GALLERY DEMO
     demo_images: Optional[List[dict]] = None
-    
-    # LIVE DEMO
-    live_demo_url: Optional[str] = None
-    live_demo_type: Optional[str] = None
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None
@@ -103,13 +91,13 @@ class ProjectPublic(BaseSchema):
     github_url: Optional[str] = None
     
     # DEMO CONFIGURATION
-    demo_type: Optional[str] = None
+    # VIDEO DEMO
     demo_video_type: Optional[str] = None
     demo_video_url: Optional[str] = None
     demo_video_thumbnail: Optional[str] = None
+    
+    # GALLERY DEMO
     demo_images: Optional[List[dict]] = None
-    live_demo_url: Optional[str] = None
-    live_demo_type: Optional[str] = None
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None
