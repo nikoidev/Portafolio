@@ -321,9 +321,11 @@ class CMSService:
                     "initials": "JD",
                     "title": "Sobre Mí",
                     "subtitle": "Soy un desarrollador full stack apasionado por crear experiencias digitales excepcionales y soluciones tecnológicas innovadoras.",
-                    "contact_email": "mailto:tu@email.com",
-                    "github_url": "https://github.com/tu-usuario",
-                    "linkedin_url": "https://linkedin.com/in/tu-perfil"
+                    "social_links": [
+                        {"text": "Email", "url": "mailto:tu@email.com", "icon": "https://cdn.simpleicons.org/gmail/EA4335", "enabled": True},
+                        {"text": "GitHub", "url": "https://github.com/tu-usuario", "icon": "https://cdn.simpleicons.org/github/181717", "enabled": True},
+                        {"text": "LinkedIn", "url": "https://linkedin.com/in/tu-perfil", "icon": "https://cdn.simpleicons.org/linkedin/0A66C2", "enabled": True}
+                    ]
                 },
                 order_index=1
             ),
@@ -364,9 +366,12 @@ class CMSService:
                 description="Datos de contacto y redes sociales",
                 content={
                     "location": "Madrid, España",
-                    "email": "tu@email.com",
-                    "github": "https://github.com/tu-usuario",
-                    "linkedin": "https://linkedin.com/in/tu-perfil"
+                    "contact_links": [
+                        {"text": "Email", "url": "mailto:tu@email.com", "icon": "https://cdn.simpleicons.org/gmail/EA4335", "enabled": True},
+                        {"text": "GitHub", "url": "https://github.com/tu-usuario", "icon": "https://cdn.simpleicons.org/github/181717", "enabled": True},
+                        {"text": "LinkedIn", "url": "https://linkedin.com/in/tu-perfil", "icon": "https://cdn.simpleicons.org/linkedin/0A66C2", "enabled": True},
+                        {"text": "Twitter", "url": "https://twitter.com/tu-usuario", "icon": "https://cdn.simpleicons.org/x/000000", "enabled": True}
+                    ]
                 },
                 order_index=4
             ),
@@ -754,20 +759,27 @@ class CMSService:
             )
         ]
         
-        created_sections = []
+        created_or_updated_sections = []
         
         for section_data in default_sections:
-            # Solo crear si no existe
+            # Verificar si existe
             existing = self.get_section(section_data.page_key, section_data.section_key)
-            if not existing:
+            
+            if existing:
+                # Actualizar sección existente
+                for key, value in section_data.model_dump(exclude_unset=True).items():
+                    setattr(existing, key, value)
+                created_or_updated_sections.append(existing)
+            else:
+                # Crear nueva sección
                 section = PageContent(**section_data.model_dump())
                 self.db.add(section)
-                created_sections.append(section)
+                created_or_updated_sections.append(section)
         
-        if created_sections:
+        if created_or_updated_sections:
             self.db.commit()
-            for section in created_sections:
+            for section in created_or_updated_sections:
                 self.db.refresh(section)
         
-        return created_sections
+        return created_or_updated_sections
 

@@ -15,8 +15,6 @@ import {
     Code,
     Coffee,
     Download,
-    Github,
-    Linkedin,
     Loader2,
     Mail,
     MapPin,
@@ -42,9 +40,11 @@ export default function AboutClient() {
         initials: 'JD',
         title: 'Sobre Mí',
         subtitle: 'Soy un desarrollador full stack apasionado por crear experiencias digitales excepcionales y soluciones tecnológicas innovadoras.',
-        contact_email: 'mailto:tu@email.com',
-        github_url: 'https://github.com/tu-usuario',
-        linkedin_url: 'https://linkedin.com/in/tu-perfil',
+        social_links: [
+            { text: 'Email', url: 'mailto:tu@email.com', icon: 'https://cdn.simpleicons.org/gmail/EA4335', enabled: true },
+            { text: 'GitHub', url: 'https://github.com/tu-usuario', icon: 'https://cdn.simpleicons.org/github/181717', enabled: true },
+            { text: 'LinkedIn', url: 'https://linkedin.com/in/tu-perfil', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', enabled: true },
+        ],
     };
 
     const defaultBio = {
@@ -64,9 +64,12 @@ export default function AboutClient() {
 
     const defaultPersonalInfo = {
         location: 'Madrid, España',
-        email: 'tu@email.com',
-        github: 'https://github.com/tu-usuario',
-        linkedin: 'https://linkedin.com/in/tu-perfil',
+        contact_links: [
+            { text: 'Email', url: 'mailto:tu@email.com', icon: 'https://cdn.simpleicons.org/gmail/EA4335', enabled: true },
+            { text: 'GitHub', url: 'https://github.com/tu-usuario', icon: 'https://cdn.simpleicons.org/github/181717', enabled: true },
+            { text: 'LinkedIn', url: 'https://linkedin.com/in/tu-perfil', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', enabled: true },
+            { text: 'Twitter', url: 'https://twitter.com/tu-usuario', icon: 'https://cdn.simpleicons.org/x/000000', enabled: true },
+        ],
     };
 
     const defaultSkills = {
@@ -242,18 +245,14 @@ export default function AboutClient() {
                                     Descargar CV
                                 </Link>
                             </Button>
-                            <Button asChild variant="outline">
-                                <a href={hero.github_url} target="_blank" rel="noopener noreferrer">
-                                    <Github className="w-4 h-4 mr-2" />
-                                    GitHub
-                                </a>
-                            </Button>
-                            <Button asChild variant="outline">
-                                <a href={hero.linkedin_url} target="_blank" rel="noopener noreferrer">
-                                    <Linkedin className="w-4 h-4 mr-2" />
-                                    LinkedIn
-                                </a>
-                            </Button>
+                            {/* Social Links con íconos dinámicos */}
+                            {hero.social_links && hero.social_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
+                                <Button key={index} asChild variant="outline" size="icon">
+                                    <a href={link.url} target="_blank" rel="noopener noreferrer" title={link.text}>
+                                        <img src={link.icon} alt={link.text} className="w-5 h-5" />
+                                    </a>
+                                </Button>
+                            ))}
                         </div>
                     </div>
                 </EditableSection>
@@ -385,34 +384,20 @@ export default function AboutClient() {
                                         <MapPin className="w-4 h-4 text-muted-foreground" />
                                         <span className="text-sm">{personalInfo.location}</span>
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <Mail className="w-4 h-4 text-muted-foreground" />
-                                        <a href={`mailto:${personalInfo.email}`} className="text-sm hover:text-primary transition-colors">
-                                            {personalInfo.email}
-                                        </a>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Github className="w-4 h-4 text-muted-foreground" />
-                                        <a
-                                            href={personalInfo.github}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm hover:text-primary transition-colors"
-                                        >
-                                            GitHub
-                                        </a>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Linkedin className="w-4 h-4 text-muted-foreground" />
-                                        <a
-                                            href={personalInfo.linkedin}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-sm hover:text-primary transition-colors"
-                                        >
-                                            LinkedIn
-                                        </a>
-                                    </div>
+                                    {/* Contact Links con íconos dinámicos */}
+                                    {personalInfo.contact_links && personalInfo.contact_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
+                                        <div key={index} className="flex items-center gap-3">
+                                            <img src={link.icon} alt={link.text} className="w-4 h-4" />
+                                            <a
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm hover:text-primary transition-colors"
+                                            >
+                                                {link.text}
+                                            </a>
+                                        </div>
+                                    ))}
                                 </CardContent>
                             </Card>
                         </EditableSection>

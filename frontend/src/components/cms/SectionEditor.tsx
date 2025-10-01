@@ -336,7 +336,7 @@ export function SectionEditor({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]">
                 <DialogHeader>
                     <DialogTitle>
                         {section?.title || 'Editar Sección'}
