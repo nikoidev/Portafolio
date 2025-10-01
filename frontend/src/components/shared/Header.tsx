@@ -40,6 +40,12 @@ export function Header({ variant = 'public' }: HeaderProps) {
                                     CV
                                 </Link>
                                 <Link
+                                    href="/admin/users"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Usuarios
+                                </Link>
+                                <Link
                                     href="/admin/uploads"
                                     className="text-sm font-medium hover:text-primary transition-colors"
                                 >

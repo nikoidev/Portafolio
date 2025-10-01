@@ -20,7 +20,8 @@ export interface User extends BaseEntity {
     twitter_url?: string;
     website_url?: string;
     is_active: boolean;
-    is_admin: boolean;
+    role: 'super_admin' | 'admin' | 'editor' | 'viewer';
+    permissions: string[];
 }
 
 export interface UserLogin {

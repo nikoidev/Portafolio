@@ -18,8 +18,8 @@ class User(BaseModel):
     
     # Rol y permisos
     role = Column(
-        SQLEnum(UserRole, name='user_role', create_constraint=True),
-        default=UserRole.EDITOR,
+        SQLEnum(UserRole, name='user_role', values_callable=lambda x: [e.value for e in x]),
+        default=UserRole.EDITOR.value,
         nullable=False,
         index=True
     )

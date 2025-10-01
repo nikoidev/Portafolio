@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Download, Github, Linkedin, Mail, Menu, X } from 'lucide-react';
+import { Download, Github, Linkedin, LogIn, Mail, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -37,8 +37,12 @@ export function Navbar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
-    // No mostrar navbar en páginas de admin
-    if (pathname.startsWith('/admin')) {
+    // Páginas de admin donde SÍ se muestra el navbar
+    const publicAdminPages = ['/admin/login'];
+    const isPublicAdminPage = publicAdminPages.includes(pathname);
+
+    // No mostrar navbar en páginas de admin protegidas (pero sí en login/setup)
+    if (pathname.startsWith('/admin') && !isPublicAdminPage) {
         return null;
     }
 
@@ -98,10 +102,18 @@ export function Navbar() {
                         </div>
 
                         {/* CV Download */}
-                        <Button asChild size="sm">
+                        <Button asChild size="sm" variant="outline">
                             <Link href="/cv/download" target="_blank">
                                 <Download className="mr-2 h-4 w-4" />
                                 CV
+                            </Link>
+                        </Button>
+
+                        {/* Login Button */}
+                        <Button asChild size="sm">
+                            <Link href="/admin/login">
+                                <LogIn className="mr-2 h-4 w-4" />
+                                Iniciar Sesión
                             </Link>
                         </Button>
                     </div>
@@ -156,7 +168,19 @@ export function Navbar() {
 
                                 {/* Actions */}
                                 <div className="flex flex-col space-y-4">
+                                    {/* Login Button */}
                                     <Button asChild className="w-full">
+                                        <Link
+                                            href="/admin/login"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            <LogIn className="mr-2 h-4 w-4" />
+                                            Iniciar Sesión
+                                        </Link>
+                                    </Button>
+
+                                    {/* CV Download */}
+                                    <Button asChild className="w-full" variant="outline">
                                         <Link
                                             href="/cv/download"
                                             target="_blank"

@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/shared/Header';
 import { useAuthStore } from '@/store/auth';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function AdminLayout({
@@ -12,17 +12,30 @@ export default function AdminLayout({
 }) {
     const { isAuthenticated, isLoading, getCurrentUser } = useAuthStore();
     const router = useRouter();
+    const pathname = usePathname();
+
+    // Páginas que no requieren autenticación
+    const publicAdminPages = ['/admin/login'];
+    const isPublicPage = publicAdminPages.includes(pathname);
 
     useEffect(() => {
-        // Verificar autenticación al cargar
-        getCurrentUser();
-    }, [getCurrentUser]);
+        // Solo verificar autenticación si no estamos en página pública
+        if (!isPublicPage) {
+            getCurrentUser();
+        }
+    }, [getCurrentUser, isPublicPage]);
 
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
+        // Solo redirigir si no está autenticado Y no está en página pública
+        if (!isLoading && !isAuthenticated && !isPublicPage) {
             router.push('/admin/login');
         }
-    }, [isAuthenticated, isLoading, router]);
+    }, [isAuthenticated, isLoading, router, isPublicPage]);
+
+    // Si es página pública, renderizar directamente sin verificaciones
+    if (isPublicPage) {
+        return <>{children}</>;
+    }
 
     // Mostrar loading mientras verifica autenticación
     if (isLoading) {

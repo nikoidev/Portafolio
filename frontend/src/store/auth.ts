@@ -19,6 +19,7 @@ interface AuthState {
     getCurrentUser: () => Promise<void>;
     clearError: () => void;
     setLoading: (loading: boolean) => void;
+    isSuperAdmin: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -94,6 +95,11 @@ export const useAuthStore = create<AuthState>()(
             clearError: () => set({ error: null }),
 
             setLoading: (loading: boolean) => set({ isLoading: loading }),
+
+            isSuperAdmin: () => {
+                const state = get();
+                return state.user?.role === 'super_admin';
+            },
         }),
         {
             name: 'auth-storage',

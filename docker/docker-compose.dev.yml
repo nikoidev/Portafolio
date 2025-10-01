@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   # Base de datos PostgreSQL
   postgres:
     image: postgres:15-alpine
-    container_name: portfolio_postgres
+    container_name: portafolio_postgres_dev
     environment:
       POSTGRES_DB: portfolio_db
       POSTGRES_USER: portfolio_user
@@ -20,7 +18,7 @@ services:
   # PgAdmin para administración de BD
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: portfolio_pgadmin
+    container_name: portafolio_pgadmin_dev
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@portfolio.com
       PGADMIN_DEFAULT_PASSWORD: admin123
@@ -31,50 +29,11 @@ services:
     networks:
       - portfolio_network
 
-  # Backend FastAPI
-  backend:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
-    container_name: portfolio_backend
-    environment:
-      DATABASE_URL: postgresql://portfolio_user:portfolio_pass@postgres:5432/portfolio_db
-      SECRET_KEY: dev-secret-key-change-in-production
-      DEBUG: "True"
-      ENVIRONMENT: development
-    ports:
-      - "8000:8000"
-    volumes:
-      - ../backend:/app
-      - backend_uploads:/app/uploads
-    depends_on:
-      - postgres
-    networks:
-      - portfolio_network
-    command: pipenv run dev
-
-  # Frontend Next.js
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile.dev
-    container_name: portfolio_frontend
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
-    ports:
-      - "3000:3000"
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - portfolio_network
-
 volumes:
   postgres_data:
-  backend_uploads:
+    name: portafolio_postgres_data_dev
 
 networks:
   portfolio_network:
+    name: portafolio_network_dev
     driver: bridge
