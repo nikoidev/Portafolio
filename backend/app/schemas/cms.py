@@ -75,3 +75,8 @@ class CMSStats(BaseSchema):
     active_sections: int
     editable_sections: int
 
+
+class ReorderSectionRequest(BaseSchema):
+    """Esquema para reordenar secciones"""
+    direction: str = Field(..., pattern="^(up|down)$")  # 'up' o 'down'
+

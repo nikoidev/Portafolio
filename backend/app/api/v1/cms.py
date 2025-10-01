@@ -16,7 +16,8 @@ from app.schemas.cms import (
     PageSectionPublic,
     PagePublic,
     PageInfo,
-    CMSStats
+    CMSStats,
+    ReorderSectionRequest
 )
 from app.services.cms_service import CMSService
 
@@ -189,4 +190,19 @@ async def seed_default_content(
     sections = cms_service.seed_default_content()
     
     return [PageContentResponse.model_validate(s) for s in sections]
+
+
+@router.patch("/sections/{page_key}/{section_key}/reorder", response_model=PageContentResponse)
+async def reorder_section(
+    page_key: str,
+    section_key: str,
+    reorder_data: ReorderSectionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_permission(Permission.UPDATE_CONTENT))
+):
+    """Reordenar una sección (mover arriba o abajo)"""
+    cms_service = CMSService(db)
+    section = cms_service.reorder_section(page_key, section_key, reorder_data.direction)
+    
+    return PageContentResponse.model_validate(section)
 
