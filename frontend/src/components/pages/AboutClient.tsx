@@ -64,11 +64,22 @@ export default function AboutClient() {
 
     const defaultPersonalInfo = {
         location: 'Madrid, España',
+        timezone: 'GMT+1 (Madrid)',
+        position: 'Senior Full Stack Developer',
+        experience_years: '5+ años',
+        availability_status: 'Disponible para proyectos',
+        languages: ['Español (Nativo)', 'Inglés (Avanzado)', 'Francés (Intermedio)'],
         contact_links: [
             { text: 'Email', url: 'mailto:tu@email.com', icon: 'https://cdn.simpleicons.org/gmail/EA4335', enabled: true },
+            { text: 'WhatsApp', url: 'https://wa.me/1234567890', icon: 'https://cdn.simpleicons.org/whatsapp/25D366', enabled: true },
+            { text: 'Calendly', url: 'https://calendly.com/tu-usuario', icon: 'https://cdn.simpleicons.org/calendly/006BFF', enabled: true },
             { text: 'GitHub', url: 'https://github.com/tu-usuario', icon: 'https://cdn.simpleicons.org/github/181717', enabled: true },
             { text: 'LinkedIn', url: 'https://linkedin.com/in/tu-perfil', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', enabled: true },
             { text: 'Twitter', url: 'https://twitter.com/tu-usuario', icon: 'https://cdn.simpleicons.org/x/000000', enabled: true },
+            { text: 'Stack Overflow', url: 'https://stackoverflow.com/users/tu-id', icon: 'https://cdn.simpleicons.org/stackoverflow/F58025', enabled: true },
+            { text: 'Dev.to', url: 'https://dev.to/tu-usuario', icon: 'https://cdn.simpleicons.org/devdotto/0A0A0A', enabled: true },
+            { text: 'Discord', url: 'https://discord.com/users/tu-id', icon: 'https://cdn.simpleicons.org/discord/5865F2', enabled: false },
+            { text: 'Telegram', url: 'https://t.me/tu-usuario', icon: 'https://cdn.simpleicons.org/telegram/26A5E4', enabled: false },
         ],
     };
 
@@ -379,25 +390,79 @@ export default function AboutClient() {
                                 <CardHeader>
                                     <CardTitle>Información Personal</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-3">
-                                    <div className="flex items-center gap-3">
-                                        <MapPin className="w-4 h-4 text-muted-foreground" />
-                                        <span className="text-sm">{personalInfo.location}</span>
-                                    </div>
-                                    {/* Contact Links con íconos dinámicos */}
-                                    {personalInfo.contact_links && personalInfo.contact_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
-                                        <div key={index} className="flex items-center gap-3">
-                                            <img src={link.icon} alt={link.text} className="w-4 h-4" />
-                                            <a
-                                                href={link.url}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-sm hover:text-primary transition-colors"
-                                            >
-                                                {link.text}
-                                            </a>
+                                <CardContent className="space-y-4">
+                                    {/* Ubicación */}
+                                    {personalInfo.location && (
+                                        <div className="flex items-center gap-3">
+                                            <MapPin className="w-4 h-4 text-muted-foreground" />
+                                            <span className="text-sm">{personalInfo.location}</span>
                                         </div>
-                                    ))}
+                                    )}
+
+                                    {/* Posición */}
+                                    {personalInfo.position && (
+                                        <div className="flex items-center gap-3">
+                                            <Briefcase className="w-4 h-4 text-muted-foreground" />
+                                            <span className="text-sm font-medium">{personalInfo.position}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Experiencia */}
+                                    {personalInfo.experience_years && (
+                                        <div className="flex items-center gap-3">
+                                            <Award className="w-4 h-4 text-muted-foreground" />
+                                            <span className="text-sm">{personalInfo.experience_years}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Disponibilidad */}
+                                    {personalInfo.availability_status && (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                            <span className="text-sm text-green-600 font-medium">{personalInfo.availability_status}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Zona horaria */}
+                                    {personalInfo.timezone && (
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs text-muted-foreground">🕐 {personalInfo.timezone}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Idiomas */}
+                                    {personalInfo.languages && personalInfo.languages.length > 0 && (
+                                        <div className="pt-3 border-t">
+                                            <p className="text-xs font-semibold text-muted-foreground mb-2">Idiomas</p>
+                                            <div className="space-y-1">
+                                                {personalInfo.languages.map((lang: string, index: number) => (
+                                                    <div key={index} className="text-sm">{lang}</div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Contact Links con íconos dinámicos */}
+                                    {personalInfo.contact_links && personalInfo.contact_links.filter((link: any) => link.enabled).length > 0 && (
+                                        <div className="pt-3 border-t">
+                                            <p className="text-xs font-semibold text-muted-foreground mb-3">Redes & Contacto</p>
+                                            <div className="space-y-2">
+                                                {personalInfo.contact_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
+                                                    <div key={index} className="flex items-center gap-3">
+                                                        <img src={link.icon} alt={link.text} className="w-4 h-4" />
+                                                        <a
+                                                            href={link.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-sm hover:text-primary transition-colors"
+                                                        >
+                                                            {link.text}
+                                                        </a>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </EditableSection>

@@ -363,14 +363,25 @@ class CMSService:
                 page_key="about",
                 section_key="personal_info",
                 title="Información Personal",
-                description="Datos de contacto y redes sociales",
+                description="Datos de contacto, información profesional y redes sociales",
                 content={
                     "location": "Madrid, España",
+                    "timezone": "GMT+1 (Madrid)",
+                    "position": "Senior Full Stack Developer",
+                    "experience_years": "5+ años",
+                    "availability_status": "Disponible para proyectos",
+                    "languages": ["Español (Nativo)", "Inglés (Avanzado)", "Francés (Intermedio)"],
                     "contact_links": [
                         {"text": "Email", "url": "mailto:tu@email.com", "icon": "https://cdn.simpleicons.org/gmail/EA4335", "enabled": True},
+                        {"text": "WhatsApp", "url": "https://wa.me/1234567890", "icon": "https://cdn.simpleicons.org/whatsapp/25D366", "enabled": True},
+                        {"text": "Calendly", "url": "https://calendly.com/tu-usuario", "icon": "https://cdn.simpleicons.org/calendly/006BFF", "enabled": True},
                         {"text": "GitHub", "url": "https://github.com/tu-usuario", "icon": "https://cdn.simpleicons.org/github/181717", "enabled": True},
                         {"text": "LinkedIn", "url": "https://linkedin.com/in/tu-perfil", "icon": "https://cdn.simpleicons.org/linkedin/0A66C2", "enabled": True},
-                        {"text": "Twitter", "url": "https://twitter.com/tu-usuario", "icon": "https://cdn.simpleicons.org/x/000000", "enabled": True}
+                        {"text": "Twitter", "url": "https://twitter.com/tu-usuario", "icon": "https://cdn.simpleicons.org/x/000000", "enabled": True},
+                        {"text": "Stack Overflow", "url": "https://stackoverflow.com/users/tu-id", "icon": "https://cdn.simpleicons.org/stackoverflow/F58025", "enabled": True},
+                        {"text": "Dev.to", "url": "https://dev.to/tu-usuario", "icon": "https://cdn.simpleicons.org/devdotto/0A0A0A", "enabled": True},
+                        {"text": "Discord", "url": "https://discord.com/users/tu-id", "icon": "https://cdn.simpleicons.org/discord/5865F2", "enabled": False},
+                        {"text": "Telegram", "url": "https://t.me/tu-usuario", "icon": "https://cdn.simpleicons.org/telegram/26A5E4", "enabled": False}
                     ]
                 },
                 order_index=4
