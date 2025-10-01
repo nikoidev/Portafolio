@@ -1,10 +1,12 @@
 'use client';
 
+import { EditableSection } from '@/components/cms/EditableSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { useCMSContent } from '@/hooks/useCMSContent';
 import {
     Award,
     BookOpen,
@@ -15,6 +17,7 @@ import {
     Download,
     Github,
     Linkedin,
+    Loader2,
     Mail,
     MapPin,
     Star,
@@ -23,6 +26,28 @@ import {
 import Link from 'next/link';
 
 export default function AboutClient() {
+    // CMS Content
+    const { content: heroContent, isLoading: heroLoading, refresh: refreshHero } = useCMSContent('about', 'hero');
+    const { content: bioContent, isLoading: bioLoading, refresh: refreshBio } = useCMSContent('about', 'bio');
+
+    const defaultHero = {
+        initials: 'JD',
+        title: 'Sobre Mí',
+        subtitle: 'Soy un desarrollador full stack apasionado por crear experiencias digitales excepcionales y soluciones tecnológicas innovadoras.',
+        contact_email: 'mailto:tu@email.com',
+        github_url: 'https://github.com/tu-usuario',
+        linkedin_url: 'https://linkedin.com/in/tu-perfil',
+    };
+
+    const defaultBio = {
+        paragraph_1: 'Mi viaje en el desarrollo de software comenzó hace más de 5 años, cuando descubrí mi pasión por resolver problemas complejos a través del código. Desde entonces, he tenido la oportunidad de trabajar en proyectos diversos, desde startups innovadoras hasta empresas establecidas.',
+        paragraph_2: 'Me especializo en el desarrollo full stack, con un enfoque particular en tecnologías modernas como React, Next.js, Node.js y Python. Mi objetivo siempre es crear soluciones que no solo funcionen bien técnicamente, sino que también proporcionen una experiencia excepcional al usuario.',
+        paragraph_3: 'Cuando no estoy programando, me gusta mantenerme actualizado con las últimas tendencias tecnológicas, contribuir a proyectos de código abierto, y compartir conocimientos con la comunidad de desarrolladores.',
+    };
+
+    const hero = heroContent || defaultHero;
+    const bio = bioContent || defaultBio;
+
     const skills = [
         { name: 'JavaScript/TypeScript', level: 95, category: 'Frontend' },
         { name: 'React/Next.js', level: 90, category: 'Frontend' },
@@ -90,50 +115,59 @@ export default function AboutClient() {
         { label: 'Tazas de café', value: '∞', icon: Coffee },
     ];
 
+    if (heroLoading || bioLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
             <div className="container mx-auto px-4 py-16">
                 {/* Hero Section */}
-                <div className="text-center mb-16">
-                    <div className="relative w-32 h-32 mx-auto mb-6">
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl font-bold text-white">
-                            JD
+                <EditableSection pageKey="about" sectionKey="hero" onContentUpdate={refreshHero}>
+                    <div className="text-center mb-16">
+                        <div className="relative w-32 h-32 mx-auto mb-6">
+                            <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl font-bold text-white">
+                                {hero.initials}
+                            </div>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                            {hero.title}
+                        </h1>
+                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                            {hero.subtitle}
+                        </p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <Button asChild>
+                                <Link href="/contact">
+                                    <Mail className="w-4 h-4 mr-2" />
+                                    Contactar
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <Link href="/cv/download" target="_blank">
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Descargar CV
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <a href={hero.github_url} target="_blank" rel="noopener noreferrer">
+                                    <Github className="w-4 h-4 mr-2" />
+                                    GitHub
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline">
+                                <a href={hero.linkedin_url} target="_blank" rel="noopener noreferrer">
+                                    <Linkedin className="w-4 h-4 mr-2" />
+                                    LinkedIn
+                                </a>
+                            </Button>
                         </div>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        Sobre Mí
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-                        Soy un desarrollador full stack apasionado por crear experiencias digitales
-                        excepcionales y soluciones tecnológicas innovadoras.
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Button asChild>
-                            <Link href="/contact">
-                                <Mail className="w-4 h-4 mr-2" />
-                                Contactar
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <Link href="/cv/download" target="_blank">
-                                <Download className="w-4 h-4 mr-2" />
-                                Descargar CV
-                            </Link>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer">
-                                <Github className="w-4 h-4 mr-2" />
-                                GitHub
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline">
-                            <a href="https://linkedin.com/in/tu-perfil" target="_blank" rel="noopener noreferrer">
-                                <Linkedin className="w-4 h-4 mr-2" />
-                                LinkedIn
-                            </a>
-                        </Button>
-                    </div>
-                </div>
+                </EditableSection>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
@@ -154,33 +188,27 @@ export default function AboutClient() {
                     {/* Columna principal */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Mi historia */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <BookOpen className="w-5 h-5" />
-                                    Mi Historia
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-muted-foreground">
-                                    Mi viaje en el desarrollo de software comenzó hace más de 5 años, cuando descubrí
-                                    mi pasión por resolver problemas complejos a través del código. Desde entonces,
-                                    he tenido la oportunidad de trabajar en proyectos diversos, desde startups
-                                    innovadoras hasta empresas establecidas.
-                                </p>
-                                <p className="text-muted-foreground">
-                                    Me especializo en el desarrollo full stack, con un enfoque particular en
-                                    tecnologías modernas como React, Next.js, Node.js y Python. Mi objetivo
-                                    siempre es crear soluciones que no solo funcionen bien técnicamente, sino
-                                    que también proporcionen una experiencia excepcional al usuario.
-                                </p>
-                                <p className="text-muted-foreground">
-                                    Cuando no estoy programando, me gusta mantenerme actualizado con las últimas
-                                    tendencias tecnológicas, contribuir a proyectos de código abierto, y compartir
-                                    conocimientos con la comunidad de desarrolladores.
-                                </p>
-                            </CardContent>
-                        </Card>
+                        <EditableSection pageKey="about" sectionKey="bio" onContentUpdate={refreshBio}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <BookOpen className="w-5 h-5" />
+                                        Mi Historia
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-muted-foreground">
+                                        {bio.paragraph_1}
+                                    </p>
+                                    <p className="text-muted-foreground">
+                                        {bio.paragraph_2}
+                                    </p>
+                                    <p className="text-muted-foreground">
+                                        {bio.paragraph_3}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </EditableSection>
 
                         {/* Experiencia */}
                         <Card>

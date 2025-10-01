@@ -1,12 +1,14 @@
 'use client';
 
+import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useCMSContent } from '@/hooks/useCMSContent';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Github, Linkedin, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
+import { Github, Linkedin, Loader2, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
@@ -21,6 +23,16 @@ const contactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactClient() {
+    // CMS Content
+    const { content: headerContent, isLoading: headerLoading, refresh: refreshHeader } = useCMSContent('contact', 'header');
+
+    const defaultHeader = {
+        title: 'Contacto',
+        subtitle: '¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti. Contacta conmigo y hablemos de tu próximo proyecto.',
+    };
+
+    const header = headerContent || defaultHeader;
+
     const form = useForm<ContactFormValues>({
         resolver: zodResolver(contactFormSchema),
         defaultValues: {
@@ -36,11 +48,11 @@ export default function ContactClient() {
             // Aquí implementarías el envío del formulario
             // Por ahora, solo mostramos un toast de éxito
             console.log('Contact form data:', data);
-            
+
             toast.success('¡Mensaje enviado correctamente!', {
                 description: 'Te responderé en las próximas 24-48 horas.',
             });
-            
+
             form.reset();
         } catch (error) {
             toast.error('Error al enviar el mensaje', {
@@ -87,19 +99,28 @@ export default function ContactClient() {
         },
     ];
 
+    if (headerLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        Contacto
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        ¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti.
-                        Contacta conmigo y hablemos de tu próximo proyecto.
-                    </p>
-                </div>
+                <EditableSection pageKey="contact" sectionKey="header" onContentUpdate={refreshHeader}>
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                            {header.title}
+                        </h1>
+                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                            {header.subtitle}
+                        </p>
+                    </div>
+                </EditableSection>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Formulario de contacto */}
@@ -145,7 +166,7 @@ export default function ContactClient() {
                                                 )}
                                             />
                                         </div>
-                                        
+
                                         <FormField
                                             control={form.control}
                                             name="subject"
@@ -162,7 +183,7 @@ export default function ContactClient() {
                                                 </FormItem>
                                             )}
                                         />
-                                        
+
                                         <FormField
                                             control={form.control}
                                             name="message"
@@ -183,7 +204,7 @@ export default function ContactClient() {
                                                 </FormItem>
                                             )}
                                         />
-                                        
+
                                         <Button type="submit" className="w-full" size="lg">
                                             <Send className="w-4 h-4 mr-2" />
                                             Enviar mensaje
@@ -278,7 +299,7 @@ export default function ContactClient() {
                                 </p>
                             </CardContent>
                         </Card>
-                        
+
                         <Card>
                             <CardContent className="pt-6">
                                 <h3 className="font-semibold mb-2">¿Trabajas con equipos?</h3>
@@ -287,7 +308,7 @@ export default function ContactClient() {
                                 </p>
                             </CardContent>
                         </Card>
-                        
+
                         <Card>
                             <CardContent className="pt-6">
                                 <h3 className="font-semibold mb-2">¿Ofreces mantenimiento?</h3>
@@ -296,7 +317,7 @@ export default function ContactClient() {
                                 </p>
                             </CardContent>
                         </Card>
-                        
+
                         <Card>
                             <CardContent className="pt-6">
                                 <h3 className="font-semibold mb-2">¿Trabajas con startups?</h3>

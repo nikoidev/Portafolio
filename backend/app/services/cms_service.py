@@ -190,66 +190,61 @@ class CMSService:
             PageContentCreate(
                 page_key="home",
                 section_key="hero",
-                title="Hero Principal",
-                description="Sección principal de bienvenida",
+                title="Sección Principal - Inicio",
+                description="Texto de bienvenida y llamada a la acción principal",
                 content={
-                    "badge": "¡Hola! Soy desarrollador Full Stack",
-                    "title": "Creando experiencias web",
-                    "titleHighlight": "excepcionales",
+                    "greeting": "👋 ¡Hola! Soy desarrollador Full Stack",
+                    "title_line1": "Creando experiencias web",
+                    "title_line2": "excepcionales",
                     "description": "Especializado en React, Next.js, Node.js y Python. Transformo ideas en aplicaciones web modernas, escalables y centradas en el usuario.",
-                    "ctaPrimary": {
-                        "text": "Ver mis proyectos",
-                        "url": "/projects"
-                    },
-                    "ctaSecondary": {
-                        "text": "Descargar CV",
-                        "url": "/cv/download"
-                    }
-                },
-                styles={
-                    "background": "gradient",
-                    "particles": True
+                    "primary_cta_text": "Ver mis proyectos",
+                    "primary_cta_link": "/projects",
+                    "secondary_cta_text": "Descargar CV",
+                    "secondary_cta_link": "/cv/download",
+                    "github_url": "https://github.com",
+                    "linkedin_url": "https://linkedin.com",
+                    "email": "contact@example.com"
                 },
                 order_index=1
             ),
-            # HOME - Featured Projects
+            # ABOUT - Hero Section
             PageContentCreate(
-                page_key="home",
-                section_key="featured-projects",
-                title="Proyectos Destacados",
-                description="Sección de proyectos destacados en la home",
+                page_key="about",
+                section_key="hero",
+                title="Encabezado - Sobre Mí",
+                description="Información principal de la página Sobre Mí",
                 content={
-                    "title": "Proyectos Destacados",
-                    "description": "Una selección de mis trabajos más recientes y significativos",
-                    "showCount": 6
+                    "initials": "JD",
+                    "title": "Sobre Mí",
+                    "subtitle": "Soy un desarrollador full stack apasionado por crear experiencias digitales excepcionales y soluciones tecnológicas innovadoras.",
+                    "contact_email": "mailto:tu@email.com",
+                    "github_url": "https://github.com/tu-usuario",
+                    "linkedin_url": "https://linkedin.com/in/tu-perfil"
+                },
+                order_index=1
+            ),
+            # ABOUT - Bio Section
+            PageContentCreate(
+                page_key="about",
+                section_key="bio",
+                title="Mi Historia",
+                description="Biografía y trayectoria profesional",
+                content={
+                    "paragraph_1": "Mi viaje en el desarrollo de software comenzó hace más de 5 años, cuando descubrí mi pasión por resolver problemas complejos a través del código. Desde entonces, he tenido la oportunidad de trabajar en proyectos diversos, desde startups innovadoras hasta empresas establecidas.",
+                    "paragraph_2": "Me especializo en el desarrollo full stack, con un enfoque particular en tecnologías modernas como React, Next.js, Node.js y Python. Mi objetivo siempre es crear soluciones que no solo funcionen bien técnicamente, sino que también proporcionen una experiencia excepcional al usuario.",
+                    "paragraph_3": "Cuando no estoy programando, me gusta mantenerme actualizado con las últimas tendencias tecnológicas, contribuir a proyectos de código abierto, y compartir conocimientos con la comunidad de desarrolladores."
                 },
                 order_index=2
             ),
-            # ABOUT - Main Info
-            PageContentCreate(
-                page_key="about",
-                section_key="main-info",
-                title="Información Principal",
-                description="Biografía y presentación",
-                content={
-                    "title": "Sobre Mí",
-                    "subtitle": "Desarrollador Full Stack",
-                    "bio": "Soy un desarrollador apasionado por crear soluciones web innovadoras y eficientes...",
-                    "image": "/images/profile.jpg"
-                },
-                order_index=1
-            ),
-            # CONTACT - Form
+            # CONTACT - Header Section
             PageContentCreate(
                 page_key="contact",
-                section_key="contact-form",
-                title="Formulario de Contacto",
-                description="Configuración del formulario de contacto",
+                section_key="header",
+                title="Encabezado - Contacto",
+                description="Título y descripción de la página de contacto",
                 content={
-                    "title": "¡Hablemos!",
-                    "description": "¿Tienes un proyecto en mente? Contáctame",
-                    "email": "contact@example.com",
-                    "showSocialLinks": True
+                    "title": "Contacto",
+                    "subtitle": "¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti. Contacta conmigo y hablemos de tu próximo proyecto."
                 },
                 order_index=1
             )

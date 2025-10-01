@@ -1,3 +1,5 @@
+import { EditModeToggle } from '@/components/cms/EditModeToggle'
+import { EditModeProvider } from '@/contexts/EditModeContext'
 import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
@@ -55,10 +57,13 @@ export default function RootLayout({
   return (
     <html lang="es" className="scroll-smooth">
       <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen bg-background text-foreground">
-          {children}
-        </div>
-        <Toaster position="top-right" richColors />
+        <EditModeProvider>
+          <div className="min-h-screen bg-background text-foreground">
+            {children}
+          </div>
+          <EditModeToggle />
+          <Toaster position="top-right" richColors />
+        </EditModeProvider>
       </body>
     </html>
   )
