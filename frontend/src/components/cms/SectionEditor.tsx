@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { cmsApi } from '@/lib/cms-api';
 import { PageContent } from '@/types/cms';
@@ -99,9 +100,20 @@ export function SectionEditor({
     const handleArrayItemAdd = (arrayKey: string) => {
         setFormData((prev) => {
             const currentArray = prev[arrayKey] || [];
-            const template = currentArray.length > 0
-                ? Object.keys(currentArray[0]).reduce((acc, key) => ({ ...acc, [key]: '' }), {})
-                : { text: '', url: '' };
+
+            // Crear plantilla basada en el primer elemento
+            let template: Record<string, any> = { text: '', url: '' };
+
+            if (currentArray.length > 0) {
+                const firstItem = currentArray[0];
+                template = Object.keys(firstItem).reduce((acc, key) => {
+                    // Preservar el tipo de dato
+                    if (typeof firstItem[key] === 'boolean') {
+                        return { ...acc, [key]: true }; // Por defecto enabled = true
+                    }
+                    return { ...acc, [key]: '' };
+                }, {});
+            }
 
             return {
                 ...prev,
@@ -157,21 +169,47 @@ export function SectionEditor({
                     {arrayValue.map((item, index) => (
                         <Card key={index} className="bg-muted/50">
                             <CardContent className="pt-6 space-y-3">
-                                {Object.entries(item).map(([field, value]) => (
-                                    <div key={field} className="space-y-2">
-                                        <Label htmlFor={`${key}-${index}-${field}`}>
-                                            {field.charAt(0).toUpperCase() + field.slice(1)}
-                                        </Label>
-                                        <Input
-                                            id={`${key}-${index}-${field}`}
-                                            value={value as string}
-                                            onChange={(e) =>
-                                                handleArrayItemChange(key, index, field, e.target.value)
-                                            }
-                                            placeholder={`Ingresa ${field}`}
-                                        />
-                                    </div>
-                                ))}
+                                {Object.entries(item).map(([field, value]) => {
+                                    // Si es un campo booleano, mostrar switch
+                                    if (typeof value === 'boolean') {
+                                        return (
+                                            <div key={field} className="flex items-center justify-between space-y-2">
+                                                <div className="space-y-0.5">
+                                                    <Label htmlFor={`${key}-${index}-${field}`}>
+                                                        {field.charAt(0).toUpperCase() + field.slice(1)}
+                                                    </Label>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {value ? 'Habilitado' : 'Deshabilitado'}
+                                                    </p>
+                                                </div>
+                                                <Switch
+                                                    id={`${key}-${index}-${field}`}
+                                                    checked={value}
+                                                    onCheckedChange={(checked) =>
+                                                        handleArrayItemChange(key, index, field, checked)
+                                                    }
+                                                />
+                                            </div>
+                                        );
+                                    }
+
+                                    // Para campos string normales
+                                    return (
+                                        <div key={field} className="space-y-2">
+                                            <Label htmlFor={`${key}-${index}-${field}`}>
+                                                {field.charAt(0).toUpperCase() + field.slice(1)}
+                                            </Label>
+                                            <Input
+                                                id={`${key}-${index}-${field}`}
+                                                value={value as string}
+                                                onChange={(e) =>
+                                                    handleArrayItemChange(key, index, field, e.target.value)
+                                                }
+                                                placeholder={`Ingresa ${field}`}
+                                            />
+                                        </div>
+                                    );
+                                })}
                                 <Button
                                     variant="destructive"
                                     size="sm"

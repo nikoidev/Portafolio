@@ -3,7 +3,7 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { useCMSContent } from '@/hooks/useCMSContent';
-import { ArrowDown, Download, Github, Linkedin, Loader2, Mail } from 'lucide-react';
+import { ArrowDown, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function HeroSection() {
@@ -19,9 +19,26 @@ export function HeroSection() {
         primary_cta_link: '/projects',
         secondary_cta_text: 'Descargar CV',
         secondary_cta_link: '/cv/download',
-        github_url: 'https://github.com',
-        linkedin_url: 'https://linkedin.com',
-        email: 'contact@example.com',
+        social_links: [
+            {
+                text: 'GitHub',
+                url: 'https://github.com',
+                icon: 'https://cdn.simpleicons.org/github',
+                enabled: true
+            },
+            {
+                text: 'LinkedIn',
+                url: 'https://linkedin.com',
+                icon: 'https://cdn.simpleicons.org/linkedin',
+                enabled: true
+            },
+            {
+                text: 'Email',
+                url: 'mailto:contact@example.com',
+                icon: 'https://cdn.simpleicons.org/gmail',
+                enabled: true
+            }
+        ]
     };
 
     const data = content || defaultContent;
@@ -76,33 +93,33 @@ export function HeroSection() {
                             </Button>
                         </div>
 
-                        {/* Redes sociales */}
-                        <div className="flex justify-center space-x-6 mb-12">
-                            <a
-                                href={data.github_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-3 rounded-full bg-background border hover:bg-accent transition-colors"
-                                aria-label="GitHub"
-                            >
-                                <Github className="w-6 h-6" />
-                            </a>
-                            <a
-                                href={data.linkedin_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-3 rounded-full bg-background border hover:bg-accent transition-colors"
-                                aria-label="LinkedIn"
-                            >
-                                <Linkedin className="w-6 h-6" />
-                            </a>
-                            <a
-                                href={`mailto:${data.email}`}
-                                className="p-3 rounded-full bg-background border hover:bg-accent transition-colors"
-                                aria-label="Email"
-                            >
-                                <Mail className="w-6 h-6" />
-                            </a>
+                        {/* Redes sociales dinámicas */}
+                        <div className="flex justify-center flex-wrap gap-4 mb-12">
+                            {data.social_links && data.social_links
+                                .filter((link: any) => link.enabled !== false)
+                                .map((link: any, index: number) => (
+                                    <a
+                                        key={index}
+                                        href={link.url}
+                                        target={link.url.startsWith('http') ? '_blank' : undefined}
+                                        rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                        className="p-3 rounded-full bg-background border hover:bg-accent transition-colors group"
+                                        aria-label={link.text}
+                                        title={link.text}
+                                    >
+                                        {link.icon ? (
+                                            <img
+                                                src={link.icon}
+                                                alt={link.text}
+                                                className="w-6 h-6 group-hover:scale-110 transition-transform"
+                                            />
+                                        ) : (
+                                            <span className="w-6 h-6 flex items-center justify-center text-xs font-bold">
+                                                {link.text.substring(0, 2).toUpperCase()}
+                                            </span>
+                                        )}
+                                    </a>
+                                ))}
                         </div>
 
                         {/* Indicador de scroll */}

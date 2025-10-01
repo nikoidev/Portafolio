@@ -267,9 +267,32 @@ class CMSService:
                     "primary_cta_link": "/projects",
                     "secondary_cta_text": "Descargar CV",
                     "secondary_cta_link": "/cv/download",
-                    "github_url": "https://github.com",
-                    "linkedin_url": "https://linkedin.com",
-                    "email": "contact@example.com"
+                    "social_links": [
+                        {
+                            "text": "GitHub",
+                            "url": "https://github.com",
+                            "icon": "https://cdn.simpleicons.org/github",
+                            "enabled": True
+                        },
+                        {
+                            "text": "LinkedIn",
+                            "url": "https://linkedin.com",
+                            "icon": "https://cdn.simpleicons.org/linkedin",
+                            "enabled": True
+                        },
+                        {
+                            "text": "Email",
+                            "url": "mailto:contact@example.com",
+                            "icon": "https://cdn.simpleicons.org/gmail",
+                            "enabled": True
+                        },
+                        {
+                            "text": "WhatsApp",
+                            "url": "https://wa.me/34XXXXXXXXX",
+                            "icon": "https://cdn.simpleicons.org/whatsapp",
+                            "enabled": False
+                        }
+                    ]
                 },
                 order_index=1
             ),
