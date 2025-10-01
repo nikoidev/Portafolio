@@ -141,24 +141,53 @@ export function SectionEditor({
         const isObjectArray = arrayValue.length > 0 && typeof arrayValue[0] === 'object';
 
         if (!isObjectArray) {
-            // Array simple de strings
+            // Array simple de strings - Interfaz amigable
             return (
-                <div key={key} className="space-y-2">
-                    <Label>{fieldLabel}</Label>
-                    <Textarea
-                        value={JSON.stringify(arrayValue, null, 2)}
-                        onChange={(e) => {
-                            try {
-                                const parsed = JSON.parse(e.target.value);
-                                handleFieldChange(key, parsed);
-                            } catch {
-                                // Ignorar
-                            }
-                        }}
-                        className="font-mono text-sm"
-                        rows={4}
-                    />
-                </div>
+                <Card key={key} className="border-2">
+                    <CardHeader>
+                        <CardTitle className="text-base">{fieldLabel}</CardTitle>
+                        <CardDescription>
+                            Gestiona los elementos de esta lista
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {arrayValue.map((item, index) => (
+                            <div key={index} className="flex gap-2">
+                                <Input
+                                    value={item as string}
+                                    onChange={(e) => {
+                                        const newArray = [...arrayValue];
+                                        newArray[index] = e.target.value;
+                                        handleFieldChange(key, newArray);
+                                    }}
+                                    placeholder={`${fieldLabel} ${index + 1}`}
+                                    className="flex-1"
+                                />
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => {
+                                        const newArray = arrayValue.filter((_, i) => i !== index);
+                                        handleFieldChange(key, newArray);
+                                    }}
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                const newArray = [...arrayValue, ''];
+                                handleFieldChange(key, newArray);
+                            }}
+                            className="w-full"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Agregar nuevo
+                        </Button>
+                    </CardContent>
+                </Card>
             );
         }
 
