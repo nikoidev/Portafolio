@@ -317,6 +317,190 @@ class CMSService:
                 },
                 order_index=2
             ),
+            # ABOUT - Stats Section
+            PageContentCreate(
+                page_key="about",
+                section_key="stats",
+                title="Estadísticas",
+                description="Números destacados de mi carrera",
+                content={
+                    "stats": [
+                        {"label": "Años de experiencia", "value": "5+", "icon": "calendar"},
+                        {"label": "Proyectos completados", "value": "50+", "icon": "briefcase"},
+                        {"label": "Clientes satisfechos", "value": "30+", "icon": "users"},
+                        {"label": "Tazas de café", "value": "∞", "icon": "coffee"}
+                    ]
+                },
+                order_index=3
+            ),
+            # ABOUT - Personal Info Section
+            PageContentCreate(
+                page_key="about",
+                section_key="personal_info",
+                title="Información Personal",
+                description="Datos de contacto y redes sociales",
+                content={
+                    "location": "Madrid, España",
+                    "email": "tu@email.com",
+                    "github": "https://github.com/tu-usuario",
+                    "linkedin": "https://linkedin.com/in/tu-perfil"
+                },
+                order_index=4
+            ),
+            # ABOUT - Skills Section
+            PageContentCreate(
+                page_key="about",
+                section_key="skills",
+                title="Habilidades Técnicas",
+                description="Tecnologías y herramientas que domino",
+                content={
+                    "skills": [
+                        {"name": "JavaScript/TypeScript", "level": 95, "category": "Frontend"},
+                        {"name": "React/Next.js", "level": 90, "category": "Frontend"},
+                        {"name": "Node.js", "level": 85, "category": "Backend"},
+                        {"name": "Python", "level": 80, "category": "Backend"},
+                        {"name": "PostgreSQL", "level": 75, "category": "Database"},
+                        {"name": "Docker", "level": 70, "category": "DevOps"}
+                    ]
+                },
+                order_index=5
+            ),
+            # ABOUT - Hobbies Section
+            PageContentCreate(
+                page_key="about",
+                section_key="hobbies",
+                title="Intereses y Hobbies",
+                description="Mis pasiones fuera del código",
+                content={
+                    "hobbies": [
+                        "Código Abierto",
+                        "Inteligencia Artificial",
+                        "Fotografía",
+                        "Viajes",
+                        "Música",
+                        "Gaming",
+                        "Lectura",
+                        "Deportes"
+                    ]
+                },
+                order_index=6
+            ),
+            # ABOUT - CTA Section
+            PageContentCreate(
+                page_key="about",
+                section_key="cta",
+                title="Call to Action",
+                description="Invitación a colaborar",
+                content={
+                    "title": "¿Trabajamos juntos?",
+                    "description": "Siempre estoy abierto a nuevas oportunidades y proyectos interesantes.",
+                    "button_primary_text": "Contactar",
+                    "button_primary_url": "/contact",
+                    "button_secondary_text": "Ver proyectos",
+                    "button_secondary_url": "/projects"
+                },
+                order_index=7
+            ),
+            # ABOUT - Experience Section
+            PageContentCreate(
+                page_key="about",
+                section_key="experience",
+                title="Experiencia Profesional",
+                description="Mi trayectoria laboral",
+                content={
+                    "experience": [
+                        {
+                            "title": "Desarrollador Full Stack Senior",
+                            "company": "Tech Company S.L.",
+                            "period": "2022 - Presente",
+                            "description": "Desarrollo de aplicaciones web modernas usando React, Next.js y Node.js. Liderazgo técnico en proyectos de gran escala.",
+                            "achievements": [
+                                "Mejoré el rendimiento de la aplicación principal en un 40%",
+                                "Lideré un equipo de 4 desarrolladores",
+                                "Implementé arquitectura de microservicios"
+                            ]
+                        },
+                        {
+                            "title": "Desarrollador Frontend",
+                            "company": "Startup Innovadora",
+                            "period": "2020 - 2022",
+                            "description": "Especialización en interfaces de usuario modernas y experiencia de usuario optimizada.",
+                            "achievements": [
+                                "Desarrollé 3 aplicaciones web desde cero",
+                                "Reduje el tiempo de carga en un 60%",
+                                "Implementé testing automatizado"
+                            ]
+                        },
+                        {
+                            "title": "Desarrollador Junior",
+                            "company": "Agencia Digital",
+                            "period": "2019 - 2020",
+                            "description": "Primeros pasos en el desarrollo profesional, trabajando en proyectos diversos para diferentes clientes.",
+                            "achievements": [
+                                "Completé más de 20 proyectos web",
+                                "Aprendí múltiples tecnologías",
+                                "Colaboré con equipos multidisciplinarios"
+                            ]
+                        }
+                    ]
+                },
+                order_index=8
+            ),
+            # ABOUT - Education Section
+            PageContentCreate(
+                page_key="about",
+                section_key="education",
+                title="Educación y Certificaciones",
+                description="Mi formación académica y profesional",
+                content={
+                    "education": [
+                        {
+                            "title": "Ingeniería Informática",
+                            "institution": "Universidad Politécnica de Madrid",
+                            "period": "2015 - 2019",
+                            "description": "Especialización en Desarrollo de Software y Sistemas Distribuidos"
+                        },
+                        {
+                            "title": "Certificación AWS Solutions Architect",
+                            "institution": "Amazon Web Services",
+                            "period": "2023",
+                            "description": "Certificación profesional en arquitectura de soluciones en la nube"
+                        }
+                    ]
+                },
+                order_index=9
+            ),
+            # ABOUT - Testimonials Section
+            PageContentCreate(
+                page_key="about",
+                section_key="testimonials",
+                title="Testimonios",
+                description="Lo que dicen mis clientes y colegas",
+                content={
+                    "title": "Lo que dicen de mi trabajo",
+                    "testimonials": [
+                        {
+                            "message": "Excelente desarrollador, siempre entrega proyectos de alta calidad en tiempo y forma. Su atención al detalle es impresionante.",
+                            "name": "María García",
+                            "role": "CEO, Tech Startup",
+                            "initials": "MG"
+                        },
+                        {
+                            "message": "Trabajar con él fue una experiencia fantástica. Su conocimiento técnico y capacidad de comunicación son excepcionales.",
+                            "name": "Juan López",
+                            "role": "CTO, Digital Agency",
+                            "initials": "JL"
+                        },
+                        {
+                            "message": "Un profesional comprometido que siempre va más allá de lo esperado. Recomiendo su trabajo sin dudarlo.",
+                            "name": "Ana Rodríguez",
+                            "role": "Product Manager",
+                            "initials": "AR"
+                        }
+                    ]
+                },
+                order_index=10
+            ),
             # CONTACT - Header Section
             PageContentCreate(
                 page_key="contact",
