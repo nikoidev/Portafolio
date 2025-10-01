@@ -119,6 +119,67 @@ class CMSService:
         
         return True
     
+    def reorder_section(
+        self,
+        page_key: str,
+        section_key: str,
+        direction: str
+    ) -> PageContent:
+        """Mover una sección arriba o abajo en el orden"""
+        section = self.get_section(page_key, section_key)
+        
+        if not section:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Sección '{section_key}' no encontrada"
+            )
+        
+        # Obtener todas las secciones de la página ordenadas
+        all_sections = self.get_page_sections(page_key, active_only=False)
+        
+        # Encontrar el índice actual
+        current_index = None
+        for i, s in enumerate(all_sections):
+            if s.id == section.id:
+                current_index = i
+                break
+        
+        if current_index is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error al encontrar la sección"
+            )
+        
+        # Calcular nuevo índice
+        if direction == "up":
+            if current_index == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="La sección ya está en la primera posición"
+                )
+            new_index = current_index - 1
+        elif direction == "down":
+            if current_index == len(all_sections) - 1:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="La sección ya está en la última posición"
+                )
+            new_index = current_index + 1
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Dirección inválida. Use 'up' o 'down'"
+            )
+        
+        # Intercambiar los order_index
+        section_to_swap = all_sections[new_index]
+        section.order_index, section_to_swap.order_index = section_to_swap.order_index, section.order_index
+        
+        self.db.commit()
+        self.db.refresh(section)
+        
+        return section
+    
     # ========== Métodos de Utilidad ==========
     
     def get_available_pages(self) -> List[PageInfo]:

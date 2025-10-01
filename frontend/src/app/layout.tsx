@@ -1,3 +1,4 @@
+import { CreateSectionButton } from '@/components/cms/CreateSectionButton'
 import { EditModeToggle } from '@/components/cms/EditModeToggle'
 import { EditModeProvider } from '@/contexts/EditModeContext'
 import '@/styles/globals.css'
@@ -62,6 +63,7 @@ export default function RootLayout({
             {children}
           </div>
           <EditModeToggle />
+          <CreateSectionButton />
           <Toaster position="top-right" richColors />
         </EditModeProvider>
       </body>

@@ -2,8 +2,6 @@
 
 import { CreateSectionModal } from '@/components/cms/CreateSectionModal';
 import { SectionEditor } from '@/components/cms/SectionEditor';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,9 +12,11 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cmsApi } from '@/lib/cms-api';
 import { PAGE_LABELS, PageContent } from '@/types/cms';
-import { ArrowLeft, Edit, Loader2, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Edit, Loader2, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -31,6 +31,7 @@ export default function EditPageCMS() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [deletingSection, setDeletingSection] = useState<PageContent | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [reorderingSection, setReorderingSection] = useState<string | null>(null);
 
     useEffect(() => {
         loadSections();
@@ -80,6 +81,19 @@ export default function EditPageCMS() {
         }
     };
 
+    const handleReorder = async (section: PageContent, direction: 'up' | 'down') => {
+        try {
+            setReorderingSection(section.section_key);
+            await cmsApi.reorderSection(section.page_key, section.section_key, direction);
+            toast.success(`Sección movida ${direction === 'up' ? 'arriba' : 'abajo'}`);
+            loadSections();
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || 'Error al reordenar la sección');
+        } finally {
+            setReorderingSection(null);
+        }
+    };
+
     const pageLabel = PAGE_LABELS[pageKey as keyof typeof PAGE_LABELS] || pageKey;
 
     return (
@@ -111,10 +125,43 @@ export default function EditPageCMS() {
                 </div>
             ) : sections.length > 0 ? (
                 <div className="grid gap-4">
-                    {sections.map((section) => (
+                    {sections.map((section, index) => (
                         <Card key={section.id}>
                             <CardHeader>
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between gap-4">
+                                    {/* Botones de ordenamiento */}
+                                    <div className="flex flex-col gap-1">
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => handleReorder(section, 'up')}
+                                            disabled={index === 0 || reorderingSection === section.section_key}
+                                            className="h-6 px-2"
+                                            title="Mover arriba"
+                                        >
+                                            {reorderingSection === section.section_key ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <ArrowUp className="w-4 h-4" />
+                                            )}
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => handleReorder(section, 'down')}
+                                            disabled={index === sections.length - 1 || reorderingSection === section.section_key}
+                                            className="h-6 px-2"
+                                            title="Mover abajo"
+                                        >
+                                            {reorderingSection === section.section_key ? (
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                                <ArrowDown className="w-4 h-4" />
+                                            )}
+                                        </Button>
+                                    </div>
+
+                                    {/* Información de la sección */}
                                     <div className="flex-1">
                                         <CardTitle>{section.title}</CardTitle>
                                         <CardDescription>{section.description}</CardDescription>
@@ -122,6 +169,8 @@ export default function EditPageCMS() {
                                             ID: {section.section_key} • {Object.keys(section.content).length} campos
                                         </div>
                                     </div>
+
+                                    {/* Botones de acción */}
                                     <div className="flex gap-2">
                                         <Button
                                             size="sm"
