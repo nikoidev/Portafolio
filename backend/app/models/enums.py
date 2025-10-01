@@ -36,6 +36,12 @@ class Permission(str, Enum):
     UPLOAD_FILE = "upload_file"
     DELETE_FILE = "delete_file"
     
+    # CMS (Content Management System)
+    CREATE_CONTENT = "create_content"
+    READ_CONTENT = "read_content"
+    UPDATE_CONTENT = "update_content"
+    DELETE_CONTENT = "delete_content"
+    
     # Sistema
     VIEW_ANALYTICS = "view_analytics"
     MANAGE_SETTINGS = "manage_settings"
@@ -59,6 +65,10 @@ ROLE_PERMISSIONS = {
         Permission.GENERATE_CV_PDF,
         Permission.UPLOAD_FILE,
         Permission.DELETE_FILE,
+        Permission.CREATE_CONTENT,
+        Permission.READ_CONTENT,
+        Permission.UPDATE_CONTENT,
+        Permission.DELETE_CONTENT,
         Permission.VIEW_ANALYTICS,
         Permission.MANAGE_SETTINGS,
     ],
@@ -77,6 +87,10 @@ ROLE_PERMISSIONS = {
         Permission.GENERATE_CV_PDF,
         Permission.UPLOAD_FILE,
         Permission.DELETE_FILE,
+        Permission.CREATE_CONTENT,
+        Permission.READ_CONTENT,
+        Permission.UPDATE_CONTENT,
+        Permission.DELETE_CONTENT,
         Permission.VIEW_ANALYTICS,
     ],
     
@@ -89,12 +103,16 @@ ROLE_PERMISSIONS = {
         Permission.UPDATE_CV,
         Permission.GENERATE_CV_PDF,
         Permission.UPLOAD_FILE,
+        Permission.CREATE_CONTENT,
+        Permission.READ_CONTENT,
+        Permission.UPDATE_CONTENT,
     ],
     
     UserRole.VIEWER: [
         # Solo lectura
         Permission.READ_USER,
         Permission.READ_PROJECT,
+        Permission.READ_CONTENT,
         Permission.VIEW_ANALYTICS,
     ],
 }

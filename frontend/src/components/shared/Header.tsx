@@ -46,6 +46,12 @@ export function Header({ variant = 'public' }: HeaderProps) {
                                     Usuarios
                                 </Link>
                                 <Link
+                                    href="/admin/cms"
+                                    className="text-sm font-medium hover:text-primary transition-colors"
+                                >
+                                    Gestión Web
+                                </Link>
+                                <Link
                                     href="/admin/uploads"
                                     className="text-sm font-medium hover:text-primary transition-colors"
                                 >
