@@ -2,7 +2,8 @@
 Esquemas Pydantic para Project
 """
 from typing import Optional, List
-from pydantic import BaseModel, Field, HttpUrl
+from datetime import datetime
+from pydantic import BaseModel, Field, HttpUrl, field_serializer, ConfigDict
 from .base import BaseSchema, TimestampMixin
 
 
@@ -14,11 +15,27 @@ class ProjectBase(BaseSchema):
     short_description: Optional[str] = Field(None, max_length=500)
     content: Optional[str] = None
     github_url: Optional[str] = None
+    
+    # DEMO CONFIGURATION
+    demo_type: Optional[str] = None
+    
+    # VIDEO DEMO
+    demo_video_type: Optional[str] = None
+    demo_video_url: Optional[str] = None
+    demo_video_thumbnail: Optional[str] = None
+    
+    # GALLERY DEMO
+    demo_images: Optional[List[dict]] = None
+    
+    # LIVE DEMO
     live_demo_url: Optional[str] = None
-    demo_type: Optional[str] = Field(None, pattern="^(iframe|link|video|images)$")
+    live_demo_type: Optional[str] = None
+    
+    # Archivos y medios
     thumbnail_url: Optional[str] = None
-    images: Optional[List[str]] = []
-    demo_files: Optional[List[dict]] = []
+    images: Optional[List[str]] = []  # Legacy
+    demo_files: Optional[List[dict]] = []  # Legacy
+    
     technologies: List[str] = []
     tags: Optional[List[str]] = []
     is_featured: bool = False
@@ -39,11 +56,27 @@ class ProjectUpdate(BaseSchema):
     short_description: Optional[str] = Field(None, max_length=500)
     content: Optional[str] = None
     github_url: Optional[str] = None
+    
+    # DEMO CONFIGURATION
+    demo_type: Optional[str] = None
+    
+    # VIDEO DEMO
+    demo_video_type: Optional[str] = None
+    demo_video_url: Optional[str] = None
+    demo_video_thumbnail: Optional[str] = None
+    
+    # GALLERY DEMO
+    demo_images: Optional[List[dict]] = None
+    
+    # LIVE DEMO
     live_demo_url: Optional[str] = None
-    demo_type: Optional[str] = Field(None, pattern="^(iframe|link|video|images)$")
+    live_demo_type: Optional[str] = None
+    
+    # Archivos y medios
     thumbnail_url: Optional[str] = None
     images: Optional[List[str]] = None
     demo_files: Optional[List[dict]] = None
+    
     technologies: Optional[List[str]] = None
     tags: Optional[List[str]] = None
     is_featured: Optional[bool] = None
@@ -59,22 +92,39 @@ class ProjectResponse(ProjectBase, TimestampMixin):
 
 class ProjectPublic(BaseSchema):
     """Esquema público de proyecto (sin datos sensibles)"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     title: str
     slug: str
     description: str
-    short_description: Optional[str]
-    content: Optional[str]
-    github_url: Optional[str]
-    live_demo_url: Optional[str]
-    demo_type: Optional[str]
-    thumbnail_url: Optional[str]
-    images: Optional[List[str]]
+    short_description: Optional[str] = None
+    content: Optional[str] = None
+    github_url: Optional[str] = None
+    
+    # DEMO CONFIGURATION
+    demo_type: Optional[str] = None
+    demo_video_type: Optional[str] = None
+    demo_video_url: Optional[str] = None
+    demo_video_thumbnail: Optional[str] = None
+    demo_images: Optional[List[dict]] = None
+    live_demo_url: Optional[str] = None
+    live_demo_type: Optional[str] = None
+    
+    # Archivos y medios
+    thumbnail_url: Optional[str] = None
+    images: Optional[List[str]] = None
+    
     technologies: List[str]
-    tags: Optional[List[str]]
+    tags: Optional[List[str]] = None
     is_featured: bool
     view_count: int
-    created_at: str  # Como string para el frontend
+    created_at: datetime
+    
+    @field_serializer('created_at')
+    def serialize_created_at(self, value: datetime) -> str:
+        """Convertir datetime a string ISO para el frontend"""
+        return value.isoformat() if value else None
 
 
 class ProjectList(BaseSchema):

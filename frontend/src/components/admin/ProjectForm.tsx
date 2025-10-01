@@ -80,7 +80,14 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             github_url: values.github_url || undefined,
             live_demo_url: values.live_demo_url || undefined,
             thumbnail_url: values.thumbnail_url || (values.images.length > 0 ? values.images[0] : undefined),
-            image_urls: values.images,
+            // Mantener images para compatibilidad
+            images: values.images,
+            // Inicializar campos de demo vacíos si no están presentes
+            demo_video_type: undefined,
+            demo_video_url: undefined,
+            demo_video_thumbnail: undefined,
+            demo_images: [],
+            live_demo_type: values.live_demo_url ? 'external' : undefined,
         };
 
         const success = await onSubmit(processedData);

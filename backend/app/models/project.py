@@ -21,13 +21,26 @@ class Project(BaseModel):
     
     # URLs y enlaces
     github_url = Column(String(500), nullable=True)
+    
+    # DEMO CONFIGURATION
+    demo_type = Column(String(50), nullable=True)  # 'video', 'gallery', 'link', 'video+gallery', 'all'
+    
+    # VIDEO DEMO
+    demo_video_type = Column(String(20), nullable=True)  # 'youtube', 'local', null
+    demo_video_url = Column(String(500), nullable=True)  # YouTube URL o ruta local (/uploads/videos/...)
+    demo_video_thumbnail = Column(String(500), nullable=True)  # Thumbnail personalizado
+    
+    # GALLERY DEMO
+    demo_images = Column(JSON, nullable=True)  # [{"url": "...", "title": "...", "order": 1}]
+    
+    # LIVE DEMO
     live_demo_url = Column(String(500), nullable=True)
-    demo_type = Column(String(50), nullable=True)  # 'iframe', 'link', 'video', 'images'
+    live_demo_type = Column(String(20), nullable=True)  # 'iframe', 'external'
     
     # Archivos y medios
     thumbnail_url = Column(String(500), nullable=True)
-    images = Column(JSON, nullable=True)  # Array de URLs de imágenes
-    demo_files = Column(JSON, nullable=True)  # Archivos del demo
+    images = Column(JSON, nullable=True)  # Array de URLs de imágenes (legacy)
+    demo_files = Column(JSON, nullable=True)  # Archivos del demo (legacy)
     
     # Tecnologías y tags
     technologies = Column(JSON, nullable=False, default=list)  # Array de tecnologías
