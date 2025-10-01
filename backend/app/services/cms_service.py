@@ -143,6 +143,11 @@ class CMSService:
                 "label": "Contacto",
                 "icon": "mail",
                 "description": "Formulario de contacto"
+            },
+            "footer": {
+                "label": "Footer",
+                "icon": "layout",
+                "description": "Pie de página del sitio web"
             }
         }
         
@@ -245,6 +250,40 @@ class CMSService:
                 content={
                     "title": "Contacto",
                     "subtitle": "¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti. Contacta conmigo y hablemos de tu próximo proyecto."
+                },
+                order_index=1
+            ),
+            # FOOTER - Main Section
+            PageContentCreate(
+                page_key="footer",
+                section_key="main",
+                title="Pie de Página Principal",
+                description="Contenido completo del footer del sitio",
+                content={
+                    "brand_name": "Portafolio",
+                    "brand_description": "Desarrollador Full Stack especializado en crear experiencias web modernas y escalables.",
+                    "links_title": "Enlaces",
+                    "links": [
+                        {"text": "Proyectos", "url": "/projects"},
+                        {"text": "Sobre mí", "url": "/about"},
+                        {"text": "Contacto", "url": "/contact"},
+                        {"text": "Descargar CV", "url": "/cv/download"}
+                    ],
+                    "social_title": "Sígueme",
+                    "social_links": [
+                        {"text": "GitHub", "url": "https://github.com"},
+                        {"text": "LinkedIn", "url": "https://linkedin.com"},
+                        {"text": "Twitter", "url": "https://twitter.com"}
+                    ],
+                    "contact_title": "Contacto",
+                    "contact_text": "¿Tienes un proyecto en mente?",
+                    "contact_cta": "Hablemos →",
+                    "contact_url": "/contact",
+                    "copyright_text": "Portafolio Personal. Todos los derechos reservados.",
+                    "legal_links": [
+                        {"text": "Privacidad", "url": "/privacy"},
+                        {"text": "Términos", "url": "/terms"}
+                    ]
                 },
                 order_index=1
             )

@@ -1,12 +1,11 @@
 'use client';
 
+import { SectionEditor } from '@/components/cms/SectionEditor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { cmsApi } from '@/lib/cms-api';
 import { PAGE_LABELS, PageContent } from '@/types/cms';
-import { ArrowLeft, Edit, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Edit, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -17,9 +16,7 @@ export default function EditPageCMS() {
     const pageKey = params.page as string;
     const [sections, setSections] = useState<PageContent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [editingSection, setEditingSection] = useState<PageContent | null>(null);
-    const [editedContent, setEditedContent] = useState<string>('');
-    const [isSaving, setIsSaving] = useState(false);
+    const [editingSectionKeys, setEditingSectionKeys] = useState<{ pageKey: string; sectionKey: string } | null>(null);
 
     useEffect(() => {
         loadSections();
@@ -38,35 +35,15 @@ export default function EditPageCMS() {
     };
 
     const handleEdit = (section: PageContent) => {
-        setEditingSection(section);
-        setEditedContent(JSON.stringify(section.content, null, 2));
+        setEditingSectionKeys({
+            pageKey: section.page_key,
+            sectionKey: section.section_key
+        });
     };
 
-    const handleSave = async () => {
-        if (!editingSection) return;
-
-        try {
-            setIsSaving(true);
-            const parsedContent = JSON.parse(editedContent);
-
-            await cmsApi.updateSection(
-                editingSection.page_key,
-                editingSection.section_key,
-                { content: parsedContent }
-            );
-
-            toast.success('Sección actualizada correctamente');
-            setEditingSection(null);
-            loadSections();
-        } catch (error: any) {
-            if (error instanceof SyntaxError) {
-                toast.error('JSON inválido. Verifica el formato');
-            } else {
-                toast.error(error.response?.data?.detail || 'Error al guardar');
-            }
-        } finally {
-            setIsSaving(false);
-        }
+    const handleClose = () => {
+        setEditingSectionKeys(null);
+        loadSections();
     };
 
     const pageLabel = PAGE_LABELS[pageKey as keyof typeof PAGE_LABELS] || pageKey;
@@ -90,45 +67,6 @@ export default function EditPageCMS() {
                 <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
-            ) : editingSection ? (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Editando: {editingSection.title}</CardTitle>
-                        <CardDescription>{editingSection.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Label>Contenido (JSON)</Label>
-                            <Textarea
-                                value={editedContent}
-                                onChange={(e) => setEditedContent(e.target.value)}
-                                className="font-mono text-sm min-h-[400px]"
-                                placeholder='{"title": "Mi título", "description": "..."}'
-                            />
-                            <p className="text-xs text-muted-foreground mt-2">
-                                Edita el contenido en formato JSON. Asegúrate de que sea válido.
-                            </p>
-                        </div>
-
-                        <div className="flex gap-2 justify-end">
-                            <Button
-                                variant="outline"
-                                onClick={() => setEditingSection(null)}
-                                disabled={isSaving}
-                            >
-                                Cancelar
-                            </Button>
-                            <Button onClick={handleSave} disabled={isSaving}>
-                                {isSaving ? (
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                ) : (
-                                    <Save className="w-4 h-4 mr-2" />
-                                )}
-                                Guardar Cambios
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
             ) : (
                 <div className="grid gap-4">
                     {sections.map((section) => (
@@ -139,25 +77,34 @@ export default function EditPageCMS() {
                                         <CardTitle>{section.title}</CardTitle>
                                         <CardDescription>{section.description}</CardDescription>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            size="sm"
-                                            onClick={() => handleEdit(section)}
-                                        >
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Editar
-                                        </Button>
-                                    </div>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => handleEdit(section)}
+                                    >
+                                        <Edit className="w-4 h-4 mr-2" />
+                                        Editar
+                                    </Button>
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <pre className="bg-muted p-4 rounded text-sm overflow-auto max-h-48">
-                                    {JSON.stringify(section.content, null, 2)}
-                                </pre>
+                                <div className="text-sm text-muted-foreground">
+                                    {Object.keys(section.content).length} campos configurables
+                                </div>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
+            )}
+
+            {/* Modal de edición (mismo que la edición visual) */}
+            {editingSectionKeys && (
+                <SectionEditor
+                    pageKey={editingSectionKeys.pageKey}
+                    sectionKey={editingSectionKeys.sectionKey}
+                    isOpen={true}
+                    onClose={handleClose}
+                    onSaved={loadSections}
+                />
             )}
         </div>
     );

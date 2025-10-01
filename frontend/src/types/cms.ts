@@ -72,13 +72,14 @@ export interface CMSStats {
 
 // ========== Helper Types ==========
 
-export type PageKey = 'home' | 'about' | 'projects' | 'contact';
+export type PageKey = 'home' | 'about' | 'projects' | 'contact' | 'footer';
 
 export const PAGE_LABELS: Record<PageKey, string> = {
     home: 'Inicio',
     about: 'Sobre Mí',
     projects: 'Proyectos',
     contact: 'Contacto',
+    footer: 'Footer',
 };
 
 export const PAGE_ICONS: Record<PageKey, string> = {
@@ -86,5 +87,6 @@ export const PAGE_ICONS: Record<PageKey, string> = {
     about: '👤',
     projects: '📁',
     contact: '📧',
+    footer: '📐',
 };
 

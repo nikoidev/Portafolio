@@ -50,6 +50,7 @@ export default function CMSPage() {
             user: '👤',
             folder: '📁',
             mail: '📧',
+            layout: '📐',
         };
         return icons[icon] || '📄';
     };
