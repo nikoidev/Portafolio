@@ -212,6 +212,21 @@ class CMSService:
                 },
                 order_index=1
             ),
+            # HOME - Featured Projects Section
+            PageContentCreate(
+                page_key="home",
+                section_key="featured_projects",
+                title="Proyectos Destacados",
+                description="Encabezado de la sección de proyectos destacados",
+                content={
+                    "title": "Proyectos Destacados",
+                    "description": "Una selección de mis trabajos más recientes y significativos, donde aplico las últimas tecnologías y mejores prácticas.",
+                    "button_text": "Ver todos los proyectos",
+                    "button_url": "/projects",
+                    "max_projects": 6
+                },
+                order_index=2
+            ),
             # ABOUT - Hero Section
             PageContentCreate(
                 page_key="about",
@@ -271,9 +286,9 @@ class CMSService:
                     ],
                     "social_title": "Sígueme",
                     "social_links": [
-                        {"text": "GitHub", "url": "https://github.com"},
-                        {"text": "LinkedIn", "url": "https://linkedin.com"},
-                        {"text": "Twitter", "url": "https://twitter.com"}
+                        {"text": "GitHub", "url": "https://github.com", "icon": "https://cdn.simpleicons.org/github"},
+                        {"text": "LinkedIn", "url": "https://linkedin.com", "icon": "https://cdn.simpleicons.org/linkedin"},
+                        {"text": "Twitter", "url": "https://twitter.com", "icon": "https://cdn.simpleicons.org/twitter"}
                     ],
                     "contact_title": "Contacto",
                     "contact_text": "¿Tienes un proyecto en mente?",

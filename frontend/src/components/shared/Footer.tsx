@@ -22,9 +22,9 @@ export function Footer() {
         ],
         social_title: 'Sígueme',
         social_links: [
-            { text: 'GitHub', url: 'https://github.com' },
-            { text: 'LinkedIn', url: 'https://linkedin.com' },
-            { text: 'Twitter', url: 'https://twitter.com' }
+            { text: 'GitHub', url: 'https://github.com', icon: 'https://cdn.simpleicons.org/github' },
+            { text: 'LinkedIn', url: 'https://linkedin.com', icon: 'https://cdn.simpleicons.org/linkedin' },
+            { text: 'Twitter', url: 'https://twitter.com', icon: 'https://cdn.simpleicons.org/twitter' }
         ],
         contact_title: 'Contacto',
         contact_text: '¿Tienes un proyecto en mente?',
@@ -88,14 +88,23 @@ export function Footer() {
                                         href={link.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                                        className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                                     >
+                                        {link.icon && (
+                                            <img
+                                                src={link.icon}
+                                                alt={link.text}
+                                                className="w-4 h-4"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        )}
                                         {link.text}
                                     </a>
                                 ))}
                             </div>
                         </div>
-
                         {/* Contacto */}
                         <div className="space-y-4">
                             <h4 className="text-sm font-semibold">{data.contact_title}</h4>
