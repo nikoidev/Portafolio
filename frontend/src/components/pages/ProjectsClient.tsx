@@ -1,17 +1,24 @@
 'use client';
 
+import { EditableSection } from '@/components/cms/EditableSection';
 import { ProjectCard } from '@/components/public/ProjectCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useCMSContent } from '@/hooks/useCMSContent';
 import { api } from '@/lib/api';
 import { Project } from '@/types/api';
-import { ArrowUpDown, Filter, Grid, List, Search } from 'lucide-react';
+import { ArrowUpDown, Filter, Grid, List, Loader2, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export default function ProjectsClient() {
+    // CMS Content
+    const { content: headerContent, isLoading: headerLoading, refresh: refreshHeader } = useCMSContent('projects', 'header');
+    const { content: filtersContent, isLoading: filtersLoading, refresh: refreshFilters } = useCMSContent('projects', 'filters');
+    const { content: ctaContent, isLoading: ctaLoading, refresh: refreshCta } = useCMSContent('projects', 'cta');
+
     const [projects, setProjects] = useState<Project[]>([]);
     const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -20,6 +27,30 @@ export default function ProjectsClient() {
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [sortBy, setSortBy] = useState<'date' | 'views' | 'title'>('date');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+    const defaultHeader = {
+        title: 'Mis Proyectos',
+        description: 'Explora mi colección de proyectos de desarrollo web, aplicaciones móviles y más. Cada proyecto representa un desafío único y una oportunidad de aprendizaje.'
+    };
+
+    const defaultFilters = {
+        title: 'Filtros y Búsqueda',
+        description: 'Encuentra proyectos específicos usando los filtros y la búsqueda',
+        search_placeholder: 'Buscar proyectos por nombre, descripción o tecnología...'
+    };
+
+    const defaultCta = {
+        title: '¿Te interesa mi trabajo?',
+        description: 'Si tienes algún proyecto en mente o quieres colaborar, no dudes en contactarme.',
+        button_primary_text: 'Contactar',
+        button_primary_url: '/contact',
+        button_secondary_text: 'Descargar CV',
+        button_secondary_url: '/cv/download'
+    };
+
+    const header = headerContent || defaultHeader;
+    const filters = filtersContent || defaultFilters;
+    const cta = ctaContent || defaultCta;
 
     // Obtener todas las tecnologías únicas
     const allTechnologies = Array.from(
@@ -97,12 +128,14 @@ export default function ProjectsClient() {
         }
     };
 
-    if (isLoading) {
+    const isLoadingData = isLoading || headerLoading || filtersLoading || ctaLoading;
+
+    if (isLoadingData) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
                 <div className="container mx-auto px-4 py-16">
                     <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                        <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
                         <p className="mt-4 text-muted-foreground">Cargando proyectos...</p>
                     </div>
                 </div>
@@ -114,120 +147,123 @@ export default function ProjectsClient() {
         <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        Mis Proyectos
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Explora mi colección de proyectos de desarrollo web, aplicaciones móviles y más.
-                        Cada proyecto representa un desafío único y una oportunidad de aprendizaje.
-                    </p>
-                </div>
+                <EditableSection pageKey="projects" sectionKey="header" onContentUpdate={refreshHeader}>
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                            {header.title}
+                        </h1>
+                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                            {header.description}
+                        </p>
+                    </div>
+                </EditableSection>
 
                 {/* Filtros y controles */}
-                <Card className="mb-8">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Filter className="w-5 h-5" />
-                            Filtros y Búsqueda
-                        </CardTitle>
-                        <CardDescription>
-                            Encuentra proyectos específicos usando los filtros y la búsqueda
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {/* Barra de búsqueda */}
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                            <Input
-                                placeholder="Buscar proyectos por nombre, descripción o tecnología..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-
-                        {/* Filtros de tecnología */}
-                        <div>
-                            <label className="text-sm font-medium mb-2 block">Tecnologías</label>
-                            <div className="flex flex-wrap gap-2">
-                                <Badge
-                                    variant={selectedTechnology === null ? "default" : "outline"}
-                                    className="cursor-pointer"
-                                    onClick={() => setSelectedTechnology(null)}
-                                >
-                                    Todas
-                                </Badge>
-                                {allTechnologies.map((tech) => (
-                                    <Badge
-                                        key={tech}
-                                        variant={selectedTechnology === tech ? "default" : "outline"}
-                                        className="cursor-pointer"
-                                        onClick={() => setSelectedTechnology(tech)}
-                                    >
-                                        {tech}
-                                    </Badge>
-                                ))}
+                <EditableSection pageKey="projects" sectionKey="filters" onContentUpdate={refreshFilters}>
+                    <Card className="mb-8">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Filter className="w-5 h-5" />
+                                {filters.title}
+                            </CardTitle>
+                            <CardDescription>
+                                {filters.description}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {/* Barra de búsqueda */}
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                                <Input
+                                    placeholder={filters.search_placeholder}
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10"
+                                />
                             </div>
-                        </div>
 
-                        {/* Controles de vista y ordenación */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">Vista:</span>
-                                <div className="flex border rounded-lg">
-                                    <Button
-                                        variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setViewMode('grid')}
-                                        className="rounded-r-none"
+                            {/* Filtros de tecnología */}
+                            <div>
+                                <label className="text-sm font-medium mb-2 block">Tecnologías</label>
+                                <div className="flex flex-wrap gap-2">
+                                    <Badge
+                                        variant={selectedTechnology === null ? "default" : "outline"}
+                                        className="cursor-pointer"
+                                        onClick={() => setSelectedTechnology(null)}
                                     >
-                                        <Grid className="w-4 h-4" />
-                                    </Button>
-                                    <Button
-                                        variant={viewMode === 'list' ? 'default' : 'ghost'}
-                                        size="sm"
-                                        onClick={() => setViewMode('list')}
-                                        className="rounded-l-none"
-                                    >
-                                        <List className="w-4 h-4" />
-                                    </Button>
+                                        Todas
+                                    </Badge>
+                                    {allTechnologies.map((tech) => (
+                                        <Badge
+                                            key={tech}
+                                            variant={selectedTechnology === tech ? "default" : "outline"}
+                                            className="cursor-pointer"
+                                            onClick={() => setSelectedTechnology(tech)}
+                                        >
+                                            {tech}
+                                        </Badge>
+                                    ))}
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">Ordenar por:</span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => toggleSort('date')}
-                                    className="gap-1"
-                                >
-                                    Fecha
-                                    {sortBy === 'date' && <ArrowUpDown className="w-3 h-3" />}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => toggleSort('views')}
-                                    className="gap-1"
-                                >
-                                    Vistas
-                                    {sortBy === 'views' && <ArrowUpDown className="w-3 h-3" />}
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => toggleSort('title')}
-                                    className="gap-1"
-                                >
-                                    Nombre
-                                    {sortBy === 'title' && <ArrowUpDown className="w-3 h-3" />}
-                                </Button>
+                            {/* Controles de vista y ordenación */}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Vista:</span>
+                                    <div className="flex border rounded-lg">
+                                        <Button
+                                            variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                                            size="sm"
+                                            onClick={() => setViewMode('grid')}
+                                            className="rounded-r-none"
+                                        >
+                                            <Grid className="w-4 h-4" />
+                                        </Button>
+                                        <Button
+                                            variant={viewMode === 'list' ? 'default' : 'ghost'}
+                                            size="sm"
+                                            onClick={() => setViewMode('list')}
+                                            className="rounded-l-none"
+                                        >
+                                            <List className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-medium">Ordenar por:</span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => toggleSort('date')}
+                                        className="gap-1"
+                                    >
+                                        Fecha
+                                        {sortBy === 'date' && <ArrowUpDown className="w-3 h-3" />}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => toggleSort('views')}
+                                        className="gap-1"
+                                    >
+                                        Vistas
+                                        {sortBy === 'views' && <ArrowUpDown className="w-3 h-3" />}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => toggleSort('title')}
+                                        className="gap-1"
+                                    >
+                                        Nombre
+                                        {sortBy === 'title' && <ArrowUpDown className="w-3 h-3" />}
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </EditableSection>
 
                 {/* Resultados */}
                 <div className="mb-6">
@@ -275,28 +311,30 @@ export default function ProjectsClient() {
 
                 {/* Call to action */}
                 {filteredProjects.length > 0 && (
-                    <div className="text-center mt-16">
-                        <Card className="max-w-2xl mx-auto">
-                            <CardContent className="pt-6">
-                                <h3 className="text-2xl font-bold mb-4">¿Te interesa mi trabajo?</h3>
-                                <p className="text-muted-foreground mb-6">
-                                    Si tienes algún proyecto en mente o quieres colaborar, no dudes en contactarme.
-                                </p>
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Button asChild size="lg">
-                                        <a href="/contact">
-                                            Contactar
-                                        </a>
-                                    </Button>
-                                    <Button asChild variant="outline" size="lg">
-                                        <a href="/cv/download" target="_blank">
-                                            Descargar CV
-                                        </a>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                    <EditableSection pageKey="projects" sectionKey="cta" onContentUpdate={refreshCta}>
+                        <div className="text-center mt-16">
+                            <Card className="max-w-2xl mx-auto">
+                                <CardContent className="pt-6">
+                                    <h3 className="text-2xl font-bold mb-4">{cta.title}</h3>
+                                    <p className="text-muted-foreground mb-6">
+                                        {cta.description}
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                        <Button asChild size="lg">
+                                            <a href={cta.button_primary_url}>
+                                                {cta.button_primary_text}
+                                            </a>
+                                        </Button>
+                                        <Button asChild variant="outline" size="lg">
+                                            <a href={cta.button_secondary_url} target="_blank">
+                                                {cta.button_secondary_text}
+                                            </a>
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </EditableSection>
                 )}
             </div>
         </div>

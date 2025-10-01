@@ -25,13 +25,107 @@ type ContactFormValues = z.infer<typeof contactFormSchema>;
 export default function ContactClient() {
     // CMS Content
     const { content: headerContent, isLoading: headerLoading, refresh: refreshHeader } = useCMSContent('contact', 'header');
+    const { content: contactInfoContent, isLoading: contactInfoLoading, refresh: refreshContactInfo } = useCMSContent('contact', 'contact_info');
+    const { content: availabilityContent, isLoading: availabilityLoading, refresh: refreshAvailability } = useCMSContent('contact', 'availability');
+    const { content: callCtaContent, isLoading: callCtaLoading, refresh: refreshCallCta } = useCMSContent('contact', 'call_cta');
+    const { content: faqContent, isLoading: faqLoading, refresh: refreshFaq } = useCMSContent('contact', 'faq');
 
     const defaultHeader = {
         title: 'Contacto',
         subtitle: '¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti. Contacta conmigo y hablemos de tu próximo proyecto.',
     };
 
+    const defaultContactInfo = {
+        contacts: [
+            {
+                icon: 'mail',
+                label: 'Email',
+                value: 'tu@email.com',
+                href: 'mailto:tu@email.com',
+                description: 'Respondo en 24-48 horas'
+            },
+            {
+                icon: 'phone',
+                label: 'Teléfono',
+                value: '+34 XXX XXX XXX',
+                href: 'tel:+34XXXXXXXXX',
+                description: 'Lun - Vie, 9:00 - 18:00'
+            },
+            {
+                icon: 'map-pin',
+                label: 'Ubicación',
+                value: 'Madrid, España',
+                href: 'https://maps.google.com/?q=Madrid,Spain',
+                description: 'Disponible para trabajo remoto'
+            },
+            {
+                icon: 'linkedin',
+                label: 'LinkedIn',
+                value: 'linkedin.com/in/tu-perfil',
+                href: 'https://linkedin.com/in/tu-perfil',
+                description: 'Conecta conmigo profesionalmente'
+            },
+            {
+                icon: 'github',
+                label: 'GitHub',
+                value: 'github.com/tu-usuario',
+                href: 'https://github.com/tu-usuario',
+                description: 'Revisa mi código y proyectos'
+            }
+        ]
+    };
+
+    const defaultAvailability = {
+        title: 'Disponibilidad',
+        status: 'Disponible',
+        status_color: 'green',
+        response_time: '24-48 horas',
+        work_mode: 'Remoto/Híbrido'
+    };
+
+    const defaultCallCta = {
+        title: '¿Prefieres una llamada?',
+        description: 'Si prefieres hablar directamente, podemos agendar una videollamada.',
+        button_text: 'Agendar llamada',
+        button_url: 'mailto:tu@email.com?subject=Solicitud de videollamada'
+    };
+
+    const defaultFaq = {
+        title: 'Preguntas frecuentes',
+        faqs: [
+            {
+                question: '¿Cuánto tiempo toma un proyecto?',
+                answer: 'Depende de la complejidad, pero típicamente entre 2-8 semanas para proyectos web completos.'
+            },
+            {
+                question: '¿Trabajas con equipos?',
+                answer: 'Sí, tengo experiencia trabajando tanto de forma independiente como en equipos multidisciplinarios.'
+            },
+            {
+                question: '¿Ofreces mantenimiento?',
+                answer: 'Sí, ofrezco servicios de mantenimiento y soporte continuo para todos mis proyectos.'
+            },
+            {
+                question: '¿Trabajas con startups?',
+                answer: 'Absolutamente. Me encanta trabajar con startups y ayudar a convertir ideas en productos reales.'
+            }
+        ]
+    };
+
     const header = headerContent || defaultHeader;
+    const contactInfoData = contactInfoContent || defaultContactInfo;
+    const availability = availabilityContent || defaultAvailability;
+    const callCta = callCtaContent || defaultCallCta;
+    const faq = faqContent || defaultFaq;
+
+    // Mapeo de iconos
+    const iconMap: Record<string, any> = {
+        mail: Mail,
+        phone: Phone,
+        'map-pin': MapPin,
+        linkedin: Linkedin,
+        github: Github,
+    };
 
     const form = useForm<ContactFormValues>({
         resolver: zodResolver(contactFormSchema),
@@ -61,45 +155,9 @@ export default function ContactClient() {
         }
     };
 
-    const contactInfo = [
-        {
-            icon: Mail,
-            label: 'Email',
-            value: 'tu@email.com',
-            href: 'mailto:tu@email.com',
-            description: 'Respondo en 24-48 horas'
-        },
-        {
-            icon: Phone,
-            label: 'Teléfono',
-            value: '+34 XXX XXX XXX',
-            href: 'tel:+34XXXXXXXXX',
-            description: 'Lun - Vie, 9:00 - 18:00'
-        },
-        {
-            icon: MapPin,
-            label: 'Ubicación',
-            value: 'Madrid, España',
-            href: 'https://maps.google.com/?q=Madrid,Spain',
-            description: 'Disponible para trabajo remoto'
-        },
-        {
-            icon: Linkedin,
-            label: 'LinkedIn',
-            value: 'linkedin.com/in/tu-perfil',
-            href: 'https://linkedin.com/in/tu-perfil',
-            description: 'Conecta conmigo profesionalmente'
-        },
-        {
-            icon: Github,
-            label: 'GitHub',
-            value: 'github.com/tu-usuario',
-            href: 'https://github.com/tu-usuario',
-            description: 'Revisa mi código y proyectos'
-        },
-    ];
+    const isLoadingData = headerLoading || contactInfoLoading || availabilityLoading || callCtaLoading || faqLoading;
 
-    if (headerLoading) {
+    if (isLoadingData) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -217,117 +275,103 @@ export default function ContactClient() {
 
                     {/* Información de contacto */}
                     <div className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Información de contacto</CardTitle>
-                                <CardDescription>
-                                    Otras formas de ponerte en contacto conmigo
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {contactInfo.map((info, index) => (
-                                    <a
-                                        key={index}
-                                        href={info.href}
-                                        target={info.href.startsWith('http') ? '_blank' : undefined}
-                                        rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-                                    >
-                                        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                            <info.icon className="w-5 h-5 text-primary" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-medium">{info.label}</h3>
-                                            <p className="text-sm text-muted-foreground">{info.value}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">{info.description}</p>
-                                        </div>
-                                    </a>
-                                ))}
-                            </CardContent>
-                        </Card>
+                        <EditableSection pageKey="contact" sectionKey="contact_info" onContentUpdate={refreshContactInfo}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Información de contacto</CardTitle>
+                                    <CardDescription>
+                                        Otras formas de ponerte en contacto conmigo
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {contactInfoData.contacts.map((info, index) => {
+                                        const IconComponent = iconMap[info.icon] || Mail;
+                                        return (
+                                            <a
+                                                key={index}
+                                                href={info.href}
+                                                target={info.href.startsWith('http') ? '_blank' : undefined}
+                                                rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                                className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                                            >
+                                                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                                    <IconComponent className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="font-medium">{info.label}</h3>
+                                                    <p className="text-sm text-muted-foreground">{info.value}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">{info.description}</p>
+                                                </div>
+                                            </a>
+                                        );
+                                    })}
+                                </CardContent>
+                            </Card>
+                        </EditableSection>
 
                         {/* Disponibilidad */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Disponibilidad</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Estado actual:</span>
-                                    <span className="text-sm font-medium text-green-600 flex items-center gap-1">
-                                        <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                                        Disponible
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Tiempo de respuesta:</span>
-                                    <span className="text-sm font-medium">24-48 horas</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Modalidad:</span>
-                                    <span className="text-sm font-medium">Remoto/Híbrido</span>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <EditableSection pageKey="contact" sectionKey="availability" onContentUpdate={refreshAvailability}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>{availability.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm">Estado actual:</span>
+                                        <span className={`text-sm font-medium text-${availability.status_color}-600 flex items-center gap-1`}>
+                                            <div className={`w-2 h-2 rounded-full bg-${availability.status_color}-600`}></div>
+                                            {availability.status}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm">Tiempo de respuesta:</span>
+                                        <span className="text-sm font-medium">{availability.response_time}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm">Modalidad:</span>
+                                        <span className="text-sm font-medium">{availability.work_mode}</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </EditableSection>
 
                         {/* Call to action */}
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h3 className="font-semibold mb-2">¿Prefieres una llamada?</h3>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Si prefieres hablar directamente, podemos agendar una videollamada.
-                                </p>
-                                <Button asChild variant="outline" className="w-full">
-                                    <a href="mailto:tu@email.com?subject=Solicitud de videollamada">
-                                        Agendar llamada
-                                    </a>
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        <EditableSection pageKey="contact" sectionKey="call_cta" onContentUpdate={refreshCallCta}>
+                            <Card>
+                                <CardContent className="pt-6">
+                                    <h3 className="font-semibold mb-2">{callCta.title}</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">
+                                        {callCta.description}
+                                    </p>
+                                    <Button asChild variant="outline" className="w-full">
+                                        <a href={callCta.button_url}>
+                                            {callCta.button_text}
+                                        </a>
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </EditableSection>
                     </div>
                 </div>
 
                 {/* FAQ Section */}
-                <div className="mt-16">
-                    <h2 className="text-3xl font-bold text-center mb-8">Preguntas frecuentes</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h3 className="font-semibold mb-2">¿Cuánto tiempo toma un proyecto?</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Depende de la complejidad, pero típicamente entre 2-8 semanas para proyectos web completos.
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h3 className="font-semibold mb-2">¿Trabajas con equipos?</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Sí, tengo experiencia trabajando tanto de forma independiente como en equipos multidisciplinarios.
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h3 className="font-semibold mb-2">¿Ofreces mantenimiento?</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Sí, ofrezco servicios de mantenimiento y soporte continuo para todos mis proyectos.
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardContent className="pt-6">
-                                <h3 className="font-semibold mb-2">¿Trabajas con startups?</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Absolutamente. Me encanta trabajar con startups y ayudar a convertir ideas en productos reales.
-                                </p>
-                            </CardContent>
-                        </Card>
+                <EditableSection pageKey="contact" sectionKey="faq" onContentUpdate={refreshFaq}>
+                    <div className="mt-16">
+                        <h2 className="text-3xl font-bold text-center mb-8">{faq.title}</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                            {faq.faqs.map((item, index) => (
+                                <Card key={index}>
+                                    <CardContent className="pt-6">
+                                        <h3 className="font-semibold mb-2">{item.question}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {item.answer}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </EditableSection>
             </div>
         </div>
     );
