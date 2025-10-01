@@ -770,27 +770,22 @@ class CMSService:
             )
         ]
         
-        created_or_updated_sections = []
+        created_sections = []
         
         for section_data in default_sections:
             # Verificar si existe
             existing = self.get_section(section_data.page_key, section_data.section_key)
             
-            if existing:
-                # Actualizar sección existente
-                for key, value in section_data.model_dump(exclude_unset=True).items():
-                    setattr(existing, key, value)
-                created_or_updated_sections.append(existing)
-            else:
-                # Crear nueva sección
+            if not existing:
+                # Solo crear si NO existe (no sobrescribir contenido existente)
                 section = PageContent(**section_data.model_dump())
                 self.db.add(section)
-                created_or_updated_sections.append(section)
+                created_sections.append(section)
         
-        if created_or_updated_sections:
+        if created_sections:
             self.db.commit()
-            for section in created_or_updated_sections:
+            for section in created_sections:
                 self.db.refresh(section)
         
-        return created_or_updated_sections
+        return created_sections
 

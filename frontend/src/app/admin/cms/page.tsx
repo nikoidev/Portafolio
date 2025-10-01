@@ -34,8 +34,14 @@ export default function CMSPage() {
     const handleSeedContent = async () => {
         try {
             setIsSeeding(true);
-            await cmsApi.seedDefaultContent();
-            toast.success('Contenido inicial creado correctamente');
+            const result = await cmsApi.seedDefaultContent();
+
+            if (result && result.length > 0) {
+                toast.success(`${result.length} secciones nuevas creadas correctamente`);
+            } else {
+                toast.info('Todas las secciones ya existen. No se sobrescribió ningún contenido.');
+            }
+
             loadPages();
         } catch (error: any) {
             toast.error(error.response?.data?.detail || 'Error al crear contenido');
@@ -76,13 +82,14 @@ export default function CMSPage() {
                     <Button
                         onClick={handleSeedContent}
                         disabled={isSeeding}
+                        variant="secondary"
                     >
                         {isSeeding ? (
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         ) : (
                             <FileText className="w-4 h-4 mr-2" />
                         )}
-                        Crear Contenido Inicial
+                        Inicializar Nuevas Secciones
                     </Button>
                 </div>
             </div>
