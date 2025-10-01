@@ -36,7 +36,7 @@ export function CreateSectionButton() {
         <>
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-24 right-6 z-50 flex items-center gap-2 px-4 py-3 bg-green-500 text-white rounded-full shadow-xl hover:bg-green-600 transition-all hover:scale-110 text-sm font-medium"
+                className="fixed bottom-24 right-6 z-[100] flex items-center gap-2 px-4 py-3 bg-green-500 text-white rounded-full shadow-xl hover:bg-green-600 transition-all hover:scale-110 text-sm font-medium"
                 title="Agregar nueva sección"
             >
                 <Plus className="w-5 h-5" />

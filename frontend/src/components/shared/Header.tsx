@@ -1,8 +1,12 @@
 'use client';
 
+import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
+import { useCMSContent } from '@/hooks/useCMSContent';
+import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface HeaderProps {
     variant?: 'public' | 'admin';
@@ -10,75 +14,89 @@ interface HeaderProps {
 
 export function Header({ variant = 'public' }: HeaderProps) {
     const { isAuthenticated, user, logout } = useAuthStore();
+    const pathname = usePathname();
+
+    // Cargar contenido desde CMS para header admin
+    const { content, isLoading, refresh } = useCMSContent('admin_header', 'main');
+
+    // Contenido por defecto si no hay en CMS
+    const defaultContent = {
+        brand_name: 'Panel Admin',
+        navigation_links: [
+            { text: 'Dashboard', url: '/admin', enabled: true },
+            { text: 'Proyectos', url: '/admin/projects', enabled: true },
+            { text: 'CV', url: '/admin/cv', enabled: true },
+            { text: 'Usuarios', url: '/admin/users', enabled: true },
+            { text: 'Gestión Web', url: '/admin/cms', enabled: true },
+            { text: 'Archivos', url: '/admin/uploads', enabled: true },
+        ],
+    };
+
+    const adminData = content || defaultContent;
 
     if (variant === 'admin') {
-        return (
-            <header className="border-b bg-background">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <Link href="/admin" className="text-xl font-bold">
-                                Panel Admin
-                            </Link>
-                            <nav className="flex items-center space-x-4 ml-8">
-                                <Link
-                                    href="/admin"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    Dashboard
-                                </Link>
-                                <Link
-                                    href="/admin/projects"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    Proyectos
-                                </Link>
-                                <Link
-                                    href="/admin/cv"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    CV
-                                </Link>
-                                <Link
-                                    href="/admin/users"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    Usuarios
-                                </Link>
-                                <Link
-                                    href="/admin/cms"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    Gestión Web
-                                </Link>
-                                <Link
-                                    href="/admin/uploads"
-                                    className="text-sm font-medium hover:text-primary transition-colors"
-                                >
-                                    Archivos
-                                </Link>
-                            </nav>
-                        </div>
+        // Filtrar enlaces habilitados
+        const enabledNavLinks = adminData.navigation_links?.filter((link: any) => link.enabled) || [];
 
-                        <div className="flex items-center space-x-4">
-                            {isAuthenticated && user && (
-                                <>
-                                    <span className="text-sm text-muted-foreground">
-                                        Hola, {user.name}
-                                    </span>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={logout}
-                                    >
-                                        Cerrar Sesión
-                                    </Button>
-                                </>
-                            )}
+        if (isLoading) {
+            return (
+                <header className="border-b bg-background">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-center">
+                            <div className="animate-pulse">Cargando...</div>
                         </div>
                     </div>
-                </div>
-            </header>
+                </header>
+            );
+        }
+
+        return (
+            <EditableSection pageKey="admin_header" sectionKey="main" onContentUpdate={refresh}>
+                <header className="border-b bg-background">
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                                <Link href="/admin" className="text-xl font-bold">
+                                    {adminData.brand_name}
+                                </Link>
+                                <nav className="flex items-center space-x-4 ml-8">
+                                    {enabledNavLinks.map((link: any) => (
+                                        <Link
+                                            key={link.text}
+                                            href={link.url}
+                                            className={cn(
+                                                'text-sm font-medium transition-colors',
+                                                pathname === link.url
+                                                    ? 'text-primary'
+                                                    : 'hover:text-primary'
+                                            )}
+                                        >
+                                            {link.text}
+                                        </Link>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="flex items-center space-x-4">
+                                {isAuthenticated && user && (
+                                    <>
+                                        <span className="text-sm text-muted-foreground">
+                                            Hola, {user.name}
+                                        </span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={logout}
+                                        >
+                                            Cerrar Sesión
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            </EditableSection>
         );
     }
 

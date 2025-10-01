@@ -130,7 +130,7 @@ export function EditableSection({
 
             {/* Botones de acción (solo visible en modo edición) */}
             {isEditMode && showActions && (
-                <div className="absolute top-2 right-2 z-10 flex gap-2">
+                <div className="absolute top-2 right-2 z-[110] flex gap-2">
                     {/* Botones de reordenamiento */}
                     <div className="flex flex-col gap-1">
                         <button

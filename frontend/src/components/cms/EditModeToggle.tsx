@@ -11,22 +11,31 @@ export function EditModeToggle() {
     const { isEditMode, toggleEditMode } = useEditMode();
     const pathname = usePathname();
 
-    // Solo mostrar en páginas públicas (no en admin)
-    const isAdminPage = pathname.startsWith('/admin');
+    // Páginas específicas de admin donde NO queremos el toggle
+    const excludedPages = [
+        '/admin/login',
+        '/admin/projects',
+        '/admin/cv',
+        '/admin/users',
+        '/admin/cms',
+        '/admin/uploads',
+    ];
 
-    // No mostrar si no está autenticado o está en página admin
-    if (!isAuthenticated || isAdminPage) {
+    const isExcludedPage = excludedPages.some(page => pathname.startsWith(page));
+
+    // No mostrar si no está autenticado o está en página excluida
+    if (!isAuthenticated || isExcludedPage) {
         return null;
     }
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
+        <div className="fixed bottom-6 right-6 z-[100]">
             <Button
                 onClick={toggleEditMode}
                 size="lg"
                 className={`shadow-lg transition-all ${isEditMode
-                        ? 'bg-orange-500 hover:bg-orange-600'
-                        : 'bg-primary hover:bg-primary/90'
+                    ? 'bg-orange-500 hover:bg-orange-600'
+                    : 'bg-primary hover:bg-primary/90'
                     }`}
             >
                 {isEditMode ? (

@@ -699,6 +699,58 @@ class CMSService:
                     ]
                 },
                 order_index=2
+            ),
+            # NAVBAR (Public) - Main Section
+            PageContentCreate(
+                page_key="navbar",
+                section_key="main",
+                title="Barra de Menú Pública",
+                description="Configuración de la barra de navegación pública",
+                content={
+                    "brand_name": "Portfolio",
+                    "brand_letter": "P",
+                    "navigation_links": [
+                        {"text": "Inicio", "url": "/", "enabled": True},
+                        {"text": "Sobre Mí", "url": "/about", "enabled": True},
+                        {"text": "Proyectos", "url": "/projects", "enabled": True},
+                        {"text": "Contacto", "url": "/contact", "enabled": True}
+                    ],
+                    "social_links": [
+                        {"text": "GitHub", "url": "https://github.com/tu-usuario", "icon": "https://cdn.simpleicons.org/github/181717", "enabled": True},
+                        {"text": "LinkedIn", "url": "https://linkedin.com/in/tu-perfil", "icon": "https://cdn.simpleicons.org/linkedin/0A66C2", "enabled": True},
+                        {"text": "Email", "url": "mailto:tu@email.com", "icon": "https://cdn.simpleicons.org/gmail/EA4335", "enabled": True}
+                    ],
+                    "cv_button": {
+                        "text": "CV",
+                        "url": "/cv/download",
+                        "enabled": True
+                    },
+                    "login_button": {
+                        "text": "Iniciar Sesión",
+                        "url": "/admin/login",
+                        "enabled": True
+                    }
+                },
+                order_index=1
+            ),
+            # ADMIN HEADER - Main Section
+            PageContentCreate(
+                page_key="admin_header",
+                section_key="main",
+                title="Barra de Menú Admin",
+                description="Configuración de la barra de navegación del panel admin",
+                content={
+                    "brand_name": "Panel Admin",
+                    "navigation_links": [
+                        {"text": "Dashboard", "url": "/admin", "enabled": True},
+                        {"text": "Proyectos", "url": "/admin/projects", "enabled": True},
+                        {"text": "CV", "url": "/admin/cv", "enabled": True},
+                        {"text": "Usuarios", "url": "/admin/users", "enabled": True},
+                        {"text": "Gestión Web", "url": "/admin/cms", "enabled": True},
+                        {"text": "Archivos", "url": "/admin/uploads", "enabled": True}
+                    ]
+                },
+                order_index=1
             )
         ]
         
