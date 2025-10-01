@@ -569,6 +569,136 @@ class CMSService:
                     ]
                 },
                 order_index=1
+            ),
+            # PRIVACY - Header Section
+            PageContentCreate(
+                page_key="privacy",
+                section_key="header",
+                title="Encabezado - Privacidad",
+                description="Título y descripción de la página de privacidad",
+                content={
+                    "title": "Política de Privacidad",
+                    "last_updated": "1 de Enero de 2024",
+                    "description": "Esta Política de Privacidad describe cómo se recopila, utiliza y comparte tu información personal cuando visitas o realizas una compra en este sitio web."
+                },
+                order_index=1
+            ),
+            # PRIVACY - Sections
+            PageContentCreate(
+                page_key="privacy",
+                section_key="sections",
+                title="Secciones - Privacidad",
+                description="Contenido de las secciones de privacidad",
+                content={
+                    "sections": [
+                        {
+                            "title": "Información que Recopilamos",
+                            "icon": "shield",
+                            "content": "Cuando visitas el sitio, recopilamos automáticamente cierta información sobre tu dispositivo, incluyendo información sobre tu navegador web, dirección IP, zona horaria y algunas de las cookies instaladas en tu dispositivo. Además, cuando navegas por el sitio, recopilamos información sobre las páginas web individuales o productos que ves, qué sitios web o términos de búsqueda te remitieron al sitio, e información sobre cómo interactúas con el sitio."
+                        },
+                        {
+                            "title": "Uso de tu Información",
+                            "icon": "shield",
+                            "content": "Utilizamos la información que recopilamos para: mejorar y optimizar nuestro sitio web, evaluar el éxito de nuestras campañas de marketing, responder a tus comentarios o consultas, y analizar las tendencias de uso del sitio. Si nos proporcionas información de contacto a través del formulario de contacto, podemos usar esa información para comunicarnos contigo."
+                        },
+                        {
+                            "title": "Compartir tu Información",
+                            "icon": "shield",
+                            "content": "No vendemos, intercambiamos ni transferimos tu información personal identificable a terceros sin tu consentimiento. Esto no incluye a terceros de confianza que nos ayudan a operar nuestro sitio web, realizar nuestro negocio o atenderte, siempre que esas partes acuerden mantener esta información confidencial."
+                        },
+                        {
+                            "title": "Cookies y Tecnologías de Seguimiento",
+                            "icon": "shield",
+                            "content": "Utilizamos cookies y tecnologías similares de seguimiento para rastrear la actividad en nuestro sitio web y almacenar cierta información. Las cookies son archivos con una pequeña cantidad de datos que pueden incluir un identificador único anónimo. Puedes configurar tu navegador para rechazar todas las cookies o para indicar cuándo se envía una cookie."
+                        },
+                        {
+                            "title": "Seguridad de los Datos",
+                            "icon": "shield",
+                            "content": "La seguridad de tu información personal es importante para nosotros. Implementamos medidas de seguridad diseñadas para proteger tu información personal contra acceso no autorizado y uso indebido. Sin embargo, ten en cuenta que ningún método de transmisión por Internet o método de almacenamiento electrónico es 100% seguro."
+                        },
+                        {
+                            "title": "Tus Derechos",
+                            "icon": "shield",
+                            "content": "Tienes derecho a acceder, corregir, actualizar o solicitar la eliminación de tu información personal. Si deseas ejercer estos derechos, contáctanos usando la información de contacto proporcionada en el sitio. También tienes derecho a oponerte al procesamiento de tu información personal, solicitar que restrinjamos el procesamiento de tu información personal o solicitar la portabilidad de tu información personal."
+                        },
+                        {
+                            "title": "Cambios a esta Política",
+                            "icon": "shield",
+                            "content": "Podemos actualizar esta política de privacidad ocasionalmente para reflejar cambios en nuestras prácticas o por otras razones operativas, legales o reglamentarias. Te notificaremos sobre cualquier cambio publicando la nueva política de privacidad en esta página y actualizando la fecha de última actualización."
+                        },
+                        {
+                            "title": "Contacto",
+                            "icon": "shield",
+                            "content": "Si tienes preguntas sobre esta Política de Privacidad o deseas ejercer tus derechos, no dudes en contactarnos a través del formulario de contacto en el sitio web o mediante el correo electrónico proporcionado."
+                        }
+                    ]
+                },
+                order_index=2
+            ),
+            # TERMS - Header Section
+            PageContentCreate(
+                page_key="terms",
+                section_key="header",
+                title="Encabezado - Términos",
+                description="Título y descripción de la página de términos",
+                content={
+                    "title": "Términos y Condiciones",
+                    "last_updated": "1 de Enero de 2024",
+                    "description": "Por favor, lee estos términos y condiciones cuidadosamente antes de usar nuestro sitio web."
+                },
+                order_index=1
+            ),
+            # TERMS - Sections
+            PageContentCreate(
+                page_key="terms",
+                section_key="sections",
+                title="Secciones - Términos",
+                description="Contenido de las secciones de términos y condiciones",
+                content={
+                    "sections": [
+                        {
+                            "title": "Aceptación de los Términos",
+                            "content": "Al acceder y utilizar este sitio web, aceptas estar sujeto a estos términos y condiciones de uso, todas las leyes y regulaciones aplicables, y aceptas que eres responsable del cumplimiento de las leyes locales aplicables. Si no estás de acuerdo con alguno de estos términos, tienes prohibido usar o acceder a este sitio."
+                        },
+                        {
+                            "title": "Uso del Sitio Web",
+                            "content": "Este sitio web es un portafolio personal que muestra proyectos, habilidades y experiencia profesional. El contenido del sitio se proporciona únicamente con fines informativos. No garantizamos que el sitio esté libre de errores o que el acceso sea ininterrumpido. Nos reservamos el derecho de modificar o discontinuar el sitio en cualquier momento sin previo aviso."
+                        },
+                        {
+                            "title": "Propiedad Intelectual",
+                            "content": "El contenido de este sitio web, incluyendo pero no limitado a texto, gráficos, logotipos, imágenes, código fuente y software, es propiedad del titular del sitio web o de sus proveedores de contenido y está protegido por leyes de propiedad intelectual. No puedes reproducir, distribuir, modificar o crear trabajos derivados del contenido sin permiso expreso."
+                        },
+                        {
+                            "title": "Enlaces a Sitios de Terceros",
+                            "content": "Este sitio web puede contener enlaces a sitios web de terceros que no son propiedad ni están controlados por nosotros. No tenemos control sobre, y no asumimos ninguna responsabilidad por el contenido, políticas de privacidad o prácticas de sitios web de terceros. Al usar este sitio, liberas expresamente de cualquier responsabilidad derivada del uso de cualquier sitio web de terceros."
+                        },
+                        {
+                            "title": "Formulario de Contacto",
+                            "content": "Al usar el formulario de contacto del sitio, aceptas proporcionar información veraz y actualizada. La información que proporciones a través del formulario de contacto se utilizará únicamente para responder a tus consultas y no será compartida con terceros sin tu consentimiento, excepto según lo requerido por la ley."
+                        },
+                        {
+                            "title": "Limitación de Responsabilidad",
+                            "content": "En ningún caso seremos responsables de daños directos, indirectos, incidentales, especiales o consecuentes que resulten del uso o la imposibilidad de usar este sitio web, incluso si hemos sido advertidos de la posibilidad de tales daños. Tu uso del sitio es bajo tu propio riesgo."
+                        },
+                        {
+                            "title": "Proyectos Mostrados",
+                            "content": "Los proyectos mostrados en este portafolio son ejemplos del trabajo realizado. Algunos proyectos pueden ser trabajos académicos, proyectos personales o trabajos realizados para clientes. Los detalles de los proyectos se proporcionan con fines demostrativos y pueden no reflejar el estado actual de los proyectos en producción."
+                        },
+                        {
+                            "title": "Modificaciones de los Términos",
+                            "content": "Nos reservamos el derecho de revisar estos términos y condiciones en cualquier momento sin previo aviso. Al continuar utilizando este sitio web después de publicar los cambios, aceptas estar sujeto a los términos revisados. Te recomendamos que revises periódicamente estos términos para estar informado de cualquier cambio."
+                        },
+                        {
+                            "title": "Ley Aplicable",
+                            "content": "Estos términos y condiciones se rigen e interpretan de acuerdo con las leyes del país en el que reside el titular del sitio web. Cualquier disputa que surja en relación con estos términos estará sujeta a la jurisdicción exclusiva de los tribunales de dicha ubicación."
+                        },
+                        {
+                            "title": "Contacto",
+                            "content": "Si tienes alguna pregunta sobre estos Términos y Condiciones, no dudes en ponerte en contacto con nosotros a través del formulario de contacto disponible en el sitio web."
+                        }
+                    ]
+                },
+                order_index=2
             )
         ]
         

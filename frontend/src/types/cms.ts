@@ -72,7 +72,7 @@ export interface CMSStats {
 
 // ========== Helper Types ==========
 
-export type PageKey = 'home' | 'about' | 'projects' | 'contact' | 'footer';
+export type PageKey = 'home' | 'about' | 'projects' | 'contact' | 'footer' | 'privacy' | 'terms';
 
 export const PAGE_LABELS: Record<PageKey, string> = {
     home: 'Inicio',
@@ -80,6 +80,8 @@ export const PAGE_LABELS: Record<PageKey, string> = {
     projects: 'Proyectos',
     contact: 'Contacto',
     footer: 'Footer',
+    privacy: 'Privacidad',
+    terms: 'Términos y Condiciones',
 };
 
 export const PAGE_ICONS: Record<PageKey, string> = {
@@ -88,5 +90,7 @@ export const PAGE_ICONS: Record<PageKey, string> = {
     projects: '📁',
     contact: '📧',
     footer: '📐',
+    privacy: '🔒',
+    terms: '📄',
 };
 
