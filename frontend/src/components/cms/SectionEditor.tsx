@@ -53,7 +53,12 @@ export function SectionEditor({
             setSection(data);
             setFormData(data.content);
         } catch (error: any) {
-            toast.error('Error al cargar la sección');
+            // Si es un 404, la sección no existe aún
+            if (error.response?.status === 404) {
+                toast.error('Esta sección aún no ha sido creada. Ve a Admin → Gestión Web y haz clic en "Crear Contenido Inicial"');
+            } else {
+                toast.error('Error al cargar la sección');
+            }
             onClose();
         } finally {
             setIsLoading(false);

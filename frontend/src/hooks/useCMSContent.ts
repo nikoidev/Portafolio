@@ -15,8 +15,14 @@ export function useCMSContent(pageKey: string, sectionKey: string) {
             const data = await cmsApi.getSectionPublic(pageKey, sectionKey);
             setContent(data.content);
         } catch (err: any) {
-            setError(err.message || 'Error al cargar contenido');
-            setContent(null);
+            // Si es un 404, no es un error real, solo significa que no hay contenido
+            if (err.response?.status === 404) {
+                setError(null);
+                setContent(null);
+            } else {
+                setError(err.message || 'Error al cargar contenido');
+                setContent(null);
+            }
         } finally {
             setIsLoading(false);
         }
