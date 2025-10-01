@@ -1,7 +1,6 @@
 'use client';
 
 import { UserList } from '@/components/admin/UserList';
-import { Header } from '@/components/shared/Header';
 import { usersApi } from '@/lib/users-api';
 import { User } from '@/types/user';
 import { useEffect, useState } from 'react';
@@ -41,15 +40,10 @@ export default function UsersPage() {
     };
 
     return (
-        <>
-            <Header variant="admin" />
-            <div className="container mx-auto px-4 py-8">
-                <UserList
-                    users={users}
-                    onDelete={handleDelete}
-                    isLoading={isLoading}
-                />
-            </div>
-        </>
+        <UserList
+            users={users}
+            onDelete={handleDelete}
+            isLoading={isLoading}
+        />
     );
 }

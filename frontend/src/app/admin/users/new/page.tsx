@@ -1,7 +1,6 @@
 'use client';
 
 import { UserForm } from '@/components/admin/UserForm';
-import { Header } from '@/components/shared/Header';
 import { usersApi } from '@/lib/users-api';
 import { UserCreate, UserUpdate } from '@/types/user';
 import { useState } from 'react';
@@ -26,11 +25,6 @@ export default function NewUserPage() {
     };
 
     return (
-        <>
-            <Header variant="admin" />
-            <div className="container mx-auto px-4 py-8">
-                <UserForm onSubmit={handleSubmit} isLoading={isLoading} />
-            </div>
-        </>
+        <UserForm onSubmit={handleSubmit} isLoading={isLoading} />
     );
 }

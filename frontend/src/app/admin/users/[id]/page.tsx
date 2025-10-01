@@ -1,7 +1,6 @@
 'use client';
 
 import { UserForm } from '@/components/admin/UserForm';
-import { Header } from '@/components/shared/Header';
 import { usersApi } from '@/lib/users-api';
 import { User, UserUpdate } from '@/types/user';
 import { useParams } from 'next/navigation';
@@ -49,38 +48,23 @@ export default function EditUserPage() {
 
     if (isFetching) {
         return (
-            <>
-                <Header variant="admin" />
-                <div className="container mx-auto px-4 py-8">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                        <p className="mt-4 text-muted-foreground">Cargando usuario...</p>
-                    </div>
-                </div>
-            </>
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-4 text-muted-foreground">Cargando usuario...</p>
+            </div>
         );
     }
 
     if (!user) {
         return (
-            <>
-                <Header variant="admin" />
-                <div className="container mx-auto px-4 py-8">
-                    <div className="text-center">
-                        <h2 className="text-2xl font-bold mb-4">Usuario no encontrado</h2>
-                        <p className="text-muted-foreground">El usuario que buscas no existe.</p>
-                    </div>
-                </div>
-            </>
+            <div className="text-center">
+                <h2 className="text-2xl font-bold mb-4">Usuario no encontrado</h2>
+                <p className="text-muted-foreground">El usuario que buscas no existe.</p>
+            </div>
         );
     }
 
     return (
-        <>
-            <Header variant="admin" />
-            <div className="container mx-auto px-4 py-8">
-                <UserForm user={user} onSubmit={handleSubmit} isLoading={isLoading} />
-            </div>
-        </>
+        <UserForm user={user} onSubmit={handleSubmit} isLoading={isLoading} />
     );
 }
