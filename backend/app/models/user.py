@@ -44,6 +44,12 @@ class User(BaseModel):
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
     cv_data = relationship("CV", back_populates="user", uselist=False, cascade="all, delete-orphan")
     
+    @property
+    def permissions(self):
+        """Obtener lista de permisos del usuario basado en su rol"""
+        from .enums import ROLE_PERMISSIONS
+        return [perm.value for perm in ROLE_PERMISSIONS.get(self.role, [])]
+    
     def has_permission(self, permission: Permission) -> bool:
         """Verificar si el usuario tiene un permiso específico"""
         return has_permission(self.role, permission)

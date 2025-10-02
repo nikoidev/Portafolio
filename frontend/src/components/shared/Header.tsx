@@ -41,6 +41,9 @@ export function Header({ variant = 'public' }: HeaderProps) {
         const enabledNavLinks = (adminData.navigation_links?.filter((link: any) => {
             if (!link.enabled) return false;
 
+            // Super Admin y Admin: pueden ver todos los links sin restricción
+            if (hasPermission('manage_roles') || hasPermission('manage_settings')) return true;
+
             // Dashboard: todos pueden verlo
             if (link.url === '/admin') return true;
 
@@ -59,7 +62,8 @@ export function Header({ variant = 'public' }: HeaderProps) {
             // Archivos: necesita upload_file
             if (link.url === '/admin/uploads') return hasPermission('upload_file');
 
-            // Por defecto, no mostrar
+            // Links personalizados: por defecto no mostrar a usuarios con roles restringidos
+            // (Solo Editor y Viewer llegarán aquí)
             return false;
         }) || []);
 

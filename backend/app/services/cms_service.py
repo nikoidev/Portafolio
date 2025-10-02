@@ -572,6 +572,103 @@ class CMSService:
                 },
                 order_index=1
             ),
+            # CONTACT - Contact Info Section
+            PageContentCreate(
+                page_key="contact",
+                section_key="contact_info",
+                title="Información de Contacto",
+                description="Métodos de contacto disponibles",
+                content={
+                    "title": "Información de Contacto",
+                    "description": "Puedes contactarme a través de los siguientes medios. Respondo generalmente en 24-48 horas.",
+                    "contact_methods": [
+                        {
+                            "icon": "https://cdn.simpleicons.org/gmail/EA4335",
+                            "label": "Email",
+                            "value": "tu@email.com",
+                            "link": "mailto:tu@email.com",
+                            "enabled": True
+                        },
+                        {
+                            "icon": "https://cdn.simpleicons.org/linkedin/0A66C2",
+                            "label": "LinkedIn",
+                            "value": "Tu Perfil",
+                            "link": "https://linkedin.com/in/tu-perfil",
+                            "enabled": True
+                        },
+                        {
+                            "icon": "https://cdn.simpleicons.org/github/181717",
+                            "label": "GitHub",
+                            "value": "tu-usuario",
+                            "link": "https://github.com/tu-usuario",
+                            "enabled": True
+                        }
+                    ]
+                },
+                order_index=2
+            ),
+            # CONTACT - Availability Section
+            PageContentCreate(
+                page_key="contact",
+                section_key="availability",
+                title="Disponibilidad",
+                description="Horarios y disponibilidad para proyectos",
+                content={
+                    "title": "Disponibilidad",
+                    "status": "Disponible para nuevos proyectos",
+                    "status_type": "available",
+                    "description": "Actualmente estoy disponible para proyectos freelance y oportunidades de colaboración. Mi horario de respuesta es de lunes a viernes, 9:00 AM - 6:00 PM (GMT-5).",
+                    "response_time": "24-48 horas",
+                    "show_availability": True
+                },
+                order_index=3
+            ),
+            # CONTACT - Call to Action Section
+            PageContentCreate(
+                page_key="contact",
+                section_key="call_cta",
+                title="Llamada a la Acción",
+                description="CTA final de la página de contacto",
+                content={
+                    "title": "¿Listo para comenzar?",
+                    "description": "No dudes en contactarme si tienes alguna pregunta o si quieres discutir un proyecto. Estoy aquí para ayudarte a hacer realidad tus ideas.",
+                    "button_text": "Enviar Mensaje",
+                    "button_action": "scroll_to_top",
+                    "show_cta": True
+                },
+                order_index=4
+            ),
+            # CONTACT - FAQ Section
+            PageContentCreate(
+                page_key="contact",
+                section_key="faq",
+                title="Preguntas Frecuentes",
+                description="Respuestas a preguntas comunes",
+                content={
+                    "title": "Preguntas Frecuentes",
+                    "description": "Aquí encontrarás respuestas a las preguntas más comunes que recibo.",
+                    "faqs": [
+                        {
+                            "question": "¿Cuánto tiempo toma completar un proyecto?",
+                            "answer": "El tiempo varía según la complejidad del proyecto. Un sitio web básico puede tomar de 2-4 semanas, mientras que aplicaciones más complejas pueden tomar de 2-3 meses. Siempre proporciono estimaciones claras al inicio del proyecto."
+                        },
+                        {
+                            "question": "¿Trabajas de forma remota?",
+                            "answer": "Sí, trabajo de forma 100% remota. Utilizo herramientas de colaboración modernas para mantener una comunicación fluida con mis clientes, sin importar la ubicación."
+                        },
+                        {
+                            "question": "¿Ofreces soporte post-lanzamiento?",
+                            "answer": "Sí, ofrezco soporte y mantenimiento después del lanzamiento. Podemos discutir diferentes paquetes de soporte según tus necesidades específicas."
+                        },
+                        {
+                            "question": "¿Cuáles son tus tecnologías principales?",
+                            "answer": "Trabajo principalmente con React, Next.js, TypeScript, Python, FastAPI, y PostgreSQL. También tengo experiencia con otras tecnologías y siempre estoy aprendiendo nuevas herramientas."
+                        }
+                    ],
+                    "show_faq": True
+                },
+                order_index=5
+            ),
             # FOOTER - Main Section
             PageContentCreate(
                 page_key="footer",
