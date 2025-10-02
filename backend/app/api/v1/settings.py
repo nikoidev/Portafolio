@@ -24,12 +24,24 @@ async def get_public_settings(db: Session = Depends(get_db)):
     return SettingsPublic.model_validate(settings)
 
 
-@router.get("/", response_model=SettingsResponse)
-async def get_settings(
+@router.get("/admin", response_model=SettingsResponse)
+async def get_admin_settings(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_admin_user)
 ):
     """Obtener configuración completa (solo admin)"""
+    settings_service = SettingsService(db)
+    settings = settings_service.get_or_create_settings()
+    
+    return SettingsResponse.model_validate(settings)
+
+
+@router.get("/", response_model=SettingsResponse)
+async def get_settings(
+    db: Session = Depends(get_db),
+    current_user = Depends(require_permission(Permission.MANAGE_SETTINGS))
+):
+    """Obtener configuración completa (admin con permiso manage_settings)"""
     settings_service = SettingsService(db)
     settings = settings_service.get_or_create_settings()
     
