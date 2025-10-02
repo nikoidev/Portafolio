@@ -108,7 +108,8 @@ class UploadService:
         file: UploadFile, 
         optimize: bool = True,
         max_width: int = 1920,
-        quality: int = 85
+        quality: int = 85,
+        project_slug: Optional[str] = None
     ) -> dict:
         """
         Subir y procesar imagen
@@ -118,6 +119,7 @@ class UploadService:
             optimize: Si optimizar la imagen
             max_width: Ancho máximo en píxeles
             quality: Calidad JPEG (1-100)
+            project_slug: Slug del proyecto (para organizar imágenes por proyecto)
             
         Returns:
             dict: Información del archivo subido
@@ -126,9 +128,19 @@ class UploadService:
         self._validate_file_size(file)
         self._validate_image_type(file)
         
-        # Generar nombre único
-        filename = self._generate_filename(file.filename or "image.jpg")
-        file_path = self.upload_dir / "images" / filename
+        # Determinar directorio de destino
+        if project_slug:
+            # Crear carpeta específica para el proyecto (usar ID como nombre de carpeta)
+            # project_slug puede ser el ID del proyecto como string
+            project_dir = self.upload_dir / "projects" / f"project_{project_slug}"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            file_path = project_dir / self._generate_filename(file.filename or "image.jpg")
+            url = f"/uploads/projects/project_{project_slug}/{file_path.name}"
+        else:
+            # Carpeta genérica (para otros usos)
+            filename = self._generate_filename(file.filename or "image.jpg")
+            file_path = self.upload_dir / "images" / filename
+            url = f"/uploads/images/{filename}"
         
         # Guardar archivo
         await self._save_file(file, file_path)
@@ -141,9 +153,9 @@ class UploadService:
         file_stats = file_path.stat()
         
         return {
-            "filename": filename,
+            "filename": file_path.name,
             "original_filename": file.filename,
-            "url": f"/uploads/images/{filename}",
+            "url": url,
             "file_path": str(file_path),
             "size": file_stats.st_size,
             "content_type": file.content_type,
@@ -196,6 +208,31 @@ class UploadService:
                 deleted_count += 1
         return deleted_count
     
+    def delete_project_folder(self, project_id: int) -> bool:
+        """
+        Eliminar toda la carpeta de un proyecto
+        
+        Args:
+            project_id: ID del proyecto
+            
+        Returns:
+            bool: True si se eliminó correctamente
+        """
+        try:
+            import shutil
+            project_dir = self.upload_dir / "projects" / f"project_{project_id}"
+            
+            if project_dir.exists() and project_dir.is_dir():
+                shutil.rmtree(project_dir)
+                print(f"Carpeta del proyecto eliminada: {project_dir}")
+                return True
+            else:
+                print(f"Carpeta del proyecto no encontrada: {project_dir}")
+                return False
+        except Exception as e:
+            print(f"Error al eliminar carpeta del proyecto {project_id}: {e}")
+            return False
+    
     async def upload_file(self, file: UploadFile, file_type: str = "general") -> dict:
         """
         Subir archivo general
@@ -240,14 +277,19 @@ class UploadService:
     async def upload_multiple_images(
         self, 
         files: List[UploadFile],
-        optimize: bool = True
+        optimize: bool = True,
+        project_slug: Optional[str] = None
     ) -> List[dict]:
         """Subir múltiples imágenes"""
         results = []
         
         for file in files:
             try:
-                result = await self.upload_image(file, optimize=optimize)
+                result = await self.upload_image(
+                    file, 
+                    optimize=optimize,
+                    project_slug=project_slug
+                )
                 results.append(result)
             except HTTPException as e:
                 results.append({

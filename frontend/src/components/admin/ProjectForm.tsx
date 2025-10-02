@@ -4,25 +4,27 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Project } from '@/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
-import { ImageSelector } from './ImageSelector';
+import { ProjectImageManager } from './ProjectImageManager';
 
 const projectSchema = z.object({
     title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
-    slug: z.string().optional(),
+    slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres'),
     description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres'),
-    short_description: z.string().optional(),
+    short_description: z.string().min(10, 'La descripción corta debe tener al menos 10 caracteres'),
     content: z.string().optional(),
     github_url: z.string().url('URL inválida').optional().or(z.literal('')),
     thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    images: z.array(z.string()).default([]),
-    technologies: z.string(),
+    technologies: z.string().min(1, 'Debes agregar al menos una tecnología'),
     tags: z.string().optional(),
     is_featured: z.boolean().default(false),
     is_published: z.boolean().default(false),
@@ -39,6 +41,9 @@ interface ProjectFormProps {
 
 export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFormProps) {
     const router = useRouter();
+    const [projectImages, setProjectImages] = useState<Array<{ url: string; title: string; order: number }>>(
+        project?.demo_images || []
+    );
 
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
@@ -50,7 +55,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             content: project?.content || '',
             github_url: project?.github_url || '',
             thumbnail_url: project?.thumbnail_url || '',
-            images: project?.images || [],
             technologies: project?.technologies?.join(', ') || '',
             tags: project?.tags?.join(', ') || '',
             is_featured: project?.is_featured || false,
@@ -60,33 +64,60 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
     });
 
     const handleSubmit = async (values: ProjectFormValues) => {
+        // Validar que haya al menos una tecnología
+        const technologies = values.technologies
+            .split(',')
+            .map(tech => tech.trim())
+            .filter(tech => tech.length > 0);
+
+        if (technologies.length === 0) {
+            toast.error('Error de validación', {
+                description: 'Debes agregar al menos una tecnología al proyecto',
+                icon: <AlertCircle className="h-4 w-4" />,
+            });
+            return;
+        }
+
         // Procesar los datos antes de enviar
         const processedData = {
             ...values,
-            technologies: values.technologies
-                .split(',')
-                .map(tech => tech.trim())
-                .filter(tech => tech.length > 0),
+            technologies,
             tags: values.tags
                 ? values.tags
                     .split(',')
                     .map(tag => tag.trim())
                     .filter(tag => tag.length > 0)
                 : [],
-            github_url: values.github_url || undefined,
-            thumbnail_url: values.thumbnail_url || (values.images.length > 0 ? values.images[0] : undefined),
-            // Mantener images para compatibilidad
-            images: values.images,
-            // Inicializar campos de demo vacíos si no están presentes
-            demo_video_type: undefined,
-            demo_video_url: undefined,
-            demo_video_thumbnail: undefined,
-            demo_images: [],
+            github_url: values.github_url || null,
+            thumbnail_url: values.thumbnail_url || (projectImages.length > 0 ? projectImages[0].url : null),
+            // Imágenes del proyecto con descripciones
+            demo_images: projectImages.length > 0 ? projectImages : [],
+            // Mantener images legacy vacío
+            images: [],
+            // Campos de video como null si están vacíos
+            demo_video_type: null,
+            demo_video_url: null,
+            demo_video_thumbnail: null,
         };
 
-        const success = await onSubmit(processedData);
-        if (success) {
-            router.push('/admin/projects');
+        try {
+            const success = await onSubmit(processedData);
+            if (success) {
+                toast.success('¡Éxito!', {
+                    description: project ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente',
+                });
+                router.push('/admin/projects');
+            } else {
+                toast.error('Error', {
+                    description: 'No se pudo guardar el proyecto. Por favor, revisa los campos obligatorios.',
+                    icon: <AlertCircle className="h-4 w-4" />,
+                });
+            }
+        } catch (error: any) {
+            toast.error('Error al guardar', {
+                description: error.message || 'Ocurrió un error inesperado',
+                icon: <AlertCircle className="h-4 w-4" />,
+            });
         }
     };
 
@@ -98,6 +129,19 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                 </CardTitle>
             </CardHeader>
             <CardContent>
+                <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div className="flex-1">
+                            <h4 className="font-semibold text-blue-900 mb-1">Campos obligatorios</h4>
+                            <p className="text-sm text-blue-800">
+                                Los campos marcados con <span className="text-red-500 font-bold">*</span> son obligatorios:
+                                <strong> Título, Slug, Descripción, Descripción Corta y Tecnologías</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -122,12 +166,12 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Slug</FormLabel>
+                                            <FormLabel>Slug *</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="mi-proyecto-increible" {...field} />
                                             </FormControl>
                                             <FormDescription>
-                                                Se generará automáticamente si se deja vacío
+                                                URL amigable para el proyecto (ej: mi-proyecto)
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -139,10 +183,13 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     name="short_description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Descripción Corta</FormLabel>
+                                            <FormLabel>Descripción Corta *</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Una breve descripción..." {...field} />
+                                                <Input placeholder="Una breve descripción del proyecto..." {...field} />
                                             </FormControl>
+                                            <FormDescription>
+                                                Mínimo 10 caracteres
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -200,28 +247,33 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                 />
 
 
-                                <FormField
-                                    control={form.control}
-                                    name="images"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Imágenes del Proyecto</FormLabel>
-                                            <FormControl>
-                                                <ImageSelector
-                                                    selectedImages={field.value}
-                                                    onImagesChange={field.onChange}
-                                                    maxImages={5}
-                                                    title="Seleccionar Imágenes del Proyecto"
-                                                    description="Elige hasta 5 imágenes para mostrar en tu proyecto"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                La primera imagen será la imagen principal del proyecto
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {/* Gestor de Imágenes - Solo si el proyecto ya existe */}
+                                {project?.id && (
+                                    <div className="space-y-2">
+                                        <Label>Imágenes del Proyecto</Label>
+                                        <ProjectImageManager
+                                            projectId={project.id}
+                                            projectTitle={project.title}
+                                            currentImages={projectImages}
+                                            onImagesUpdate={setProjectImages}
+                                        />
+                                        <p className="text-sm text-muted-foreground">
+                                            {projectImages.length} imagen(es) cargada(s). Cada imagen puede tener su propia descripción.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Mensaje si es proyecto nuevo */}
+                                {!project?.id && (
+                                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                                        <p className="text-sm text-muted-foreground mb-2">
+                                            📸 Las imágenes se pueden agregar después de crear el proyecto
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            Primero guarda el proyecto con la información básica, luego podrás gestionar las imágenes
+                                        </p>
+                                    </div>
+                                )}
 
                                 <FormField
                                     control={form.control}
@@ -368,7 +420,7 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                         Guardando...
                                     </>
                                 ) : (
-                                    project ? 'Actualizar' : 'Crear Proyecto'
+                                    <>{project ? 'Actualizar' : 'Crear Proyecto'}</>
                                 )}
                             </Button>
                         </div>

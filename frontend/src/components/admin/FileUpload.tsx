@@ -23,6 +23,7 @@ interface FileUploadProps {
     onUploadComplete?: (results: any[]) => void;
     title?: string;
     description?: string;
+    projectSlug?: string;
 }
 
 export function FileUpload({
@@ -34,7 +35,8 @@ export function FileUpload({
     uploadType = 'images',
     onUploadComplete,
     title = 'Subir Archivos',
-    description = 'Arrastra y suelta archivos aquí o haz clic para seleccionar'
+    description = 'Arrastra y suelta archivos aquí o haz clic para seleccionar',
+    projectSlug
 }: FileUploadProps) {
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -70,6 +72,9 @@ export function FileUpload({
                         const formData = new FormData();
                         formData.append('file', fileData.file);
                         formData.append('optimize', 'true');
+                        if (projectSlug) {
+                            formData.append('project_slug', projectSlug);
+                        }
 
                         const result = await api.uploadImage(formData);
 

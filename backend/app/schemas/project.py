@@ -23,7 +23,7 @@ class ProjectBase(BaseSchema):
     demo_video_thumbnail: Optional[str] = None
     
     # GALLERY DEMO (screenshots)
-    demo_images: Optional[List[dict]] = None  # [{"url": "...", "title": "...", "order": 1}]
+    demo_images: Optional[List[dict]] = []  # [{"url": "...", "title": "...", "order": 1}]
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None
@@ -58,7 +58,7 @@ class ProjectUpdate(BaseSchema):
     demo_video_thumbnail: Optional[str] = None
     
     # GALLERY DEMO
-    demo_images: Optional[List[dict]] = None
+    demo_images: Optional[List[dict]] = []
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None
@@ -97,7 +97,7 @@ class ProjectPublic(BaseSchema):
     demo_video_thumbnail: Optional[str] = None
     
     # GALLERY DEMO
-    demo_images: Optional[List[dict]] = None
+    demo_images: Optional[List[dict]] = []
     
     # Archivos y medios
     thumbnail_url: Optional[str] = None

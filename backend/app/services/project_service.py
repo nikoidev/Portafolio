@@ -130,7 +130,7 @@ class ProjectService:
         return project
     
     def delete_project(self, project_id: int, owner: User) -> bool:
-        """Eliminar proyecto y sus imágenes asociadas"""
+        """Eliminar proyecto y toda su carpeta de archivos"""
         project = self.db.query(Project).filter(
             Project.id == project_id,
             Project.owner_id == owner.id
@@ -142,32 +142,14 @@ class ProjectService:
                 detail="Proyecto no encontrado"
             )
         
-        # Recopilar todas las imágenes a eliminar
-        images_to_delete = []
+        # Eliminar toda la carpeta del proyecto (usando ID)
+        upload_service = UploadService()
+        deleted = upload_service.delete_project_folder(project.id)
         
-        # Imágenes legacy (images)
-        if project.images:
-            images_to_delete.extend(project.images)
-        
-        # Thumbnail
-        if project.thumbnail_url:
-            images_to_delete.append(project.thumbnail_url)
-        
-        # Imágenes de demo (demo_images)
-        if project.demo_images:
-            for img in project.demo_images:
-                if isinstance(img, dict) and 'url' in img:
-                    images_to_delete.append(img['url'])
-        
-        # Video thumbnail
-        if project.demo_video_thumbnail:
-            images_to_delete.append(project.demo_video_thumbnail)
-        
-        # Eliminar imágenes del sistema de archivos
-        if images_to_delete:
-            upload_service = UploadService()
-            deleted_count = upload_service.delete_files(images_to_delete)
-            print(f"Eliminadas {deleted_count} imágenes del proyecto {project_id}")
+        if deleted:
+            print(f"Carpeta completa del proyecto ID {project.id} eliminada")
+        else:
+            print(f"No se encontró carpeta para el proyecto ID {project.id}")
         
         # Eliminar proyecto de la base de datos
         self.db.delete(project)

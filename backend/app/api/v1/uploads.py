@@ -20,6 +20,7 @@ async def upload_image(
     optimize: bool = Form(True),
     max_width: int = Form(1920),
     quality: int = Form(85),
+    project_slug: Optional[str] = Form(None),
     current_user = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -31,7 +32,8 @@ async def upload_image(
             file=file,
             optimize=optimize,
             max_width=max_width,
-            quality=quality
+            quality=quality,
+            project_slug=project_slug
         )
         
         return {
@@ -52,6 +54,7 @@ async def upload_image(
 async def upload_multiple_images(
     files: List[UploadFile] = File(...),
     optimize: bool = Form(True),
+    project_slug: Optional[str] = Form(None),
     current_user = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -67,7 +70,8 @@ async def upload_multiple_images(
     try:
         results = await upload_service.upload_multiple_images(
             files=files,
-            optimize=optimize
+            optimize=optimize,
+            project_slug=project_slug
         )
         
         successful_uploads = [r for r in results if "error" not in r]
