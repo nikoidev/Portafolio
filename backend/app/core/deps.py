@@ -12,6 +12,7 @@ from app.models.enums import Permission, UserRole
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
 def get_current_user(
@@ -101,7 +102,7 @@ def require_permission(permission: Permission) -> Callable:
 
 def get_optional_user(
     db: Session = Depends(get_db),
-    token: Optional[str] = Depends(oauth2_scheme)
+    token: Optional[str] = Depends(oauth2_scheme_optional)
 ) -> Optional[User]:
     """Obtener usuario opcional (para endpoints públicos que pueden usar auth)"""
     if not token:

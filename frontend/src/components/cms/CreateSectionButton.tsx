@@ -1,6 +1,7 @@
 'use client';
 
 import { useEditMode } from '@/contexts/EditModeContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { Plus } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -16,14 +17,18 @@ const ROUTE_TO_PAGE_KEY: Record<string, string> = {
 
 export function CreateSectionButton() {
     const { isEditMode } = useEditMode();
+    const { hasPermission } = usePermissions();
     const pathname = usePathname();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Obtener el page_key basado en la ruta actual
     const pageKey = ROUTE_TO_PAGE_KEY[pathname] || null;
 
-    // No mostrar el botón si no estamos en modo edición o no es una página editable
-    if (!isEditMode || !pageKey) {
+    // Verificar si puede crear contenido
+    const canCreateContent = hasPermission('create_content');
+
+    // No mostrar el botón si no estamos en modo edición, no es una página editable, o no tiene permisos
+    if (!isEditMode || !pageKey || !canCreateContent) {
         return null;
     }
 

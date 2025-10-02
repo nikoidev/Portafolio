@@ -149,6 +149,7 @@ export function UserList({ users, onDelete, isLoading = false }: UserListProps) 
                                 <TableHead>Usuario</TableHead>
                                 <TableHead>Email</TableHead>
                                 <TableHead>Rol</TableHead>
+                                <TableHead>Permisos</TableHead>
                                 <TableHead>Estado</TableHead>
                                 <TableHead className="text-right">Acciones</TableHead>
                             </TableRow>
@@ -180,6 +181,29 @@ export function UserList({ users, onDelete, isLoading = false }: UserListProps) 
                                             </span>
                                             {ROLE_LABELS[user.role as UserRole]}
                                         </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex flex-wrap gap-1 max-w-xs">
+                                            {user.permissions && user.permissions.length > 0 ? (
+                                                <>
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        {user.permissions.length} permisos
+                                                    </Badge>
+                                                    {user.permissions.slice(0, 2).map((perm, idx) => (
+                                                        <Badge key={idx} variant="outline" className="text-xs">
+                                                            {perm.replace(/_/g, ' ')}
+                                                        </Badge>
+                                                    ))}
+                                                    {user.permissions.length > 2 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            +{user.permissions.length - 2}
+                                                        </Badge>
+                                                    )}
+                                                </>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">Sin permisos</span>
+                                            )}
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         {user.is_active ? (

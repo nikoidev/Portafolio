@@ -113,10 +113,28 @@ export default function ContactClient() {
     };
 
     const header = headerContent || defaultHeader;
-    const contactInfoData = contactInfoContent || defaultContactInfo;
+    const contactInfoData = contactInfoContent ? {
+        ...defaultContactInfo,
+        ...contactInfoContent,
+        // Asegurar que contacts existe y es un array
+        contacts: Array.isArray(contactInfoContent.contact_methods)
+            ? contactInfoContent.contact_methods.map((method: any) => ({
+                icon: method.icon?.includes('simpleicons') ? 'mail' : 'mail', // Fallback icon
+                label: method.label || 'Contacto',
+                value: method.value || '',
+                href: method.link || '#',
+                description: method.description || ''
+            }))
+            : (contactInfoContent.contacts || defaultContactInfo.contacts)
+    } : defaultContactInfo;
     const availability = availabilityContent || defaultAvailability;
     const callCta = callCtaContent || defaultCallCta;
-    const faq = faqContent || defaultFaq;
+    const faq = faqContent ? {
+        ...defaultFaq,
+        ...faqContent,
+        // Asegurar que faqs existe y es un array
+        faqs: Array.isArray(faqContent.faqs) ? faqContent.faqs : defaultFaq.faqs
+    } : defaultFaq;
 
     // Mapeo de iconos
     const iconMap: Record<string, any> = {

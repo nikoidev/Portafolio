@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useEditMode } from '@/contexts/EditModeContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useAuthStore } from '@/store/auth';
 import { Edit, Eye } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -9,6 +10,7 @@ import { usePathname } from 'next/navigation';
 export function EditModeToggle() {
     const { isAuthenticated } = useAuthStore();
     const { isEditMode, toggleEditMode } = useEditMode();
+    const { hasPermission } = usePermissions();
     const pathname = usePathname();
 
     // Páginas específicas de admin donde NO queremos el toggle
@@ -23,8 +25,10 @@ export function EditModeToggle() {
 
     const isExcludedPage = excludedPages.some(page => pathname.startsWith(page));
 
-    // No mostrar si no está autenticado o está en página excluida
-    if (!isAuthenticated || isExcludedPage) {
+    // No mostrar si no está autenticado, está en página excluida, o no tiene permiso para editar contenido
+    const canEditContent = hasPermission('update_content');
+
+    if (!isAuthenticated || isExcludedPage || !canEditContent) {
         return null;
     }
 

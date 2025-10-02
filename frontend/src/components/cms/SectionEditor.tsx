@@ -26,6 +26,7 @@ interface SectionEditorProps {
     isOpen: boolean;
     onClose: () => void;
     onSaved: () => void;
+    readOnly?: boolean;
 }
 
 export function SectionEditor({
@@ -34,6 +35,7 @@ export function SectionEditor({
     isOpen,
     onClose,
     onSaved,
+    readOnly = false,
 }: SectionEditorProps) {
     const [section, setSection] = useState<PageContent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -162,30 +164,35 @@ export function SectionEditor({
                                     }}
                                     placeholder={`${fieldLabel} ${index + 1}`}
                                     className="flex-1"
+                                    disabled={readOnly}
                                 />
-                                <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    onClick={() => {
-                                        const newArray = arrayValue.filter((_, i) => i !== index);
-                                        handleFieldChange(key, newArray);
-                                    }}
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </Button>
+                                {!readOnly && (
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => {
+                                            const newArray = arrayValue.filter((_, i) => i !== index);
+                                            handleFieldChange(key, newArray);
+                                        }}
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                )}
                             </div>
                         ))}
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                const newArray = [...arrayValue, ''];
-                                handleFieldChange(key, newArray);
-                            }}
-                            className="w-full"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Agregar nuevo
-                        </Button>
+                        {!readOnly && (
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    const newArray = [...arrayValue, ''];
+                                    handleFieldChange(key, newArray);
+                                }}
+                                className="w-full"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Agregar nuevo
+                            </Button>
+                        )}
                     </CardContent>
                 </Card>
             );
@@ -222,6 +229,7 @@ export function SectionEditor({
                                                     onCheckedChange={(checked) =>
                                                         handleArrayItemChange(key, index, field, checked)
                                                     }
+                                                    disabled={readOnly}
                                                 />
                                             </div>
                                         );
@@ -240,30 +248,35 @@ export function SectionEditor({
                                                     handleArrayItemChange(key, index, field, e.target.value)
                                                 }
                                                 placeholder={`Ingresa ${field}`}
+                                                disabled={readOnly}
                                             />
                                         </div>
                                     );
                                 })}
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => handleArrayItemDelete(key, index)}
-                                    className="w-full mt-2"
-                                >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Eliminar
-                                </Button>
+                                {!readOnly && (
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => handleArrayItemDelete(key, index)}
+                                        className="w-full mt-2"
+                                    >
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Eliminar
+                                    </Button>
+                                )}
                             </CardContent>
                         </Card>
                     ))}
-                    <Button
-                        variant="outline"
-                        onClick={() => handleArrayItemAdd(key)}
-                        className="w-full"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Agregar nuevo
-                    </Button>
+                    {!readOnly && (
+                        <Button
+                            variant="outline"
+                            onClick={() => handleArrayItemAdd(key)}
+                            className="w-full"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Agregar nuevo
+                        </Button>
+                    )}
                 </CardContent>
             </Card>
         );
@@ -295,9 +308,10 @@ export function SectionEditor({
                         }}
                         className="font-mono text-sm"
                         rows={6}
+                        disabled={readOnly}
                     />
                     <p className="text-xs text-muted-foreground">
-                        Formato JSON. Edita con cuidado.
+                        {readOnly ? 'Formato JSON (solo lectura)' : 'Formato JSON. Edita con cuidado.'}
                     </p>
                 </div>
             );
@@ -314,6 +328,7 @@ export function SectionEditor({
                         onChange={(e) => handleFieldChange(key, e.target.value)}
                         rows={4}
                         placeholder={`Ingresa ${fieldLabel.toLowerCase()}`}
+                        disabled={readOnly}
                     />
                 </div>
             );
@@ -329,6 +344,7 @@ export function SectionEditor({
                     onChange={(e) => handleFieldChange(key, e.target.value)}
                     type={typeof value === 'number' ? 'number' : 'text'}
                     placeholder={`Ingresa ${fieldLabel.toLowerCase()}`}
+                    disabled={readOnly}
                 />
             </div>
         );
@@ -339,10 +355,13 @@ export function SectionEditor({
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]">
                 <DialogHeader>
                     <DialogTitle>
-                        {section?.title || 'Editar Sección'}
+                        {readOnly ? 'Ver Sección' : 'Editar Sección'}: {section?.title}
                     </DialogTitle>
                     <DialogDescription>
-                        {section?.description || 'Modifica el contenido de esta sección'}
+                        {readOnly
+                            ? 'Visualiza el contenido de esta sección (solo lectura)'
+                            : (section?.description || 'Modifica el contenido de esta sección')
+                        }
                     </DialogDescription>
                 </DialogHeader>
 
@@ -357,22 +376,30 @@ export function SectionEditor({
                 )}
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose} disabled={isSaving}>
-                        Cancelar
-                    </Button>
-                    <Button onClick={handleSave} disabled={isSaving || isLoading}>
-                        {isSaving ? (
-                            <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Guardando...
-                            </>
-                        ) : (
-                            <>
-                                <Save className="w-4 h-4 mr-2" />
-                                Guardar Cambios
-                            </>
-                        )}
-                    </Button>
+                    {readOnly ? (
+                        <Button variant="outline" onClick={onClose}>
+                            Cerrar
+                        </Button>
+                    ) : (
+                        <>
+                            <Button variant="outline" onClick={onClose} disabled={isSaving}>
+                                Cancelar
+                            </Button>
+                            <Button onClick={handleSave} disabled={isSaving || isLoading}>
+                                {isSaving ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Guardando...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4 mr-2" />
+                                        Guardar Cambios
+                                    </>
+                                )}
+                            </Button>
+                        </>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

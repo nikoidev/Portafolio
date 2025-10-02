@@ -95,22 +95,24 @@ ROLE_PERMISSIONS = {
     ],
     
     UserRole.EDITOR: [
-        # Solo edición de contenido
-        Permission.READ_USER,
+        # Solo edición de contenido (proyectos, CV, CMS)
+        # NO puede gestionar usuarios ni eliminar contenido
         Permission.CREATE_PROJECT,
         Permission.READ_PROJECT,
         Permission.UPDATE_PROJECT,
+        Permission.PUBLISH_PROJECT,
         Permission.UPDATE_CV,
         Permission.GENERATE_CV_PDF,
         Permission.UPLOAD_FILE,
         Permission.CREATE_CONTENT,
         Permission.READ_CONTENT,
         Permission.UPDATE_CONTENT,
+        Permission.VIEW_ANALYTICS,
     ],
     
     UserRole.VIEWER: [
-        # Solo lectura
-        Permission.READ_USER,
+        # Solo lectura de contenido
+        # NO puede ver lista de usuarios, solo contenido público
         Permission.READ_PROJECT,
         Permission.READ_CONTENT,
         Permission.VIEW_ANALYTICS,
