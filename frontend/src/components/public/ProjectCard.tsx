@@ -4,9 +4,9 @@ import { DemoModal } from '@/components/shared/DemoModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
 import { Eye, Github, Play } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -26,11 +26,10 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                     {/* Imagen del proyecto */}
                     <div className="relative md:w-80 aspect-video md:aspect-square overflow-hidden">
                         {(project.thumbnail_url || (project.image_urls && project.image_urls.length > 0)) ? (
-                            <Image
-                                src={project.thumbnail_url || project.image_urls?.[0] || ''}
+                            <img
+                                src={getImageUrl(project.thumbnail_url || project.image_urls?.[0] || '')}
                                 alt={project.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                         ) : (
                             <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
@@ -129,11 +128,10 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
             {/* Imagen del proyecto */}
             <div className="relative aspect-video overflow-hidden">
                 {(project.thumbnail_url || (project.image_urls && project.image_urls.length > 0)) ? (
-                    <Image
-                        src={project.thumbnail_url || project.image_urls?.[0] || ''}
+                    <img
+                        src={getImageUrl(project.thumbnail_url || project.image_urls?.[0] || '')}
                         alt={project.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">

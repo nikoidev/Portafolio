@@ -5,10 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { api } from '@/lib/api';
+import { api, getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
 import { ArrowLeft, Calendar, Eye, Share2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -166,12 +165,10 @@ export default function ProjectDetailClient() {
                                     <div className="space-y-4">
                                         {/* Imagen principal */}
                                         <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-                                            <Image
-                                                src={images[currentImageIndex]}
+                                            <img
+                                                src={getImageUrl(images[currentImageIndex])}
                                                 alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
-                                                fill
-                                                className="object-cover"
-                                                priority
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
 
@@ -187,11 +184,10 @@ export default function ProjectDetailClient() {
                                                             : 'border-transparent hover:border-muted-foreground/50'
                                                             }`}
                                                     >
-                                                        <Image
-                                                            src={image}
+                                                        <img
+                                                            src={getImageUrl(image)}
                                                             alt={`${project.title} - Miniatura ${index + 1}`}
-                                                            fill
-                                                            className="object-cover"
+                                                            className="w-full h-full object-cover"
                                                         />
                                                     </button>
                                                 ))}

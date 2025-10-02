@@ -1,5 +1,6 @@
 'use client';
 
+import { getImageUrl } from '@/lib/api';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
@@ -45,7 +46,7 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
                 {/* Main Image */}
                 <div className="relative aspect-video bg-muted rounded-lg overflow-hidden group cursor-pointer" onClick={() => openLightbox(currentIndex)}>
                     <img
-                        src={sortedImages[currentIndex].url}
+                        src={getImageUrl(sortedImages[currentIndex].url)}
                         alt={sortedImages[currentIndex].title || `Screenshot ${currentIndex + 1}`}
                         className="w-full h-full object-cover"
                     />
@@ -86,14 +87,23 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
                 )}
 
                 {/* Image Counter */}
-                <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
                     {currentIndex + 1} / {sortedImages.length}
                 </div>
 
-                {/* Title */}
-                {sortedImages[currentIndex].title && (
-                    <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded-lg text-sm">
+                {/* Title - Solo si no hay descripción debajo */}
+                {sortedImages[currentIndex].title && !sortedImages[currentIndex].title.length && (
+                    <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded-lg text-sm max-w-md">
                         {sortedImages[currentIndex].title}
+                    </div>
+                )}
+
+                {/* Description below image */}
+                {sortedImages[currentIndex].title && (
+                    <div className="mt-3 p-3 bg-muted/50 rounded-lg border">
+                        <p className="text-sm text-foreground/80">
+                            <span className="font-semibold">Descripción:</span> {sortedImages[currentIndex].title}
+                        </p>
                     </div>
                 )}
 
@@ -105,12 +115,13 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}
                                 className={`flex-shrink-0 w-20 h-16 rounded-md overflow-hidden border-2 transition-all ${index === currentIndex
-                                        ? 'border-primary scale-105'
-                                        : 'border-transparent opacity-60 hover:opacity-100'
+                                    ? 'border-primary scale-105'
+                                    : 'border-transparent opacity-60 hover:opacity-100'
                                     }`}
+                                title={image.title || `Imagen ${index + 1}`}
                             >
                                 <img
-                                    src={image.url}
+                                    src={getImageUrl(image.url)}
                                     alt={image.title || `Thumbnail ${index + 1}`}
                                     className="w-full h-full object-cover"
                                 />
@@ -158,7 +169,7 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
                     {/* Image */}
                     <div className="max-w-7xl max-h-[90vh] w-full">
                         <img
-                            src={sortedImages[currentIndex].url}
+                            src={getImageUrl(sortedImages[currentIndex].url)}
                             alt={sortedImages[currentIndex].title || `Screenshot ${currentIndex + 1}`}
                             className="w-full h-full object-contain"
                         />
