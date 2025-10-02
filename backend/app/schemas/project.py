@@ -106,6 +106,7 @@ class ProjectPublic(BaseSchema):
     technologies: List[dict]  # [{"name": "Python", "icon": "https://...", "enabled": true}]
     tags: Optional[List[str]] = None
     is_featured: bool
+    is_published: bool
     view_count: int
     created_at: datetime
     

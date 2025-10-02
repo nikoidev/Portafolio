@@ -62,8 +62,8 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                 ? project.thumbnail_url
                 : '',
             tags: project?.tags?.join(', ') || '',
-            is_featured: project?.is_featured || false,
-            is_published: project?.is_published || false,
+            is_featured: Boolean(project?.is_featured ?? (project as any)?.isFeatured ?? false),
+            is_published: Boolean(project?.is_published ?? (project as any)?.isPublished ?? false),
             order_index: project?.order_index || 0,
         },
     });
