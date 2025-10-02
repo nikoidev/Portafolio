@@ -117,27 +117,39 @@ export default function AdminDashboard() {
             {/* Acciones Rápidas o Enlaces Rápidos según el rol */}
             {quickActions.length > 0 ? (
                 <div>
-                    <h2 className="text-2xl font-semibold mb-6">Acciones Rápidas</h2>
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-8 w-1 bg-primary rounded-full" />
+                        <h2 className="text-2xl font-bold">Acciones Rápidas</h2>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {quickActions.map((action) => {
+                        {quickActions.map((action, index) => {
                             const Icon = action.icon;
+                            const gradients = [
+                                'from-blue-500 to-cyan-500',
+                                'from-green-500 to-emerald-500',
+                                'from-purple-500 to-pink-500',
+                                'from-orange-500 to-red-500',
+                            ];
                             return (
-                                <Card key={action.title} className="hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mb-4`}>
-                                            <Icon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <CardTitle className="text-lg">{action.title}</CardTitle>
-                                        <CardDescription>{action.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <Button asChild className="w-full">
-                                            <Link href={action.href}>
-                                                Ir a {action.title}
-                                            </Link>
-                                        </Button>
-                                    </CardContent>
-                                </Card>
+                                <Link key={action.title} href={action.href}>
+                                    <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer h-full">
+                                        {/* Fondo con gradiente animado */}
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+
+                                        <CardContent className="relative flex flex-col items-center justify-center text-center py-8">
+                                            {/* Icono con efecto hover */}
+                                            <div className={`w-16 h-16 bg-gradient-to-br ${gradients[index % gradients.length]} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                                                <Icon className="w-8 h-8 text-white" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                                                {action.title}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                {action.description}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
                             );
                         })}
                     </div>
@@ -145,107 +157,102 @@ export default function AdminDashboard() {
             ) : isViewer && (
                 /* Enlaces Rápidos para Visualizadores */
                 <div>
-                    <h2 className="text-2xl font-semibold mb-6">Enlaces Rápidos</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <Card className="hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <Eye className="w-5 h-5 text-blue-600" />
-                                    Ver Proyectos
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground mb-3">
-                                    Explora todos los proyectos del portafolio
-                                </p>
-                                <Button asChild variant="outline" size="sm" className="w-full">
-                                    <Link href="/admin/projects">
-                                        Ver Lista de Proyectos
-                                    </Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="h-8 w-1 bg-blue-500 rounded-full" />
+                        <h2 className="text-2xl font-bold">Enlaces Rápidos</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            { icon: Eye, title: 'Ver Proyectos', desc: 'Explora todos los proyectos del portafolio', href: '/admin/projects', gradient: 'from-blue-500 to-cyan-500' },
+                            { icon: FileText, title: 'Contenido del Sitio', desc: 'Revisa el contenido de las páginas', href: '/admin/cms', gradient: 'from-green-500 to-emerald-500' },
+                            { icon: FolderPlus, title: 'Sitio Público', desc: 'Ve cómo se muestra el portafolio', href: '/', gradient: 'from-purple-500 to-pink-500' }
+                        ].map((link) => {
+                            const Icon = link.icon;
+                            return (
+                                <Link key={link.title} href={link.href}>
+                                    <Card className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer h-full">
+                                        <div className={`absolute inset-0 bg-gradient-to-br ${link.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
 
-                        <Card className="hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <FileText className="w-5 h-5 text-green-600" />
-                                    Contenido del Sitio
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground mb-3">
-                                    Revisa el contenido de las páginas
-                                </p>
-                                <Button asChild variant="outline" size="sm" className="w-full">
-                                    <Link href="/admin/cms">
-                                        Ver Gestión Web
-                                    </Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="hover:shadow-md transition-shadow">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base flex items-center gap-2">
-                                    <FolderPlus className="w-5 h-5 text-purple-600" />
-                                    Sitio Público
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground mb-3">
-                                    Ve cómo se muestra el portafolio
-                                </p>
-                                <Button asChild variant="outline" size="sm" className="w-full">
-                                    <Link href="/">
-                                        Ir al Sitio Público
-                                    </Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
+                                        <CardContent className="relative flex flex-col items-center justify-center text-center py-8">
+                                            <div className={`w-16 h-16 bg-gradient-to-br ${link.gradient} rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                                                <Icon className="w-8 h-8 text-white" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                                                {link.title}
+                                            </h3>
+                                            <p className="text-sm text-muted-foreground">
+                                                {link.desc}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            );
+                        })}
                     </div>
                 </div>
             )}
 
-            {/* Proyectos Recientes */}
+            {/* Proyectos Destacados */}
             <div>
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold">Proyectos Destacados</h2>
-                    <Button asChild variant="outline">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="h-8 w-1 bg-yellow-500 rounded-full" />
+                        <h2 className="text-2xl font-bold">Proyectos Destacados</h2>
+                    </div>
+                    <Button asChild variant="outline" className="gap-2">
                         <Link href="/admin/projects">
                             Ver todos
+                            <span>→</span>
                         </Link>
                     </Button>
                 </div>
 
                 {featuredProjects.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {featuredProjects.map((project) => (
-                            <Card key={project.id}>
-                                <CardHeader>
-                                    <CardTitle className="text-lg line-clamp-1">
-                                        {project.title}
-                                    </CardTitle>
-                                    <CardDescription className="line-clamp-2">
-                                        {project.description}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-muted-foreground">
-                                            {project.view_count} vistas
-                                        </span>
+                        {featuredProjects.map((project, index) => {
+                            const gradients = [
+                                'from-violet-500 to-purple-500',
+                                'from-cyan-500 to-blue-500',
+                                'from-amber-500 to-orange-500',
+                            ];
+                            return (
+                                <Card key={project.id} className="group relative overflow-hidden border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl">
+                                    {/* Badge de destacado */}
+                                    <div className="absolute top-4 right-4 z-10">
+                                        <Badge className={`bg-gradient-to-r ${gradients[index % gradients.length]} text-white border-0 shadow-lg`}>
+                                            ⭐ Destacado
+                                        </Badge>
+                                    </div>
+
+                                    {/* Gradiente de fondo */}
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index % gradients.length]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+
+                                    <CardHeader className="relative pb-3">
+                                        <CardTitle className="text-lg line-clamp-1 pr-20 group-hover:text-primary transition-colors">
+                                            {project.title}
+                                        </CardTitle>
+                                        <CardDescription className="line-clamp-2 mt-2">
+                                            {project.description}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="relative">
+                                        {/* Contador de vistas */}
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                                            <Eye className="w-4 h-4" />
+                                            <span className="font-medium">{project.view_count}</span>
+                                            <span>vistas</span>
+                                        </div>
+
+                                        {/* Botones de acción */}
                                         <div className="flex gap-2">
-                                            {/* Botón Ver - Todos pueden ver */}
-                                            <Button asChild size="sm" variant="outline">
+                                            <Button asChild size="sm" variant="outline" className="flex-1 group/btn">
                                                 <Link href={`/projects/${project.slug}`}>
                                                     <Eye className="w-4 h-4 mr-1" />
                                                     Ver
                                                 </Link>
                                             </Button>
-                                            {/* Botón Editar - Solo con permiso */}
                                             <PermissionGuard permission="update_project">
-                                                <Button asChild size="sm" variant="default">
+                                                <Button asChild size="sm" className="flex-1">
                                                     <Link href={`/admin/projects/${project.id}`}>
                                                         <Pencil className="w-4 h-4 mr-1" />
                                                         Editar
@@ -253,20 +260,25 @@ export default function AdminDashboard() {
                                                 </Button>
                                             </PermissionGuard>
                                         </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 ) : (
-                    <Card>
-                        <CardContent className="text-center py-8">
-                            <p className="text-muted-foreground">
-                                No hay proyectos destacados aún.
+                    <Card className="border-2 border-dashed">
+                        <CardContent className="text-center py-12">
+                            <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+                                <FolderPlus className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                            <h3 className="text-lg font-semibold mb-2">No hay proyectos destacados</h3>
+                            <p className="text-muted-foreground mb-6">
+                                Crea tu primer proyecto y márcalo como destacado para que aparezca aquí
                             </p>
                             <PermissionGuard permission="create_project">
-                                <Button asChild className="mt-4">
+                                <Button asChild className="gap-2">
                                     <Link href="/admin/projects/new">
+                                        <FolderPlus className="w-4 h-4" />
                                         Crear primer proyecto
                                     </Link>
                                 </Button>
