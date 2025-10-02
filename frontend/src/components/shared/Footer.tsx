@@ -2,12 +2,16 @@
 
 import { EditableSection } from '@/components/cms/EditableSection';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function Footer() {
     const currentYear = new Date().getFullYear();
     const { content, isLoading, refresh } = useCMSContent('footer', 'main');
+
+    // Cargar configuración global
+    const { socialLinks: globalSocialLinks, siteName } = useGlobalSettings();
 
     // Contenido por defecto
     const defaultContent = {
@@ -39,6 +43,19 @@ export function Footer() {
 
     const data = content || defaultContent;
 
+    // Usar social links globales si están habilitados, sino usar los del CMS
+    const useGlobalSocial = data.use_global_social_links ?? true;
+    const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
+        ? globalSocialLinks.map((link: any) => ({
+            text: link.name,
+            url: link.url,
+            icon: link.icon
+        }))
+        : (data.social_links || []);
+
+    // Usar nombre del sitio global si está configurado
+    const brandName = data.use_global_brand_name && siteName ? siteName : data.brand_name;
+
     if (isLoading) {
         return (
             <footer className="border-t bg-background">
@@ -56,7 +73,7 @@ export function Footer() {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         {/* Información principal */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold">{data.brand_name}</h3>
+                            <h3 className="text-lg font-semibold">{brandName}</h3>
                             <p className="text-sm text-muted-foreground">
                                 {data.brand_description}
                             </p>
@@ -82,7 +99,7 @@ export function Footer() {
                         <div className="space-y-4">
                             <h4 className="text-sm font-semibold">{data.social_title}</h4>
                             <div className="flex flex-col space-y-2">
-                                {data.social_links.map((link: any, index: number) => (
+                                {socialLinksToUse.map((link: any, index: number) => (
                                     <a
                                         key={index}
                                         href={link.url}

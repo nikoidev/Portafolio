@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import {
     Award,
     BookOpen,
@@ -24,6 +25,8 @@ import {
 import Link from 'next/link';
 
 export default function AboutClient() {
+    // Configuración global
+    const { socialLinks: globalSocialLinks, contactEmail, contactPhone, contactLocation } = useGlobalSettings();
     // CMS Content
     const { content: heroContent, isLoading: heroLoading, refresh: refreshHero } = useCMSContent('about', 'hero');
     const { content: bioContent, isLoading: bioLoading, refresh: refreshBio } = useCMSContent('about', 'bio');
@@ -205,6 +208,21 @@ export default function AboutClient() {
     const experience = experienceContent || defaultExperience;
     const education = educationContent || defaultEducation;
     const testimonials = testimonialsContent || defaultTestimonials;
+
+    // Integrar contact_links globales en personalInfo
+    const useGlobalContactLinks = personalInfo.use_global_contact_links ?? true;
+    const personalInfoWithGlobalLinks = {
+        ...personalInfo,
+        contact_links: useGlobalContactLinks && globalSocialLinks.length > 0
+            ? globalSocialLinks.map((link: any) => ({
+                text: link.name,
+                url: link.url,
+                icon: link.icon,
+                enabled: link.enabled
+            }))
+            : (personalInfo.contact_links || []),
+        location: personalInfo.location || contactLocation || 'No especificado',
+    };
 
     // Mapeo de iconos
     const iconMap: Record<string, any> = {
@@ -392,7 +410,7 @@ export default function AboutClient() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {/* Ubicación */}
-                                    {personalInfo.location && (
+                                    {personalInfoWithGlobalLinks.location && (
                                         <div className="flex items-center gap-3">
                                             <MapPin className="w-4 h-4 text-muted-foreground" />
                                             <span className="text-sm">{personalInfo.location}</span>
@@ -443,11 +461,11 @@ export default function AboutClient() {
                                     )}
 
                                     {/* Contact Links con íconos dinámicos */}
-                                    {personalInfo.contact_links && personalInfo.contact_links.filter((link: any) => link.enabled).length > 0 && (
+                                    {personalInfoWithGlobalLinks.contact_links && personalInfoWithGlobalLinks.contact_links.filter((link: any) => link.enabled).length > 0 && (
                                         <div className="pt-3 border-t">
                                             <p className="text-xs font-semibold text-muted-foreground mb-3">Redes & Contacto</p>
                                             <div className="space-y-2">
-                                                {personalInfo.contact_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
+                                                {personalInfoWithGlobalLinks.contact_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
                                                     <div key={index} className="flex items-center gap-3">
                                                         <img src={link.icon} alt={link.text} className="w-4 h-4" />
                                                         <a

@@ -7,6 +7,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Github, Linkedin, Loader2, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -23,6 +24,8 @@ const contactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactClient() {
+    // Configuración global
+    const { socialLinks: globalSocialLinks, contactEmail: globalEmail, contactPhone: globalPhone, contactLocation: globalLocation } = useGlobalSettings();
     // CMS Content
     const { content: headerContent, isLoading: headerLoading, refresh: refreshHeader } = useCMSContent('contact', 'header');
     const { content: contactInfoContent, isLoading: contactInfoLoading, refresh: refreshContactInfo } = useCMSContent('contact', 'contact_info');
@@ -127,6 +130,37 @@ export default function ContactClient() {
             }))
             : (contactInfoContent.contacts || defaultContactInfo.contacts)
     } : defaultContactInfo;
+
+    // Integrar datos globales de contacto
+    const useGlobalContactData = contactInfoData.use_global_contact ?? true;
+    const contactInfoWithGlobals = {
+        ...contactInfoData,
+        contacts: useGlobalContactData && globalSocialLinks.length > 0
+            ? [
+                ...(globalEmail ? [{
+                    icon: 'mail',
+                    label: 'Email',
+                    value: globalEmail,
+                    href: `mailto:${globalEmail}`,
+                    description: 'Envíame un correo'
+                }] : []),
+                ...(globalPhone ? [{
+                    icon: 'phone',
+                    label: 'Teléfono',
+                    value: globalPhone,
+                    href: `tel:${globalPhone}`,
+                    description: 'Llámame'
+                }] : []),
+                ...globalSocialLinks.filter((l: any) => l.enabled).map((link: any) => ({
+                    icon: 'link',
+                    label: link.name,
+                    value: link.name,
+                    href: link.url,
+                    description: `Sígueme en ${link.name}`
+                }))
+            ]
+            : contactInfoData.contacts
+    };
     const availability = availabilityContent || defaultAvailability;
     const callCta = callCtaContent || defaultCallCta;
     const faq = faqContent ? {
@@ -302,7 +336,7 @@ export default function ContactClient() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {contactInfoData.contacts.map((info, index) => {
+                                    {contactInfoWithGlobals.contacts.map((info, index) => {
                                         const IconComponent = iconMap[info.icon] || Mail;
                                         return (
                                             <a

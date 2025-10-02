@@ -3,11 +3,13 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { ArrowDown, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function HeroSection() {
     const { content, isLoading, refresh } = useCMSContent('home', 'hero');
+    const { socialLinks: globalSocialLinks } = useGlobalSettings();
 
     // Contenido por defecto mientras carga o si no existe en DB
     const defaultContent = {
@@ -42,6 +44,17 @@ export function HeroSection() {
     };
 
     const data = content || defaultContent;
+
+    // Usar social links globales si están disponibles
+    const useGlobalSocial = data.use_global_social_links ?? true;
+    const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
+        ? globalSocialLinks.map((link: any) => ({
+            text: link.name,
+            url: link.url,
+            icon: link.icon,
+            enabled: link.enabled
+        }))
+        : (data.social_links || []);
 
     if (isLoading) {
         return (
@@ -95,7 +108,7 @@ export function HeroSection() {
 
                         {/* Redes sociales dinámicas */}
                         <div className="flex justify-center flex-wrap gap-4 mb-12">
-                            {data.social_links && data.social_links
+                            {socialLinksToUse
                                 .filter((link: any) => link.enabled !== false)
                                 .map((link: any, index: number) => (
                                     <a

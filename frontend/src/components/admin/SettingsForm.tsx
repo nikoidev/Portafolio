@@ -609,9 +609,33 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
                     Resetear a Predeterminados
                 </Button>
 
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} size="lg">
                     <Save className="w-4 h-4 mr-2" />
                     {isSubmitting ? 'Guardando...' : 'Guardar Configuración'}
+                </Button>
+            </div>
+
+            {/* Botón flotante para guardar (siempre visible) */}
+            <div className="fixed bottom-8 right-8 z-50 flex gap-2">
+                <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={handleReset}
+                    disabled={isSubmitting || !onReset}
+                    className="shadow-lg"
+                >
+                    <RotateCcw className="w-5 h-5 mr-2" />
+                    Resetear
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    size="lg"
+                    className="shadow-lg bg-primary hover:bg-primary/90"
+                >
+                    <Save className="w-5 h-5 mr-2" />
+                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
                 </Button>
             </div>
         </form>
