@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 # Importar configuración y modelos
 from app.core.config import settings
 from app.models.base import Base
-from app.models import User, Project, CV, SiteSettings, Analytics
+from app.models import User, Project, CV, Settings, PageContent
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

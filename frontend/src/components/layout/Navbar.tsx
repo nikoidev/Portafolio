@@ -4,6 +4,7 @@ import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { cn } from '@/lib/utils';
 import { Download, LogIn, Menu } from 'lucide-react';
 import Link from 'next/link';
@@ -16,6 +17,9 @@ export function Navbar() {
 
     // Cargar contenido desde CMS
     const { content, isLoading, refresh } = useCMSContent('navbar', 'main');
+
+    // Cargar configuración global
+    const { socialLinks: globalSocialLinks } = useGlobalSettings();
 
     // Contenido por defecto si no hay en CMS
     const defaultContent = {
@@ -57,7 +61,19 @@ export function Navbar() {
 
     // Filtrar enlaces habilitados
     const enabledNavLinks = navData.navigation_links?.filter((link: any) => link.enabled) || [];
-    const enabledSocialLinks = navData.social_links?.filter((link: any) => link.enabled) || [];
+
+    // Usar social links globales si están habilitados en CMS, sino usar los del CMS
+    const useGlobalSocial = navData.use_global_social_links ?? true; // Por defecto usar globales
+    const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
+        ? globalSocialLinks.map((link: any) => ({
+            text: link.name,
+            url: link.url,
+            icon: link.icon,
+            enabled: link.enabled
+        }))
+        : (navData.social_links || []);
+
+    const enabledSocialLinks = socialLinksToUse.filter((link: any) => link.enabled);
 
     if (isLoading) {
         return (

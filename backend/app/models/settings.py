@@ -1,95 +1,61 @@
 """
-Modelo de Configuración del sitio
+Modelo de Configuración Global del Sitio
 """
-from sqlalchemy import Column, String, Text, Boolean, JSON, Integer
+from sqlalchemy import Column, String, Boolean, Text, JSON
 from .base import BaseModel
 
 
-class SiteSettings(BaseModel):
-    """Configuración general del sitio"""
-    __tablename__ = "site_settings"
+class Settings(BaseModel):
+    """Modelo para configuración global del sitio"""
+    __tablename__ = "settings"
     
-    # Información del sitio
-    site_title = Column(String(200), default="Mi Portafolio", nullable=False)
+    # Información del Sitio
+    site_name = Column(String(100), nullable=False, default="Mi Portafolio")
     site_description = Column(Text, nullable=True)
-    site_keywords = Column(String(500), nullable=True)
+    site_logo_url = Column(String(500), nullable=True)
+    site_favicon_url = Column(String(500), nullable=True)
     
-    # Hero section
-    hero_title = Column(String(200), nullable=True)
-    hero_subtitle = Column(String(500), nullable=True)
-    hero_description = Column(Text, nullable=True)
-    hero_image_url = Column(String(500), nullable=True)
-    hero_background_url = Column(String(500), nullable=True)
-    
-    # About section
-    about_title = Column(String(200), default="Sobre mí", nullable=False)
-    about_content = Column(Text, nullable=True)
-    about_image_url = Column(String(500), nullable=True)
-    
-    # Configuración de contacto
+    # Contacto Global
     contact_email = Column(String(255), nullable=True)
     contact_phone = Column(String(50), nullable=True)
-    contact_form_enabled = Column(Boolean, default=True, nullable=False)
+    contact_location = Column(String(255), nullable=True)
+    contact_availability = Column(String(255), nullable=True)
     
-    # Redes sociales
-    social_links = Column(JSON, nullable=True, default=dict)
-    # Estructura: {"github": "url", "linkedin": "url", "twitter": "url", ...}
+    # Social Links Global (JSON)
+    social_links = Column(JSON, nullable=True, default=list)
+    # Formato: [{"name": "GitHub", "url": "...", "icon": "...", "enabled": true}]
     
-    # Configuración de SEO
-    seo_meta_title = Column(String(200), nullable=True)
-    seo_meta_description = Column(String(500), nullable=True)
+    # SEO y Marketing
+    seo_title = Column(String(255), nullable=True)
+    seo_description = Column(Text, nullable=True)
+    seo_keywords = Column(Text, nullable=True)
     seo_og_image = Column(String(500), nullable=True)
-    
-    # Configuración del tema
-    theme_primary_color = Column(String(20), default="#3B82F6", nullable=False)
-    theme_secondary_color = Column(String(20), default="#1E40AF", nullable=False)
-    theme_accent_color = Column(String(20), default="#F59E0B", nullable=False)
-    dark_mode_enabled = Column(Boolean, default=True, nullable=False)
-    
-    # Analytics
     google_analytics_id = Column(String(50), nullable=True)
+    google_search_console = Column(String(100), nullable=True)
     
-    # Configuración de proyectos
-    projects_per_page = Column(Integer, default=6, nullable=False)
-    show_project_count = Column(Boolean, default=True, nullable=False)
+    # Apariencia
+    theme_mode = Column(String(20), nullable=False, default="auto")  # light, dark, auto
+    primary_color = Column(String(20), nullable=True, default="#3B82F6")
+    font_family = Column(String(100), nullable=True)
     
-    # Footer
-    footer_text = Column(Text, nullable=True)
-    footer_links = Column(JSON, nullable=True, default=list)
-    # Estructura: [{"text": "Política de Privacidad", "url": "/privacy"}]
-    
-    # Configuración técnica
-    maintenance_mode = Column(Boolean, default=False, nullable=False)
+    # Avisos y Notificaciones
+    maintenance_mode = Column(Boolean, nullable=False, default=False)
     maintenance_message = Column(Text, nullable=True)
+    global_banner = Column(Text, nullable=True)
+    banner_enabled = Column(Boolean, nullable=False, default=False)
+    banner_type = Column(String(20), nullable=True, default="info")  # info, warning, error, success
+    
+    # Newsletter
+    newsletter_enabled = Column(Boolean, nullable=False, default=False)
+    newsletter_provider = Column(String(50), nullable=True)
+    newsletter_api_key = Column(String(255), nullable=True)
+    
+    # Integraciones
+    facebook_pixel = Column(String(50), nullable=True)
+    hotjar_id = Column(String(50), nullable=True)
+    
+    # Metadata adicional (renombrado porque 'metadata' está reservado)
+    extra_config = Column(JSON, nullable=True, default=dict)
     
     def __repr__(self):
-        return f"<SiteSettings(site_title={self.site_title})>"
-
-
-class Analytics(BaseModel):
-    """Modelo para métricas y analytics básicos"""
-    __tablename__ = "analytics"
-    
-    # Métricas de página
-    page_path = Column(String(500), nullable=False)
-    page_title = Column(String(200), nullable=True)
-    
-    # Información del visitante
-    visitor_ip = Column(String(45), nullable=True)  # IPv6 compatible
-    user_agent = Column(Text, nullable=True)
-    referrer = Column(String(500), nullable=True)
-    
-    # Ubicación (opcional)
-    country = Column(String(100), nullable=True)
-    city = Column(String(100), nullable=True)
-    
-    # Métricas de tiempo
-    session_duration = Column(Integer, nullable=True)  # en segundos
-    
-    # Información adicional
-    device_type = Column(String(50), nullable=True)  # desktop, mobile, tablet
-    browser = Column(String(100), nullable=True)
-    os = Column(String(100), nullable=True)
-    
-    def __repr__(self):
-        return f"<Analytics(page_path={self.page_path})>"
+        return f"<Settings(site_name={self.site_name})>"
