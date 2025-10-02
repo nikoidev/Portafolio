@@ -248,6 +248,55 @@ async def delete_image(
         )
 
 
+@router.post("/videos", response_model=dict)
+async def upload_video(
+    file: UploadFile = File(...),
+    project_slug: Optional[str] = Form(None),
+    current_user = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Subir un video (solo admin)"""
+    upload_service = UploadService()
+    
+    try:
+        # Validar tipo de archivo
+        allowed_types = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo']
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Tipo de archivo no permitido. Tipos aceptados: MP4, WebM, MOV, AVI"
+            )
+        
+        # Validar tamaño (100MB)
+        file.file.seek(0, 2)  # Ir al final del archivo
+        file_size = file.file.tell()
+        file.file.seek(0)  # Volver al inicio
+        
+        if file_size > 100 * 1024 * 1024:  # 100MB
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El video no debe superar los 100MB"
+            )
+        
+        result = await upload_service.upload_video(
+            file=file,
+            project_slug=project_slug
+        )
+        
+        return {
+            "message": "Video subido correctamente",
+            "success": True,
+            "data": result
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del servidor: {str(e)}"
+        )
+
+
 @router.delete("/files/{filename}")
 async def delete_file(
     filename: str,

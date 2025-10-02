@@ -274,6 +274,46 @@ class UploadService:
             "uploaded_at": datetime.now().isoformat()
         }
     
+    async def upload_video(
+        self,
+        file: UploadFile,
+        project_slug: Optional[str] = None
+    ) -> dict:
+        """
+        Subir un video al servidor
+        """
+        if not file.content_type or not file.content_type.startswith('video/'):
+            raise ValueError("El archivo no es un video válido")
+        
+        # Determinar directorio de destino
+        if project_slug:
+            project_dir = self.upload_dir / "projects" / f"project_{project_slug}" / "videos"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            file_path = project_dir / self._generate_filename(file.filename or "video.mp4")
+            url = f"/uploads/projects/project_{project_slug}/videos/{file_path.name}"
+        else:
+            video_dir = self.upload_dir / "videos"
+            video_dir.mkdir(parents=True, exist_ok=True)
+            file_path = video_dir / self._generate_filename(file.filename or "video.mp4")
+            url = f"/uploads/videos/{file_path.name}"
+        
+        # Guardar archivo
+        await self._save_file(file, file_path)
+        
+        # Obtener información del archivo
+        file_stats = file_path.stat()
+        
+        return {
+            "filename": file_path.name,
+            "original_filename": file.filename,
+            "url": url,
+            "file_path": str(file_path),
+            "size": file_stats.st_size,
+            "content_type": file.content_type,
+            "uploaded_at": datetime.now().isoformat(),
+            "thumbnail": None  # Se puede generar después si es necesario
+        }
+    
     async def upload_multiple_images(
         self, 
         files: List[UploadFile],

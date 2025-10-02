@@ -1,5 +1,6 @@
 'use client';
 
+import { getImageUrl } from '@/lib/api';
 import { Play } from 'lucide-react';
 import { useState } from 'react';
 
@@ -68,14 +69,14 @@ export function VideoPlayer({
     return (
         <div className={`relative w-full aspect-video bg-black rounded-lg overflow-hidden ${className}`}>
             <video
-                src={url}
+                src={getImageUrl(url)}
                 title={title}
                 autoPlay={autoPlay}
                 muted={muted}
                 loop={loop}
                 controls
                 className="w-full h-full"
-                poster={thumbnail}
+                poster={thumbnail ? getImageUrl(thumbnail) : undefined}
             >
                 Tu navegador no soporta el tag de video.
             </video>

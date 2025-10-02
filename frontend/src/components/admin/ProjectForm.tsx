@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 import { ProjectImageManager } from './ProjectImageManager';
 import { TechnologyManager } from './TechnologyManager';
+import { VideoManager } from './VideoManager';
 
 const projectSchema = z.object({
     title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
@@ -47,6 +48,11 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
     const [technologies, setTechnologies] = useState<Array<{ name: string; icon: string; enabled: boolean }>>(
         project?.technologies || []
     );
+    const [videoData, setVideoData] = useState<{ type: string | null; url: string | null; thumbnail: string | null }>({
+        type: project?.demo_video_type || null,
+        url: project?.demo_video_url || null,
+        thumbnail: project?.demo_video_thumbnail || null
+    });
 
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
@@ -94,10 +100,10 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             demo_images: projectImages.length > 0 ? projectImages : [],
             // Mantener images legacy vacío
             images: [],
-            // Campos de video como null si están vacíos
-            demo_video_type: null,
-            demo_video_url: null,
-            demo_video_thumbnail: null,
+            // Campos de video
+            demo_video_type: videoData.type,
+            demo_video_url: videoData.url,
+            demo_video_thumbnail: videoData.thumbnail,
         };
 
         try {
@@ -255,11 +261,33 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                 {!project?.id && (
                                     <div className="border-2 border-dashed rounded-lg p-6 text-center">
                                         <p className="text-sm text-muted-foreground mb-2">
-                                            📸 Las imágenes se pueden agregar después de crear el proyecto
+                                            📸 Las imágenes y videos se pueden agregar después de crear el proyecto
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            Primero guarda el proyecto con la información básica, luego podrás gestionar las imágenes
+                                            Primero guarda el proyecto con la información básica, luego podrás gestionar multimedia
                                         </p>
+                                    </div>
+                                )}
+
+                                {/* Gestor de Video */}
+                                {project?.id && (
+                                    <div className="space-y-3">
+                                        <Label>Video Demo del Proyecto</Label>
+                                        <VideoManager
+                                            projectId={project.id}
+                                            projectTitle={project.title}
+                                            currentVideo={{
+                                                type: videoData.type,
+                                                url: videoData.url,
+                                                thumbnail: videoData.thumbnail
+                                            }}
+                                            onVideoUpdate={setVideoData}
+                                        />
+                                        {videoData.url && (
+                                            <p className="text-sm text-muted-foreground">
+                                                Video {videoData.type === 'youtube' ? 'de YouTube' : 'local'} agregado ✅
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 
