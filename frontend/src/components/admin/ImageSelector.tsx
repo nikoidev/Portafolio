@@ -22,6 +22,7 @@ interface ImageSelectorProps {
     maxImages?: number;
     title?: string;
     description?: string;
+    projectSlug?: string;
 }
 
 export function ImageSelector({
@@ -29,7 +30,8 @@ export function ImageSelector({
     onImagesChange,
     maxImages = 5,
     title = 'Seleccionar Imágenes',
-    description = 'Elige imágenes para tu proyecto'
+    description = 'Elige imágenes para tu proyecto',
+    projectSlug
 }: ImageSelectorProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -147,6 +149,7 @@ export function ImageSelector({
                             onUploadComplete={handleUploadComplete}
                             title="Subir Nuevas Imágenes"
                             description="Sube imágenes y se seleccionarán automáticamente"
+                            projectSlug={projectSlug}
                         />
 
                         {/* Galería para seleccionar */}

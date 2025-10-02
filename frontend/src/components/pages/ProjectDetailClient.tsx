@@ -1,14 +1,13 @@
 'use client';
 
-import { DemoModal } from '@/components/shared/DemoModal';
+import { ProjectDemo } from '@/components/shared/ProjectDemo';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { api } from '@/lib/api';
+import { api, getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
-import { ArrowLeft, Calendar, ExternalLink, Eye, Github, Play, Share2 } from 'lucide-react';
-import Image from 'next/image';
+import { ArrowLeft, Calendar, Eye, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,7 +19,6 @@ export default function ProjectDetailClient() {
     const [project, setProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isDemoOpen, setIsDemoOpen] = useState(false);
 
     useEffect(() => {
         const loadProject = async () => {
@@ -138,34 +136,34 @@ export default function ProjectDetailClient() {
 
                             {/* Tecnologías */}
                             <div className="flex flex-wrap gap-2 mb-6">
-                                {project.technologies?.map((tech) => (
-                                    <Badge key={tech} variant="secondary">
-                                        {tech}
-                                    </Badge>
+                                {project.technologies?.filter(t => t.enabled).map((tech, index) => (
+                                    <div key={index} className="flex items-center gap-2 px-3 py-1.5 border rounded-lg bg-background">
+                                        {tech.icon && (
+                                            <img
+                                                src={tech.icon}
+                                                alt={tech.name}
+                                                className="w-4 h-4"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        )}
+                                        <span className="text-sm font-medium">{tech.name}</span>
+                                    </div>
                                 ))}
                             </div>
 
-                            {/* Botones de acción */}
-                            <div className="flex flex-wrap gap-3">
-                                {(project.github_url || (project as any).githubUrl) && (
-                                    <Button asChild>
-                                        <a href={project.github_url || (project as any).githubUrl} target="_blank" rel="noopener noreferrer">
-                                            <Github className="w-4 h-4 mr-2" />
-                                            Ver código
-                                        </a>
-                                    </Button>
-                                )}
-                                {(project.live_demo_url || (project as any).demo_url || (project as any).demoUrl) && (
-                                    <Button
-                                        variant="default"
-                                        onClick={() => setIsDemoOpen(true)}
-                                    >
-                                        <Play className="w-4 h-4 mr-2" />
-                                        Ver Demo en Vivo
-                                    </Button>
-                                )}
-                            </div>
                         </div>
+
+                        {/* Demo del Proyecto */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Demo del Proyecto</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ProjectDemo project={project} />
+                            </CardContent>
+                        </Card>
 
                         {/* Galería de imágenes */}
                         {hasImages && (
@@ -177,12 +175,10 @@ export default function ProjectDetailClient() {
                                     <div className="space-y-4">
                                         {/* Imagen principal */}
                                         <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
-                                            <Image
-                                                src={images[currentImageIndex]}
+                                            <img
+                                                src={getImageUrl(images[currentImageIndex])}
                                                 alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
-                                                fill
-                                                className="object-cover"
-                                                priority
+                                                className="w-full h-full object-cover"
                                             />
                                         </div>
 
@@ -198,11 +194,10 @@ export default function ProjectDetailClient() {
                                                             : 'border-transparent hover:border-muted-foreground/50'
                                                             }`}
                                                     >
-                                                        <Image
-                                                            src={image}
+                                                        <img
+                                                            src={getImageUrl(image)}
                                                             alt={`${project.title} - Miniatura ${index + 1}`}
-                                                            fill
-                                                            className="object-cover"
+                                                            className="w-full h-full object-cover"
                                                         />
                                                     </button>
                                                 ))}
@@ -255,12 +250,22 @@ export default function ProjectDetailClient() {
                                 <Separator />
 
                                 <div>
-                                    <h4 className="font-medium mb-2">Tecnologías utilizadas</h4>
-                                    <div className="flex flex-wrap gap-1">
-                                        {project.technologies?.map((tech) => (
-                                            <Badge key={tech} variant="outline" className="text-xs">
-                                                {tech}
-                                            </Badge>
+                                    <h4 className="font-medium mb-3">Tecnologías utilizadas</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.technologies?.filter(t => t.enabled).map((tech, index) => (
+                                            <div key={index} className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
+                                                {tech.icon && (
+                                                    <img
+                                                        src={tech.icon}
+                                                        alt={tech.name}
+                                                        className="w-5 h-5"
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                        }}
+                                                    />
+                                                )}
+                                                <span className="font-medium">{tech.name}</span>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>
@@ -271,28 +276,7 @@ export default function ProjectDetailClient() {
                                         <div>
                                             <h4 className="font-medium mb-2">Enlaces</h4>
                                             <div className="space-y-2">
-                                                {((project as any).githubUrl || (project as any).github_url) && (
-                                                    <a
-                                                        href={(project as any).githubUrl || (project as any).github_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-                                                    >
-                                                        <Github className="w-4 h-4" />
-                                                        Repositorio en GitHub
-                                                    </a>
-                                                )}
-                                                {((project as any).demoUrl || (project as any).demo_url) && (
-                                                    <a
-                                                        href={(project as any).demoUrl || (project as any).demo_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-                                                    >
-                                                        <ExternalLink className="w-4 h-4" />
-                                                        Ver demo en vivo
-                                                    </a>
-                                                )}
+                                                <p className="text-sm text-muted-foreground">Ver sección de Demo arriba</p>
                                             </div>
                                         </div>
                                     </>
@@ -323,17 +307,6 @@ export default function ProjectDetailClient() {
                         </Card>
                     </div>
                 </div>
-
-                {/* Modal de Demo */}
-                {(project.live_demo_url || (project as any).demo_url || (project as any).demoUrl) && (
-                    <DemoModal
-                        isOpen={isDemoOpen}
-                        onClose={() => setIsDemoOpen(false)}
-                        demoUrl={project.live_demo_url || (project as any).demo_url || (project as any).demoUrl || ''}
-                        projectTitle={project.title}
-                        demoType={project.demo_type as 'iframe' | 'link' | 'video' | 'images'}
-                    />
-                )}
             </div>
         </div>
     );

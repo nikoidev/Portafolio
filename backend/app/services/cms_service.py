@@ -209,6 +209,26 @@ class CMSService:
                 "label": "Footer",
                 "icon": "layout",
                 "description": "Pie de página del sitio web"
+            },
+            "navbar": {
+                "label": "Menú Público",
+                "icon": "menu",
+                "description": "Barra de navegación pública"
+            },
+            "admin_header": {
+                "label": "Menú Admin",
+                "icon": "settings",
+                "description": "Barra de navegación del panel admin"
+            },
+            "privacy": {
+                "label": "Privacidad",
+                "icon": "shield",
+                "description": "Política de privacidad"
+            },
+            "terms": {
+                "label": "Términos",
+                "icon": "file-text",
+                "description": "Términos y condiciones"
             }
         }
         
@@ -767,6 +787,49 @@ class CMSService:
                     ]
                 },
                 order_index=1
+            ),
+            # PROJECTS - Header Section
+            PageContentCreate(
+                page_key="projects",
+                section_key="header",
+                title="Encabezado - Proyectos",
+                description="Título y descripción principal de la página de proyectos",
+                content={
+                    "title": "Mis Proyectos",
+                    "description": "Explora mi colección de proyectos de desarrollo web, aplicaciones móviles y más. Cada proyecto representa un desafío único y una oportunidad de aprendizaje."
+                },
+                order_index=1
+            ),
+            # PROJECTS - Filters Section
+            PageContentCreate(
+                page_key="projects",
+                section_key="filters",
+                title="Filtros y Búsqueda",
+                description="Configuración de filtros y búsqueda de proyectos",
+                content={
+                    "title": "Filtros y Búsqueda",
+                    "search_placeholder": "Buscar proyectos por nombre, descripción o tecnología...",
+                    "show_search": True,
+                    "show_technology_filter": True,
+                    "show_view_toggle": True,
+                    "filter_label": "Encuentra proyectos específicos usando los filtros y la búsqueda"
+                },
+                order_index=2
+            ),
+            # PROJECTS - CTA Section
+            PageContentCreate(
+                page_key="projects",
+                section_key="cta",
+                title="Llamada a la Acción",
+                description="Sección de llamada a la acción al final de la página",
+                content={
+                    "title": "¿Interesado en trabajar juntos?",
+                    "description": "Estoy siempre abierto a discutir nuevos proyectos, ideas creativas o oportunidades para formar parte de tu visión.",
+                    "button_text": "Contáctame",
+                    "button_url": "/contact",
+                    "show_cta": True
+                },
+                order_index=3
             )
         ]
         

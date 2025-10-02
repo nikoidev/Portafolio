@@ -8,6 +8,7 @@ from fastapi import HTTPException, status
 from app.models.project import Project
 from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectUpdate, ProjectResponse, ProjectPublic
+from app.services.upload_service import UploadService
 from slugify import slugify
 
 
@@ -16,6 +17,27 @@ class ProjectService:
     
     def __init__(self, db: Session):
         self.db = db
+    
+    def _migrate_technologies(self, project: Project) -> Project:
+        """
+        Migrar tecnologías de formato antiguo (strings) a nuevo formato (objetos)
+        """
+        if project.technologies and isinstance(project.technologies, list):
+            # Verificar si el primer elemento es string (formato antiguo)
+            if len(project.technologies) > 0 and isinstance(project.technologies[0], str):
+                # Convertir a nuevo formato
+                project.technologies = [
+                    {
+                        "name": tech,
+                        "icon": "",  # Sin icono por defecto
+                        "enabled": True
+                    }
+                    for tech in project.technologies
+                ]
+                # Guardar cambios
+                self.db.commit()
+                self.db.refresh(project)
+        return project
     
     def create_project(self, project_data: ProjectCreate, owner: User) -> Project:
         """Crear nuevo proyecto"""
@@ -50,7 +72,10 @@ class ProjectService:
         if not include_unpublished:
             query = query.filter(Project.is_published == True)
         
-        return query.first()
+        project = query.first()
+        if project:
+            project = self._migrate_technologies(project)
+        return project
     
     def get_project_by_slug(self, slug: str, include_unpublished: bool = False) -> Optional[Project]:
         """Obtener proyecto por slug"""
@@ -59,7 +84,10 @@ class ProjectService:
         if not include_unpublished:
             query = query.filter(Project.is_published == True)
         
-        return query.first()
+        project = query.first()
+        if project:
+            project = self._migrate_technologies(project)
+        return project
     
     def get_projects(
         self, 
@@ -90,7 +118,13 @@ class ProjectService:
         # Ordenar por order_index y fecha
         query = query.order_by(desc(Project.order_index), desc(Project.created_at))
         
-        return query.offset(skip).limit(limit).all()
+        projects = query.offset(skip).limit(limit).all()
+        
+        # Migrar tecnologías de formato antiguo a nuevo
+        for project in projects:
+            self._migrate_technologies(project)
+        
+        return projects
     
     def update_project(self, project_id: int, project_data: ProjectUpdate, owner: User) -> Project:
         """Actualizar proyecto"""
@@ -129,7 +163,7 @@ class ProjectService:
         return project
     
     def delete_project(self, project_id: int, owner: User) -> bool:
-        """Eliminar proyecto"""
+        """Eliminar proyecto y toda su carpeta de archivos"""
         project = self.db.query(Project).filter(
             Project.id == project_id,
             Project.owner_id == owner.id
@@ -141,6 +175,16 @@ class ProjectService:
                 detail="Proyecto no encontrado"
             )
         
+        # Eliminar toda la carpeta del proyecto (usando ID)
+        upload_service = UploadService()
+        deleted = upload_service.delete_project_folder(project.id)
+        
+        if deleted:
+            print(f"Carpeta completa del proyecto ID {project.id} eliminada")
+        else:
+            print(f"No se encontró carpeta para el proyecto ID {project.id}")
+        
+        # Eliminar proyecto de la base de datos
         self.db.delete(project)
         self.db.commit()
         
@@ -157,10 +201,16 @@ class ProjectService:
     
     def get_featured_projects(self, limit: int = 6) -> List[Project]:
         """Obtener proyectos destacados"""
-        return self.db.query(Project).filter(
+        projects = self.db.query(Project).filter(
             Project.is_published == True,
             Project.is_featured == True
         ).order_by(desc(Project.order_index), desc(Project.created_at)).limit(limit).all()
+        
+        # Migrar tecnologías
+        for project in projects:
+            self._migrate_technologies(project)
+        
+        return projects
     
     def get_project_stats(self) -> dict:
         """Obtener estadísticas de proyectos"""

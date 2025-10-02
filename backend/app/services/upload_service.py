@@ -108,7 +108,8 @@ class UploadService:
         file: UploadFile, 
         optimize: bool = True,
         max_width: int = 1920,
-        quality: int = 85
+        quality: int = 85,
+        project_slug: Optional[str] = None
     ) -> dict:
         """
         Subir y procesar imagen
@@ -118,6 +119,7 @@ class UploadService:
             optimize: Si optimizar la imagen
             max_width: Ancho máximo en píxeles
             quality: Calidad JPEG (1-100)
+            project_slug: Slug del proyecto (para organizar imágenes por proyecto)
             
         Returns:
             dict: Información del archivo subido
@@ -126,9 +128,19 @@ class UploadService:
         self._validate_file_size(file)
         self._validate_image_type(file)
         
-        # Generar nombre único
-        filename = self._generate_filename(file.filename or "image.jpg")
-        file_path = self.upload_dir / "images" / filename
+        # Determinar directorio de destino
+        if project_slug:
+            # Crear carpeta específica para el proyecto (usar ID como nombre de carpeta)
+            # project_slug puede ser el ID del proyecto como string
+            project_dir = self.upload_dir / "projects" / f"project_{project_slug}"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            file_path = project_dir / self._generate_filename(file.filename or "image.jpg")
+            url = f"/uploads/projects/project_{project_slug}/{file_path.name}"
+        else:
+            # Carpeta genérica (para otros usos)
+            filename = self._generate_filename(file.filename or "image.jpg")
+            file_path = self.upload_dir / "images" / filename
+            url = f"/uploads/images/{filename}"
         
         # Guardar archivo
         await self._save_file(file, file_path)
@@ -141,14 +153,85 @@ class UploadService:
         file_stats = file_path.stat()
         
         return {
-            "filename": filename,
+            "filename": file_path.name,
             "original_filename": file.filename,
-            "url": f"/uploads/images/{filename}",
+            "url": url,
             "file_path": str(file_path),
             "size": file_stats.st_size,
             "content_type": file.content_type,
             "uploaded_at": datetime.now().isoformat()
         }
+    
+    def delete_file(self, file_url: str) -> bool:
+        """
+        Eliminar un archivo del sistema
+        
+        Args:
+            file_url: URL del archivo (ej: /uploads/images/archivo.jpg)
+            
+        Returns:
+            bool: True si se eliminó correctamente
+        """
+        try:
+            # Convertir URL a ruta del sistema
+            if file_url.startswith("/uploads/"):
+                file_path = self.upload_dir / file_url.replace("/uploads/", "")
+            else:
+                # Asumir que es una ruta relativa
+                file_path = Path(file_url)
+            
+            # Verificar que el archivo existe
+            if file_path.exists() and file_path.is_file():
+                file_path.unlink()
+                print(f"Archivo eliminado: {file_path}")
+                return True
+            else:
+                print(f"Archivo no encontrado: {file_path}")
+                return False
+        except Exception as e:
+            print(f"Error al eliminar archivo {file_url}: {e}")
+            return False
+    
+    def delete_files(self, file_urls: List[str]) -> int:
+        """
+        Eliminar múltiples archivos
+        
+        Args:
+            file_urls: Lista de URLs de archivos
+            
+        Returns:
+            int: Cantidad de archivos eliminados exitosamente
+        """
+        deleted_count = 0
+        for file_url in file_urls:
+            if self.delete_file(file_url):
+                deleted_count += 1
+        return deleted_count
+    
+    def delete_project_folder(self, project_id: int) -> bool:
+        """
+        Eliminar toda la carpeta de un proyecto
+        
+        Args:
+            project_id: ID del proyecto
+            
+        Returns:
+            bool: True si se eliminó correctamente
+        """
+        try:
+            import shutil
+            project_dir = self.upload_dir / "projects" / f"project_{project_id}"
+            
+            if project_dir.exists() and project_dir.is_dir():
+                shutil.rmtree(project_dir)
+                print(f"Carpeta del proyecto eliminada: {project_dir}")
+                return True
+            else:
+                print(f"Carpeta del proyecto no encontrada: {project_dir}")
+                return False
+        except Exception as e:
+            print(f"Error al eliminar carpeta del proyecto {project_id}: {e}")
+            return False
     
     async def upload_file(self, file: UploadFile, file_type: str = "general") -> dict:
         """
@@ -191,17 +274,62 @@ class UploadService:
             "uploaded_at": datetime.now().isoformat()
         }
     
+    async def upload_video(
+        self,
+        file: UploadFile,
+        project_slug: Optional[str] = None
+    ) -> dict:
+        """
+        Subir un video al servidor
+        """
+        if not file.content_type or not file.content_type.startswith('video/'):
+            raise ValueError("El archivo no es un video válido")
+        
+        # Determinar directorio de destino
+        if project_slug:
+            project_dir = self.upload_dir / "projects" / f"project_{project_slug}" / "videos"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            file_path = project_dir / self._generate_filename(file.filename or "video.mp4")
+            url = f"/uploads/projects/project_{project_slug}/videos/{file_path.name}"
+        else:
+            video_dir = self.upload_dir / "videos"
+            video_dir.mkdir(parents=True, exist_ok=True)
+            file_path = video_dir / self._generate_filename(file.filename or "video.mp4")
+            url = f"/uploads/videos/{file_path.name}"
+        
+        # Guardar archivo
+        await self._save_file(file, file_path)
+        
+        # Obtener información del archivo
+        file_stats = file_path.stat()
+        
+        return {
+            "filename": file_path.name,
+            "original_filename": file.filename,
+            "url": url,
+            "file_path": str(file_path),
+            "size": file_stats.st_size,
+            "content_type": file.content_type,
+            "uploaded_at": datetime.now().isoformat(),
+            "thumbnail": None  # Se puede generar después si es necesario
+        }
+    
     async def upload_multiple_images(
         self, 
         files: List[UploadFile],
-        optimize: bool = True
+        optimize: bool = True,
+        project_slug: Optional[str] = None
     ) -> List[dict]:
         """Subir múltiples imágenes"""
         results = []
         
         for file in files:
             try:
-                result = await self.upload_image(file, optimize=optimize)
+                result = await self.upload_image(
+                    file, 
+                    optimize=optimize,
+                    project_slug=project_slug
+                )
                 results.append(result)
             except HTTPException as e:
                 results.append({

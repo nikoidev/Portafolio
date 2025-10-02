@@ -4,27 +4,28 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Project } from '@/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
-import { ImageSelector } from './ImageSelector';
+import { ProjectImageManager } from './ProjectImageManager';
+import { TechnologyManager } from './TechnologyManager';
+import { VideoManager } from './VideoManager';
 
 const projectSchema = z.object({
     title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
-    slug: z.string().optional(),
+    slug: z.string().min(3, 'El slug debe tener al menos 3 caracteres'),
     description: z.string().min(10, 'La descripción debe tener al menos 10 caracteres'),
-    short_description: z.string().optional(),
+    short_description: z.string().min(10, 'La descripción corta debe tener al menos 10 caracteres'),
     content: z.string().optional(),
     github_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    live_demo_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    demo_type: z.enum(['iframe', 'link', 'video', 'images']).optional(),
     thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    images: z.array(z.string()).default([]),
-    technologies: z.string(),
     tags: z.string().optional(),
     is_featured: z.boolean().default(false),
     is_published: z.boolean().default(false),
@@ -41,6 +42,17 @@ interface ProjectFormProps {
 
 export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFormProps) {
     const router = useRouter();
+    const [projectImages, setProjectImages] = useState<Array<{ url: string; title: string; order: number }>>(
+        project?.demo_images || []
+    );
+    const [technologies, setTechnologies] = useState<Array<{ name: string; icon: string; enabled: boolean }>>(
+        project?.technologies || []
+    );
+    const [videoData, setVideoData] = useState<{ type: string | null; url: string | null; thumbnail: string | null }>({
+        type: project?.demo_video_type || null,
+        url: project?.demo_video_url || null,
+        thumbnail: project?.demo_video_thumbnail || null
+    });
 
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
@@ -51,41 +63,67 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             short_description: project?.short_description || '',
             content: project?.content || '',
             github_url: project?.github_url || '',
-            live_demo_url: project?.live_demo_url || '',
-            demo_type: project?.demo_type || 'link',
-            thumbnail_url: project?.thumbnail_url || '',
-            images: project?.images || [],
-            technologies: project?.technologies?.join(', ') || '',
+            // Solo mostrar thumbnail_url si NO es una imagen del propio proyecto
+            thumbnail_url: (project?.thumbnail_url && !project.thumbnail_url.includes('/uploads/projects/project_'))
+                ? project.thumbnail_url
+                : '',
             tags: project?.tags?.join(', ') || '',
-            is_featured: project?.is_featured || false,
-            is_published: project?.is_published || false,
+            is_featured: Boolean(project?.is_featured ?? (project as any)?.isFeatured ?? false),
+            is_published: Boolean(project?.is_published ?? (project as any)?.isPublished ?? false),
             order_index: project?.order_index || 0,
         },
     });
 
     const handleSubmit = async (values: ProjectFormValues) => {
+        // Validar que haya al menos una tecnología
+        if (technologies.length === 0) {
+            toast.error('Error de validación', {
+                description: 'Debes agregar al menos una tecnología al proyecto',
+                icon: <AlertCircle className="h-4 w-4" />,
+            });
+            return;
+        }
+
         // Procesar los datos antes de enviar
         const processedData = {
             ...values,
-            technologies: values.technologies
-                .split(',')
-                .map(tech => tech.trim())
-                .filter(tech => tech.length > 0),
+            technologies,
             tags: values.tags
                 ? values.tags
                     .split(',')
                     .map(tag => tag.trim())
                     .filter(tag => tag.length > 0)
                 : [],
-            github_url: values.github_url || undefined,
-            live_demo_url: values.live_demo_url || undefined,
-            thumbnail_url: values.thumbnail_url || (values.images.length > 0 ? values.images[0] : undefined),
-            image_urls: values.images,
+            github_url: values.github_url || null,
+            thumbnail_url: values.thumbnail_url || (projectImages.length > 0 ? projectImages[0].url : null),
+            // Imágenes del proyecto con descripciones
+            demo_images: projectImages.length > 0 ? projectImages : [],
+            // Mantener images legacy vacío
+            images: [],
+            // Campos de video
+            demo_video_type: videoData.type,
+            demo_video_url: videoData.url,
+            demo_video_thumbnail: videoData.thumbnail,
         };
 
-        const success = await onSubmit(processedData);
-        if (success) {
-            router.push('/admin/projects');
+        try {
+            const success = await onSubmit(processedData);
+            if (success) {
+                toast.success('¡Éxito!', {
+                    description: project ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente',
+                });
+                router.push('/admin/projects');
+            } else {
+                toast.error('Error', {
+                    description: 'No se pudo guardar el proyecto. Por favor, revisa los campos obligatorios.',
+                    icon: <AlertCircle className="h-4 w-4" />,
+                });
+            }
+        } catch (error: any) {
+            toast.error('Error al guardar', {
+                description: error.message || 'Ocurrió un error inesperado',
+                icon: <AlertCircle className="h-4 w-4" />,
+            });
         }
     };
 
@@ -97,6 +135,19 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                 </CardTitle>
             </CardHeader>
             <CardContent>
+                <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <div className="flex items-start gap-3">
+                        <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                        <div className="flex-1">
+                            <h4 className="font-semibold text-blue-900 mb-1">Campos obligatorios</h4>
+                            <p className="text-sm text-blue-800">
+                                Los campos marcados con <span className="text-red-500 font-bold">*</span> son obligatorios:
+                                <strong> Título, Slug, Descripción, Descripción Corta y al menos una Tecnología</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,12 +172,12 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Slug</FormLabel>
+                                            <FormLabel>Slug *</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="mi-proyecto-increible" {...field} />
                                             </FormControl>
                                             <FormDescription>
-                                                Se generará automáticamente si se deja vacío
+                                                URL amigable para el proyecto (ej: mi-proyecto)
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -138,30 +189,21 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     name="short_description"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Descripción Corta</FormLabel>
+                                            <FormLabel>Descripción Corta *</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Una breve descripción..." {...field} />
+                                                <Input placeholder="Una breve descripción del proyecto..." {...field} />
                                             </FormControl>
+                                            <FormDescription>
+                                                Mínimo 10 caracteres
+                                            </FormDescription>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name="technologies"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tecnologías *</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="React, Next.js, TypeScript" {...field} />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Separar con comas
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                <TechnologyManager
+                                    technologies={technologies}
+                                    onChange={setTechnologies}
                                 />
 
                                 <FormField
@@ -198,73 +240,56 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name="live_demo_url"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>URL del Demo</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="https://mi-proyecto.vercel.app" {...field} />
-                                            </FormControl>
-                                            <FormDescription>
-                                                URL del proyecto desplegado o demo en vivo
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
 
-                                <FormField
-                                    control={form.control}
-                                    name="demo_type"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tipo de Demo</FormLabel>
-                                            <FormControl>
-                                                <select
-                                                    {...field}
-                                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                >
-                                                    <option value="iframe">Iframe (Interactivo)</option>
-                                                    <option value="link">Enlace Externo</option>
-                                                    <option value="video">Video</option>
-                                                    <option value="images">Solo Imágenes</option>
-                                                </select>
-                                            </FormControl>
-                                            <FormDescription>
-                                                Iframe: Muestra el proyecto en un modal interactivo<br />
-                                                Enlace: Abre en nueva pestaña<br />
-                                                Video: Muestra un video del demo<br />
-                                                Imágenes: Solo muestra las capturas de pantalla
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {/* Gestor de Imágenes - Solo si el proyecto ya existe */}
+                                {project?.id && (
+                                    <div className="space-y-2">
+                                        <Label>Imágenes del Proyecto</Label>
+                                        <ProjectImageManager
+                                            projectId={project.id}
+                                            projectTitle={project.title}
+                                            currentImages={projectImages}
+                                            onImagesUpdate={setProjectImages}
+                                        />
+                                        <p className="text-sm text-muted-foreground">
+                                            {projectImages.length} imagen(es) cargada(s). Cada imagen puede tener su propia descripción.
+                                        </p>
+                                    </div>
+                                )}
 
-                                <FormField
-                                    control={form.control}
-                                    name="images"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Imágenes del Proyecto</FormLabel>
-                                            <FormControl>
-                                                <ImageSelector
-                                                    selectedImages={field.value}
-                                                    onImagesChange={field.onChange}
-                                                    maxImages={5}
-                                                    title="Seleccionar Imágenes del Proyecto"
-                                                    description="Elige hasta 5 imágenes para mostrar en tu proyecto"
-                                                />
-                                            </FormControl>
-                                            <FormDescription>
-                                                La primera imagen será la imagen principal del proyecto
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                {/* Mensaje si es proyecto nuevo */}
+                                {!project?.id && (
+                                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                                        <p className="text-sm text-muted-foreground mb-2">
+                                            📸 Las imágenes y videos se pueden agregar después de crear el proyecto
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            Primero guarda el proyecto con la información básica, luego podrás gestionar multimedia
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Gestor de Video */}
+                                {project?.id && (
+                                    <div className="space-y-3">
+                                        <Label>Video Demo del Proyecto</Label>
+                                        <VideoManager
+                                            projectId={project.id}
+                                            projectTitle={project.title}
+                                            currentVideo={{
+                                                type: videoData.type,
+                                                url: videoData.url,
+                                                thumbnail: videoData.thumbnail
+                                            }}
+                                            onVideoUpdate={setVideoData}
+                                        />
+                                        {videoData.url && (
+                                            <p className="text-sm text-muted-foreground">
+                                                Video {videoData.type === 'youtube' ? 'de YouTube' : 'local'} agregado ✅
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
                                 <FormField
                                     control={form.control}
@@ -272,11 +297,22 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>URL de Imagen Manual (Opcional)</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="https://ejemplo.com/imagen.jpg" {...field} />
-                                            </FormControl>
+                                            <div className="flex gap-2">
+                                                <FormControl>
+                                                    <Input placeholder="https://ejemplo.com/imagen.jpg" {...field} />
+                                                </FormControl>
+                                                {field.value && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => field.onChange('')}
+                                                    >
+                                                        Limpiar
+                                                    </Button>
+                                                )}
+                                            </div>
                                             <FormDescription>
-                                                Solo si quieres usar una imagen externa en lugar de las subidas
+                                                Solo si quieres usar una imagen externa. Si está vacío, se usará la primera imagen del proyecto.
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -411,7 +447,7 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                         Guardando...
                                     </>
                                 ) : (
-                                    project ? 'Actualizar' : 'Crear Proyecto'
+                                    <>{project ? 'Actualizar' : 'Crear Proyecto'}</>
                                 )}
                             </Button>
                         </div>

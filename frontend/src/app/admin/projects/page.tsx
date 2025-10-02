@@ -160,18 +160,28 @@ export default function AdminProjectsPage() {
                                 </div>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex flex-wrap gap-1">
-                                    {project.technologies.slice(0, 5).map((tech) => (
-                                        <span
-                                            key={tech}
-                                            className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                                <div className="flex flex-wrap gap-2">
+                                    {project.technologies.filter(t => t.enabled).slice(0, 5).map((tech, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-md"
                                         >
-                                            {tech}
-                                        </span>
+                                            {tech.icon && (
+                                                <img
+                                                    src={tech.icon}
+                                                    alt={tech.name}
+                                                    className="w-3.5 h-3.5"
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                            )}
+                                            <span>{tech.name}</span>
+                                        </div>
                                     ))}
-                                    {project.technologies.length > 5 && (
+                                    {project.technologies.filter(t => t.enabled).length > 5 && (
                                         <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
-                                            +{project.technologies.length - 5} más
+                                            +{project.technologies.filter(t => t.enabled).length - 5} más
                                         </span>
                                     )}
                                 </div>

@@ -43,12 +43,22 @@ export interface Project extends BaseEntity {
     short_description?: string;
     content?: string;
     github_url?: string;
-    live_demo_url?: string;
-    demo_type?: 'iframe' | 'link' | 'video' | 'images';
+
+    // DEMO CONFIGURATION
+    // VIDEO DEMO
+    demo_video_type?: string;  // 'youtube' | 'local'
+    demo_video_url?: string;
+    demo_video_thumbnail?: string;
+
+    // GALLERY DEMO
+    demo_images?: Array<{ url: string; title?: string; order?: number }>;
+
+    // Legacy fields
     thumbnail_url?: string;
     images?: string[];
     image_urls?: string[];
-    technologies: string[];
+
+    technologies: Array<{ name: string; icon: string; enabled: boolean }>;
     tags?: string[];
     is_featured: boolean;
     is_published?: boolean;
@@ -63,12 +73,22 @@ export interface ProjectCreate {
     short_description?: string;
     content?: string;
     github_url?: string;
-    live_demo_url?: string;
-    demo_type?: 'iframe' | 'link' | 'video' | 'images';
+
+    // DEMO CONFIGURATION
+    // VIDEO DEMO
+    demo_video_type?: string;
+    demo_video_url?: string;
+    demo_video_thumbnail?: string;
+
+    // GALLERY DEMO
+    demo_images?: Array<{ url: string; title?: string; order?: number }>;
+
+    // Legacy fields
     thumbnail_url?: string;
     images?: string[];
     image_urls?: string[];
-    technologies: string[];
+
+    technologies: Array<{ name: string; icon: string; enabled: boolean }>;
     tags?: string[];
     is_featured?: boolean;
     is_published?: boolean;
