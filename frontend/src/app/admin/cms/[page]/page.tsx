@@ -2,6 +2,7 @@
 
 import { CreateSectionModal } from '@/components/cms/CreateSectionModal';
 import { SectionEditor } from '@/components/cms/SectionEditor';
+import { PermissionGuard } from '@/components/shared/PermissionGuard';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -14,9 +15,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cmsApi } from '@/lib/cms-api';
 import { PAGE_LABELS, PageContent } from '@/types/cms';
-import { ArrowDown, ArrowLeft, ArrowUp, Edit, Loader2, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowUp, Edit, Eye, Loader2, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,13 +27,19 @@ import { toast } from 'sonner';
 export default function EditPageCMS() {
     const params = useParams();
     const pageKey = params.page as string;
+    const { hasPermission } = usePermissions();
     const [sections, setSections] = useState<PageContent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [editingSectionKeys, setEditingSectionKeys] = useState<{ pageKey: string; sectionKey: string } | null>(null);
+    const [editingSectionKeys, setEditingSectionKeys] = useState<{ pageKey: string; sectionKey: string; readOnly: boolean } | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [deletingSection, setDeletingSection] = useState<PageContent | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [reorderingSection, setReorderingSection] = useState<string | null>(null);
+
+    // Verificar permisos
+    const canUpdateContent = hasPermission('update_content');
+    const canDeleteContent = hasPermission('delete_content');
+    const canCreateContent = hasPermission('create_content');
 
     useEffect(() => {
         loadSections();
@@ -49,10 +57,11 @@ export default function EditPageCMS() {
         }
     };
 
-    const handleEdit = (section: PageContent) => {
+    const handleEdit = (section: PageContent, readOnly: boolean = false) => {
         setEditingSectionKeys({
             pageKey: section.page_key,
-            sectionKey: section.section_key
+            sectionKey: section.section_key,
+            readOnly
         });
     };
 
@@ -107,15 +116,17 @@ export default function EditPageCMS() {
                 </Link>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold">Editar: {pageLabel}</h1>
+                        <h1 className="text-3xl font-bold">{canUpdateContent ? 'Editar' : 'Ver'}: {pageLabel}</h1>
                         <p className="text-muted-foreground mt-2">
-                            Gestiona el contenido de las secciones de esta página
+                            {canUpdateContent ? 'Gestiona el contenido de las secciones de esta página' : 'Visualiza el contenido de las secciones de esta página'}
                         </p>
                     </div>
-                    <Button onClick={() => setIsCreateModalOpen(true)}>
-                        <Plus className="w-4 h-4 mr-2" />
-                        Agregar Sección
-                    </Button>
+                    <PermissionGuard permission="create_content">
+                        <Button onClick={() => setIsCreateModalOpen(true)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Agregar Sección
+                        </Button>
+                    </PermissionGuard>
                 </div>
             </div>
 
@@ -129,37 +140,39 @@ export default function EditPageCMS() {
                         <Card key={section.id}>
                             <CardHeader>
                                 <div className="flex items-center justify-between gap-4">
-                                    {/* Botones de ordenamiento */}
-                                    <div className="flex flex-col gap-1">
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => handleReorder(section, 'up')}
-                                            disabled={index === 0 || reorderingSection === section.section_key}
-                                            className="h-6 px-2"
-                                            title="Mover arriba"
-                                        >
-                                            {reorderingSection === section.section_key ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <ArrowUp className="w-4 h-4" />
-                                            )}
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => handleReorder(section, 'down')}
-                                            disabled={index === sections.length - 1 || reorderingSection === section.section_key}
-                                            className="h-6 px-2"
-                                            title="Mover abajo"
-                                        >
-                                            {reorderingSection === section.section_key ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <ArrowDown className="w-4 h-4" />
-                                            )}
-                                        </Button>
-                                    </div>
+                                    {/* Botones de ordenamiento - Solo con permiso */}
+                                    {canUpdateContent && (
+                                        <div className="flex flex-col gap-1">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => handleReorder(section, 'up')}
+                                                disabled={index === 0 || reorderingSection === section.section_key}
+                                                className="h-6 px-2"
+                                                title="Mover arriba"
+                                            >
+                                                {reorderingSection === section.section_key ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <ArrowUp className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => handleReorder(section, 'down')}
+                                                disabled={index === sections.length - 1 || reorderingSection === section.section_key}
+                                                className="h-6 px-2"
+                                                title="Mover abajo"
+                                            >
+                                                {reorderingSection === section.section_key ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <ArrowDown className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        </div>
+                                    )}
 
                                     {/* Información de la sección */}
                                     <div className="flex-1">
@@ -172,22 +185,35 @@ export default function EditPageCMS() {
 
                                     {/* Botones de acción */}
                                     <div className="flex gap-2">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => handleEdit(section)}
-                                        >
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() => handleDeleteClick(section)}
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-2" />
-                                            Eliminar
-                                        </Button>
+                                        {canUpdateContent ? (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleEdit(section, false)}
+                                            >
+                                                <Edit className="w-4 h-4 mr-2" />
+                                                Editar
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleEdit(section, true)}
+                                            >
+                                                <Eye className="w-4 h-4 mr-2" />
+                                                Ver
+                                            </Button>
+                                        )}
+                                        <PermissionGuard permission="delete_content">
+                                            <Button
+                                                size="sm"
+                                                variant="destructive"
+                                                onClick={() => handleDeleteClick(section)}
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-2" />
+                                                Eliminar
+                                            </Button>
+                                        </PermissionGuard>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -211,7 +237,7 @@ export default function EditPageCMS() {
                 </Card>
             )}
 
-            {/* Modal de edición */}
+            {/* Modal de edición/visualización */}
             {editingSectionKeys && (
                 <SectionEditor
                     pageKey={editingSectionKeys.pageKey}
@@ -219,6 +245,7 @@ export default function EditPageCMS() {
                     isOpen={true}
                     onClose={handleClose}
                     onSaved={loadSections}
+                    readOnly={editingSectionKeys.readOnly}
                 />
             )}
 

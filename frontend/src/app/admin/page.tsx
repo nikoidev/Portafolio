@@ -2,6 +2,7 @@
 
 import { DashboardStats } from '@/components/admin/DashboardStats';
 import { PermissionGuard } from '@/components/shared/PermissionGuard';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Permission, usePermissions } from '@/hooks/usePermissions';
@@ -60,6 +61,10 @@ export default function AdminDashboard() {
         return allQuickActions.filter(action => hasPermission(action.permission));
     }, [hasPermission]);
 
+    const isViewer = useMemo(() => {
+        return user?.role === 'viewer';
+    }, [user?.role]);
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -70,11 +75,47 @@ export default function AdminDashboard() {
                 </p>
             </div>
 
+            {/* Banner informativo para Visualizadores */}
+            {isViewer && (
+                <Card className="border-blue-200 bg-blue-50">
+                    <CardContent className="pt-6">
+                        <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0">
+                                <Eye className="w-8 h-8 text-blue-600" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-semibold text-blue-900 mb-2">
+                                    Modo Solo Lectura
+                                </h3>
+                                <p className="text-sm text-blue-800 mb-3">
+                                    Tu rol de <strong>Visualizador</strong> te permite ver todo el contenido del portafolio
+                                    sin poder modificarlo. Puedes revisar proyectos, analíticas y contenido del sitio.
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Badge variant="outline" className="bg-white text-blue-700 border-blue-300">
+                                        ✓ Ver proyectos
+                                    </Badge>
+                                    <Badge variant="outline" className="bg-white text-blue-700 border-blue-300">
+                                        ✓ Ver estadísticas
+                                    </Badge>
+                                    <Badge variant="outline" className="bg-white text-blue-700 border-blue-300">
+                                        ✓ Ver contenido
+                                    </Badge>
+                                    <Badge variant="outline" className="bg-white text-red-700 border-red-300">
+                                        ✗ Editar contenido
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             {/* Estadísticas */}
             <DashboardStats />
 
-            {/* Acciones Rápidas */}
-            {quickActions.length > 0 && (
+            {/* Acciones Rápidas o Enlaces Rápidos según el rol */}
+            {quickActions.length > 0 ? (
                 <div>
                     <h2 className="text-2xl font-semibold mb-6">Acciones Rápidas</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -99,6 +140,69 @@ export default function AdminDashboard() {
                                 </Card>
                             );
                         })}
+                    </div>
+                </div>
+            ) : isViewer && (
+                /* Enlaces Rápidos para Visualizadores */
+                <div>
+                    <h2 className="text-2xl font-semibold mb-6">Enlaces Rápidos</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <Card className="hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <Eye className="w-5 h-5 text-blue-600" />
+                                    Ver Proyectos
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    Explora todos los proyectos del portafolio
+                                </p>
+                                <Button asChild variant="outline" size="sm" className="w-full">
+                                    <Link href="/admin/projects">
+                                        Ver Lista de Proyectos
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-green-600" />
+                                    Contenido del Sitio
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    Revisa el contenido de las páginas
+                                </p>
+                                <Button asChild variant="outline" size="sm" className="w-full">
+                                    <Link href="/admin/cms">
+                                        Ver Gestión Web
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <FolderPlus className="w-5 h-5 text-purple-600" />
+                                    Sitio Público
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    Ve cómo se muestra el portafolio
+                                </p>
+                                <Button asChild variant="outline" size="sm" className="w-full">
+                                    <Link href="/">
+                                        Ir al Sitio Público
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             )}

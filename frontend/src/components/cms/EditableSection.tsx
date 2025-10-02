@@ -11,6 +11,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useEditMode } from '@/contexts/EditModeContext';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cmsApi } from '@/lib/cms-api';
 import { ArrowDown, ArrowUp, Copy, Edit2, Loader2, Trash2 } from 'lucide-react';
 import { ReactNode, useState } from 'react';
@@ -41,11 +42,15 @@ export function EditableSection({
     canMoveDown = true,
 }: EditableSectionProps) {
     const { isEditMode } = useEditMode();
+    const { hasPermission } = usePermissions();
     const [isEditorOpen, setIsEditorOpen] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isDuplicating, setIsDuplicating] = useState(false);
     const [isReordering, setIsReordering] = useState(false);
+
+    // Verificar si el usuario puede editar contenido
+    const canEditContent = hasPermission('update_content');
 
     const handleSaved = () => {
         if (onContentUpdate) {
@@ -128,8 +133,8 @@ export function EditableSection({
                 {children}
             </div>
 
-            {/* Botones de acción (solo visible en modo edición) */}
-            {isEditMode && showActions && (
+            {/* Botones de acción (solo visible en modo edición Y con permisos) */}
+            {isEditMode && showActions && canEditContent && (
                 <div className="absolute top-2 right-2 z-[110] flex gap-2">
                     {/* Botones de reordenamiento */}
                     <div className="flex flex-col gap-1">
