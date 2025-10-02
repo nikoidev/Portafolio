@@ -109,6 +109,14 @@ export function usePermissions() {
         return user?.role === 'viewer' || (!canEdit() && !canCreate() && !canDelete());
     };
 
+    /**
+     * Verificar roles específicos
+     */
+    const isSuperAdmin = user?.role === 'super_admin';
+    const isAdmin = user?.role === 'admin';
+    const isEditor = user?.role === 'editor';
+    const isViewer = user?.role === 'viewer';
+
     return {
         hasPermission,
         hasAllPermissions,
@@ -118,6 +126,10 @@ export function usePermissions() {
         canCreate,
         canDelete,
         isViewerOnly,
+        isSuperAdmin,
+        isAdmin,
+        isEditor,
+        isViewer,
         permissions: Array.from(permissions),
         user,
     };
