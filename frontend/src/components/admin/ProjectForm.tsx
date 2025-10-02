@@ -57,7 +57,10 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             short_description: project?.short_description || '',
             content: project?.content || '',
             github_url: project?.github_url || '',
-            thumbnail_url: project?.thumbnail_url || '',
+            // Solo mostrar thumbnail_url si NO es una imagen del propio proyecto
+            thumbnail_url: (project?.thumbnail_url && !project.thumbnail_url.includes('/uploads/projects/project_'))
+                ? project.thumbnail_url
+                : '',
             tags: project?.tags?.join(', ') || '',
             is_featured: project?.is_featured || false,
             is_published: project?.is_published || false,
@@ -266,11 +269,22 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>URL de Imagen Manual (Opcional)</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="https://ejemplo.com/imagen.jpg" {...field} />
-                                            </FormControl>
+                                            <div className="flex gap-2">
+                                                <FormControl>
+                                                    <Input placeholder="https://ejemplo.com/imagen.jpg" {...field} />
+                                                </FormControl>
+                                                {field.value && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => field.onChange('')}
+                                                    >
+                                                        Limpiar
+                                                    </Button>
+                                                )}
+                                            </div>
                                             <FormDescription>
-                                                Solo si quieres usar una imagen externa en lugar de las subidas
+                                                Solo si quieres usar una imagen externa. Si está vacío, se usará la primera imagen del proyecto.
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
