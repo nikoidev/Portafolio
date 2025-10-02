@@ -53,7 +53,7 @@ export function ProjectImageManager({
         accept: {
             'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif']
         },
-        maxFiles: 5,
+        // Sin límite de imágenes
         disabled: isUploading
     });
 
@@ -169,7 +169,7 @@ export function ProjectImageManager({
                                 {isDragActive ? '¡Suelta las imágenes aquí!' : 'Arrastra imágenes aquí o haz clic para seleccionar'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                                Máximo 5 imágenes, 10MB por archivo
+                                Puedes subir todas las imágenes que necesites, 10MB por archivo
                             </p>
                         </div>
                     </div>
