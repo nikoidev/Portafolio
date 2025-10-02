@@ -3,7 +3,7 @@ from .base import BaseModel, Base
 from .user import User
 from .project import Project
 from .cv import CV
-from .settings import SiteSettings, Analytics
+from .settings import Settings
 from .page_content import PageContent
 
 # Exportar todos los modelos
@@ -13,7 +13,6 @@ __all__ = [
     "User",
     "Project", 
     "CV",
-    "SiteSettings",
-    "Analytics",
+    "Settings",
     "PageContent"
 ]

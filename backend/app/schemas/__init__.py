@@ -13,6 +13,10 @@ from .cv import (
     WorkExperience, Education, TechnicalSkill, Language, Certification,
     PDFGenerationRequest, PDFResponse
 )
+from .settings import (
+    SocialLink, SettingsBase, SettingsCreate, SettingsUpdate,
+    SettingsResponse, SettingsPublic
+)
 
 # Exportar todos los esquemas
 __all__ = [
@@ -30,5 +34,9 @@ __all__ = [
     # CV
     "CVBase", "CVCreate", "CVUpdate", "CVResponse", "CVPublic",
     "WorkExperience", "Education", "TechnicalSkill", "Language", "Certification",
-    "PDFGenerationRequest", "PDFResponse"
+    "PDFGenerationRequest", "PDFResponse",
+    
+    # Settings
+    "SocialLink", "SettingsBase", "SettingsCreate", "SettingsUpdate",
+    "SettingsResponse", "SettingsPublic"
 ]
