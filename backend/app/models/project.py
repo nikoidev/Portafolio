@@ -37,7 +37,7 @@ class Project(BaseModel):
     demo_files = Column(JSON, nullable=True)  # Archivos del demo (legacy)
     
     # Tecnologías y tags
-    technologies = Column(JSON, nullable=False, default=list)  # Array de tecnologías
+    technologies = Column(JSON, nullable=False, default=list)  # Array de objetos: [{"name": "Python", "icon": "https://...", "enabled": true}]
     tags = Column(JSON, nullable=True, default=list)  # Tags adicionales
     
     # Configuración

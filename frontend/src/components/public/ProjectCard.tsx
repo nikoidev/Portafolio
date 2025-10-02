@@ -70,14 +70,24 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                         <CardContent className="flex-1">
                             {/* Tecnologías */}
                             <div className="flex flex-wrap gap-2">
-                                {project.technologies?.slice(0, 6).map((tech) => (
-                                    <Badge key={tech} variant="outline">
-                                        {tech}
-                                    </Badge>
+                                {project.technologies?.filter(t => t.enabled).slice(0, 6).map((tech, index) => (
+                                    <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 border rounded-md bg-background text-sm">
+                                        {tech.icon && (
+                                            <img
+                                                src={tech.icon}
+                                                alt={tech.name}
+                                                className="w-4 h-4"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        )}
+                                        <span>{tech.name}</span>
+                                    </div>
                                 ))}
-                                {(project.technologies?.length || 0) > 6 && (
+                                {(project.technologies?.filter(t => t.enabled).length || 0) > 6 && (
                                     <Badge variant="outline">
-                                        +{(project.technologies?.length || 0) - 6} más
+                                        +{(project.technologies?.filter(t => t.enabled).length || 0) - 6} más
                                     </Badge>
                                 )}
                             </div>
@@ -160,15 +170,25 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
 
             <CardContent>
                 {/* Tecnologías */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {project.technologies?.slice(0, 4).map((tech) => (
-                        <Badge key={tech} variant="outline" className="text-xs">
-                            {tech}
-                        </Badge>
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {project.technologies?.filter(t => t.enabled).slice(0, 4).map((tech, index) => (
+                        <div key={index} className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md bg-background text-xs">
+                            {tech.icon && (
+                                <img
+                                    src={tech.icon}
+                                    alt={tech.name}
+                                    className="w-3.5 h-3.5"
+                                    onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                    }}
+                                />
+                            )}
+                            <span>{tech.name}</span>
+                        </div>
                     ))}
-                    {(project.technologies?.length || 0) > 4 && (
+                    {(project.technologies?.filter(t => t.enabled).length || 0) > 4 && (
                         <Badge variant="outline" className="text-xs">
-                            +{(project.technologies?.length || 0) - 4}
+                            +{(project.technologies?.filter(t => t.enabled).length || 0) - 4}
                         </Badge>
                     )}
                 </div>

@@ -58,7 +58,7 @@ export interface Project extends BaseEntity {
     images?: string[];
     image_urls?: string[];
 
-    technologies: string[];
+    technologies: Array<{ name: string; icon: string; enabled: boolean }>;
     tags?: string[];
     is_featured: boolean;
     is_published?: boolean;
@@ -88,7 +88,7 @@ export interface ProjectCreate {
     images?: string[];
     image_urls?: string[];
 
-    technologies: string[];
+    technologies: Array<{ name: string; icon: string; enabled: boolean }>;
     tags?: string[];
     is_featured?: boolean;
     is_published?: boolean;

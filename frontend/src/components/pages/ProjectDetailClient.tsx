@@ -136,10 +136,20 @@ export default function ProjectDetailClient() {
 
                             {/* Tecnologías */}
                             <div className="flex flex-wrap gap-2 mb-6">
-                                {project.technologies?.map((tech) => (
-                                    <Badge key={tech} variant="secondary">
-                                        {tech}
-                                    </Badge>
+                                {project.technologies?.filter(t => t.enabled).map((tech, index) => (
+                                    <div key={index} className="flex items-center gap-2 px-3 py-1.5 border rounded-lg bg-background">
+                                        {tech.icon && (
+                                            <img
+                                                src={tech.icon}
+                                                alt={tech.name}
+                                                className="w-4 h-4"
+                                                onError={(e) => {
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        )}
+                                        <span className="text-sm font-medium">{tech.name}</span>
+                                    </div>
                                 ))}
                             </div>
 
@@ -240,12 +250,22 @@ export default function ProjectDetailClient() {
                                 <Separator />
 
                                 <div>
-                                    <h4 className="font-medium mb-2">Tecnologías utilizadas</h4>
-                                    <div className="flex flex-wrap gap-1">
-                                        {project.technologies?.map((tech) => (
-                                            <Badge key={tech} variant="outline" className="text-xs">
-                                                {tech}
-                                            </Badge>
+                                    <h4 className="font-medium mb-3">Tecnologías utilizadas</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {project.technologies?.filter(t => t.enabled).map((tech, index) => (
+                                            <div key={index} className="flex items-center gap-2 px-3 py-2 border rounded-lg bg-background hover:bg-muted/50 transition-colors">
+                                                {tech.icon && (
+                                                    <img
+                                                        src={tech.icon}
+                                                        alt={tech.name}
+                                                        className="w-5 h-5"
+                                                        onError={(e) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                        }}
+                                                    />
+                                                )}
+                                                <span className="font-medium">{tech.name}</span>
+                                            </div>
                                         ))}
                                     </div>
                                 </div>

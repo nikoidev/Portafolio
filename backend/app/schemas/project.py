@@ -30,7 +30,7 @@ class ProjectBase(BaseSchema):
     images: Optional[List[str]] = []  # Legacy
     demo_files: Optional[List[dict]] = []  # Legacy
     
-    technologies: List[str] = []
+    technologies: List[dict] = []  # [{"name": "Python", "icon": "https://...", "enabled": true}]
     tags: Optional[List[str]] = []
     is_featured: bool = False
     is_published: bool = True
@@ -65,7 +65,7 @@ class ProjectUpdate(BaseSchema):
     images: Optional[List[str]] = None
     demo_files: Optional[List[dict]] = None
     
-    technologies: Optional[List[str]] = None
+    technologies: Optional[List[dict]] = None  # [{"name": "Python", "icon": "https://...", "enabled": true}]
     tags: Optional[List[str]] = None
     is_featured: Optional[bool] = None
     is_published: Optional[bool] = None
@@ -103,7 +103,7 @@ class ProjectPublic(BaseSchema):
     thumbnail_url: Optional[str] = None
     images: Optional[List[str]] = None
     
-    technologies: List[str]
+    technologies: List[dict]  # [{"name": "Python", "icon": "https://...", "enabled": true}]
     tags: Optional[List[str]] = None
     is_featured: bool
     view_count: int

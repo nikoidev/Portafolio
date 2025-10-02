@@ -54,7 +54,13 @@ export default function ProjectsClient() {
 
     // Obtener todas las tecnologías únicas
     const allTechnologies = Array.from(
-        new Set(projects.flatMap(project => project.technologies || []))
+        new Set(
+            projects.flatMap(project =>
+                (project.technologies || [])
+                    .filter(t => t.enabled)
+                    .map(t => t.name)
+            )
+        )
     ).sort();
 
     useEffect(() => {
@@ -85,7 +91,7 @@ export default function ProjectsClient() {
                 project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 project.technologies?.some(tech =>
-                    tech.toLowerCase().includes(searchTerm.toLowerCase())
+                    tech.name.toLowerCase().includes(searchTerm.toLowerCase())
                 )
             );
         }
@@ -93,7 +99,7 @@ export default function ProjectsClient() {
         // Filtrar por tecnología
         if (selectedTechnology) {
             filtered = filtered.filter(project =>
-                project.technologies?.includes(selectedTechnology)
+                project.technologies?.some(tech => tech.name === selectedTechnology)
             );
         }
 

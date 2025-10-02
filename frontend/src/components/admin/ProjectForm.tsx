@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 import { ProjectImageManager } from './ProjectImageManager';
+import { TechnologyManager } from './TechnologyManager';
 
 const projectSchema = z.object({
     title: z.string().min(3, 'El título debe tener al menos 3 caracteres'),
@@ -24,7 +25,6 @@ const projectSchema = z.object({
     content: z.string().optional(),
     github_url: z.string().url('URL inválida').optional().or(z.literal('')),
     thumbnail_url: z.string().url('URL inválida').optional().or(z.literal('')),
-    technologies: z.string().min(1, 'Debes agregar al menos una tecnología'),
     tags: z.string().optional(),
     is_featured: z.boolean().default(false),
     is_published: z.boolean().default(false),
@@ -44,6 +44,9 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
     const [projectImages, setProjectImages] = useState<Array<{ url: string; title: string; order: number }>>(
         project?.demo_images || []
     );
+    const [technologies, setTechnologies] = useState<Array<{ name: string; icon: string; enabled: boolean }>>(
+        project?.technologies || []
+    );
 
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
@@ -55,7 +58,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
             content: project?.content || '',
             github_url: project?.github_url || '',
             thumbnail_url: project?.thumbnail_url || '',
-            technologies: project?.technologies?.join(', ') || '',
             tags: project?.tags?.join(', ') || '',
             is_featured: project?.is_featured || false,
             is_published: project?.is_published || false,
@@ -65,11 +67,6 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
 
     const handleSubmit = async (values: ProjectFormValues) => {
         // Validar que haya al menos una tecnología
-        const technologies = values.technologies
-            .split(',')
-            .map(tech => tech.trim())
-            .filter(tech => tech.length > 0);
-
         if (technologies.length === 0) {
             toast.error('Error de validación', {
                 description: 'Debes agregar al menos una tecnología al proyecto',
@@ -136,7 +133,7 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                             <h4 className="font-semibold text-blue-900 mb-1">Campos obligatorios</h4>
                             <p className="text-sm text-blue-800">
                                 Los campos marcados con <span className="text-red-500 font-bold">*</span> son obligatorios:
-                                <strong> Título, Slug, Descripción, Descripción Corta y Tecnologías</strong>.
+                                <strong> Título, Slug, Descripción, Descripción Corta y al menos una Tecnología</strong>.
                             </p>
                         </div>
                     </div>
@@ -195,21 +192,9 @@ export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFor
                                     )}
                                 />
 
-                                <FormField
-                                    control={form.control}
-                                    name="technologies"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Tecnologías *</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="React, Next.js, TypeScript" {...field} />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Separar con comas
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                <TechnologyManager
+                                    technologies={technologies}
+                                    onChange={setTechnologies}
                                 />
 
                                 <FormField
