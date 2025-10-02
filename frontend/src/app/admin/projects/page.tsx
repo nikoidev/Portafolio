@@ -1,5 +1,6 @@
 'use client';
 
+import { PermissionGuard } from '@/components/shared/PermissionGuard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -49,12 +50,14 @@ export default function AdminProjectsPage() {
                         Administra todos tus proyectos del portafolio
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href="/admin/projects/new">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nuevo Proyecto
-                    </Link>
-                </Button>
+                <PermissionGuard permission="create_project">
+                    <Button asChild>
+                        <Link href="/admin/projects/new">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Nuevo Proyecto
+                        </Link>
+                    </Button>
+                </PermissionGuard>
             </div>
 
             {/* Buscador */}
@@ -128,6 +131,12 @@ export default function AdminProjectsPage() {
                                         </div>
                                     </div>
                                     <div className="flex space-x-2">
+                                        {/* Botón Ver - Todos pueden ver */}
+                                        <Button asChild size="sm" variant="outline">
+                                            <Link href={`/projects/${project.slug}`}>
+                                                <Eye className="w-4 h-4" />
+                                            </Link>
+                                        </Button>
                                         {project.github_url && (
                                             <Button asChild size="sm" variant="outline">
                                                 <a
@@ -139,23 +148,27 @@ export default function AdminProjectsPage() {
                                                 </a>
                                             </Button>
                                         )}
-                                        <Button asChild size="sm" variant="outline">
-                                            <Link href={`/admin/projects/${project.id}`}>
-                                                <Pencil className="w-4 h-4" />
-                                            </Link>
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => handleDelete(project.id)}
-                                            disabled={deleteLoading === project.id}
-                                        >
-                                            {deleteLoading === project.id ? (
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="w-4 h-4" />
-                                            )}
-                                        </Button>
+                                        <PermissionGuard permission="update_project">
+                                            <Button asChild size="sm" variant="outline">
+                                                <Link href={`/admin/projects/${project.id}`}>
+                                                    <Pencil className="w-4 h-4" />
+                                                </Link>
+                                            </Button>
+                                        </PermissionGuard>
+                                        <PermissionGuard permission="delete_project">
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => handleDelete(project.id)}
+                                                disabled={deleteLoading === project.id}
+                                            >
+                                                {deleteLoading === project.id ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="w-4 h-4" />
+                                                )}
+                                            </Button>
+                                        </PermissionGuard>
                                     </div>
                                 </div>
                             </CardHeader>
@@ -196,12 +209,14 @@ export default function AdminProjectsPage() {
                             {searchTerm ? 'No se encontraron proyectos' : 'No hay proyectos creados aún'}
                         </p>
                         {!searchTerm && (
-                            <Button asChild>
-                                <Link href="/admin/projects/new">
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Crear primer proyecto
-                                </Link>
-                            </Button>
+                            <PermissionGuard permission="create_project">
+                                <Button asChild>
+                                    <Link href="/admin/projects/new">
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        Crear primer proyecto
+                                    </Link>
+                                </Button>
+                            </PermissionGuard>
                         )}
                     </CardContent>
                 </Card>

@@ -1,5 +1,6 @@
 'use client';
 
+import { RolePermissionsInfo } from '@/components/admin/RolePermissionsInfo';
 import { UserList } from '@/components/admin/UserList';
 import { usersApi } from '@/lib/users-api';
 import { User } from '@/types/user';
@@ -40,10 +41,13 @@ export default function UsersPage() {
     };
 
     return (
-        <UserList
-            users={users}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-        />
+        <div className="space-y-6">
+            <RolePermissionsInfo />
+            <UserList
+                users={users}
+                onDelete={handleDelete}
+                isLoading={isLoading}
+            />
+        </div>
     );
 }

@@ -3,6 +3,7 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
 import Link from 'next/link';
@@ -15,6 +16,7 @@ interface HeaderProps {
 export function Header({ variant = 'public' }: HeaderProps) {
     const { isAuthenticated, user, logout } = useAuthStore();
     const pathname = usePathname();
+    const { hasPermission, isViewerOnly } = usePermissions();
 
     // Cargar contenido desde CMS para header admin
     const { content, isLoading, refresh } = useCMSContent('admin_header', 'main');
@@ -35,8 +37,31 @@ export function Header({ variant = 'public' }: HeaderProps) {
     const adminData = content || defaultContent;
 
     if (variant === 'admin') {
-        // Filtrar enlaces habilitados
-        const enabledNavLinks = adminData.navigation_links?.filter((link: any) => link.enabled) || [];
+        // Filtrar enlaces habilitados y según permisos del usuario
+        const enabledNavLinks = (adminData.navigation_links?.filter((link: any) => {
+            if (!link.enabled) return false;
+
+            // Dashboard: todos pueden verlo
+            if (link.url === '/admin') return true;
+
+            // Proyectos: necesita read_project
+            if (link.url === '/admin/projects') return hasPermission('read_project');
+
+            // CV: necesita update_cv o read_content
+            if (link.url === '/admin/cv') return hasPermission('update_cv') || hasPermission('read_content');
+
+            // Usuarios: necesita read_user
+            if (link.url === '/admin/users') return hasPermission('read_user');
+
+            // Gestión Web (CMS): necesita read_content
+            if (link.url === '/admin/cms') return hasPermission('read_content');
+
+            // Archivos: necesita upload_file
+            if (link.url === '/admin/uploads') return hasPermission('upload_file');
+
+            // Por defecto, no mostrar
+            return false;
+        }) || []);
 
         if (isLoading) {
             return (
