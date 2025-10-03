@@ -334,7 +334,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                     onClose={() => setIsDemoOpen(false)}
                     demoUrl={project.demo_video_url}
                     projectTitle={project.title}
-                    demoType={project.demo_type as 'iframe' | 'link' | 'video' | 'images'}
+                    demoType={project.demo_video_type as 'iframe' | 'link' | 'video' | 'images'}
                 />
             )}
         </Card>

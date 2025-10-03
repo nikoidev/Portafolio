@@ -44,7 +44,7 @@ export function Footer() {
     const data = content || defaultContent;
 
     // Usar social links globales si están habilitados, sino usar los del CMS
-    const useGlobalSocial = data.use_global_social_links ?? true;
+    const useGlobalSocial = (data as any).use_global_social_links ?? true;
     const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
         ? globalSocialLinks.map((link: any) => ({
             text: link.name,
@@ -54,7 +54,7 @@ export function Footer() {
         : (data.social_links || []);
 
     // Usar nombre del sitio global si está configurado
-    const brandName = data.use_global_brand_name && siteName ? siteName : data.brand_name;
+    const brandName = (data as any).use_global_brand_name && siteName ? siteName : data.brand_name;
 
     if (isLoading) {
         return (
