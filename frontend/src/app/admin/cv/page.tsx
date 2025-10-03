@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
-import { FileText, Loader2, Upload, Eye, Trash2, Download } from 'lucide-react';
+import { Download, Eye, FileText, Loader2, Trash2, Upload } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -52,7 +52,7 @@ export default function CVManagementPage() {
             const formData = new FormData();
             formData.append('file', file);
             const uploadResult = await api.uploadFile(formData);
-            
+
             // Crear o actualizar el CV automáticamente
             const cvData = {
                 full_name: 'CV',
@@ -70,7 +70,7 @@ export default function CVManagementPage() {
                 toast.success('CV subido correctamente');
                 setCvExists(true);
             }
-            
+
             setCurrentCV(uploadResult.url);
         } catch (error: any) {
             console.error('Error al subir CV:', error);
