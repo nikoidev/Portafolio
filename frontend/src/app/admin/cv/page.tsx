@@ -56,6 +56,7 @@ export default function CVManagementPage() {
             // Crear o actualizar el CV automáticamente
             const cvData = {
                 full_name: 'CV',
+                title: 'Curriculum Vitae',
                 email: 'cv@nikoidev.com',
                 cv_source: 'manual',
                 manual_cv_url: uploadResult.url,
