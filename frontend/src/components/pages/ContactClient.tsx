@@ -132,7 +132,7 @@ export default function ContactClient() {
     } : defaultContactInfo;
 
     // Integrar datos globales de contacto
-    const useGlobalContactData = contactInfoData.use_global_contact ?? true;
+    const useGlobalContactData = (contactInfoData as any).use_global_contact ?? true;
     const contactInfoWithGlobals = {
         ...contactInfoData,
         contacts: useGlobalContactData && globalSocialLinks.length > 0
@@ -336,7 +336,7 @@ export default function ContactClient() {
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {contactInfoWithGlobals.contacts.map((info, index) => {
+                                    {contactInfoWithGlobals.contacts.map((info: any, index: number) => {
                                         const IconComponent = iconMap[info.icon] || Mail;
                                         return (
                                             <a
@@ -411,7 +411,7 @@ export default function ContactClient() {
                     <div className="mt-16">
                         <h2 className="text-3xl font-bold text-center mb-8">{faq.title}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                            {faq.faqs.map((item, index) => (
+                            {faq.faqs.map((item: any, index: number) => (
                                 <Card key={index}>
                                     <CardContent className="pt-6">
                                         <h3 className="font-semibold mb-2">{item.question}</h3>
