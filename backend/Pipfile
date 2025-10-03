@@ -12,7 +12,8 @@ psycopg2-binary = "*"
 asyncpg = "*"
 python-multipart = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = ">=1.7.4"}
+passlib = "==1.7.4"
+bcrypt = "==4.0.1"
 python-decouple = "*"
 pydantic = {extras = ["email"], version = "*"}
 pydantic-settings = "*"
@@ -22,7 +23,6 @@ aiofiles = "*"
 pillow = "*"
 reportlab = "*"
 python-slugify = "*"
-bcrypt = ">=4.0.0"
 
 [dev-packages]
 pytest = "*"
