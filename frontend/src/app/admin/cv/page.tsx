@@ -13,20 +13,24 @@ export default function CVManagementPage() {
     const [cvExists, setCvExists] = useState(false);
 
     // Cargar CV actual
-    useEffect(() => {
-        const loadCV = async () => {
-            try {
-                const cvData = await api.getCV() as any;
-                if (cvData && cvData.manual_cv_url) {
-                    setCurrentCV(cvData.manual_cv_url);
-                    setCvExists(true);
-                }
-            } catch (error) {
-                console.log('No hay CV existente');
+    const loadCV = async () => {
+        try {
+            const cvData = await api.getCV() as any;
+            if (cvData && cvData.manual_cv_url) {
+                setCurrentCV(cvData.manual_cv_url);
+                setCvExists(true);
+            } else {
+                setCurrentCV(null);
                 setCvExists(false);
             }
-        };
+        } catch (error) {
+            console.log('No hay CV existente');
+            setCurrentCV(null);
+            setCvExists(false);
+        }
+    };
 
+    useEffect(() => {
         loadCV();
     }, []);
 
@@ -71,7 +75,8 @@ export default function CVManagementPage() {
                 setCvExists(true);
             }
 
-            setCurrentCV(uploadResult.url);
+            // Recargar el CV para actualizar la interfaz
+            await loadCV();
         } catch (error: any) {
             console.error('Error al subir CV:', error);
             toast.error(error.response?.data?.detail || 'Error al subir el CV');
@@ -87,8 +92,7 @@ export default function CVManagementPage() {
 
         try {
             await api.deleteCV();
-            setCurrentCV(null);
-            setCvExists(false);
+            await loadCV();
             toast.success('CV eliminado correctamente');
         } catch (error: any) {
             toast.error(error.response?.data?.detail || 'Error al eliminar el CV');
