@@ -215,6 +215,14 @@ class ApiClient {
         });
     }
 
+    async uploadVideo(formData: FormData): Promise<{ url: string; filename: string; size: number; thumbnail?: string }> {
+        return this.post<{ url: string; filename: string; size: number; thumbnail?: string }>('/api/v1/uploads/videos', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    }
+
     async getImages(limit = 50) {
         return this.get('/api/v1/uploads/images', { limit });
     }

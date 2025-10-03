@@ -115,17 +115,10 @@ export function VideoManager({
                 setUploadProgress(prev => Math.min(prev + 10, 90));
             }, 500);
 
-            const response = await api.post('/api/v1/uploads/videos', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const uploadResult = await api.uploadVideo(formData);
 
             clearInterval(progressInterval);
             setUploadProgress(100);
-
-            // La respuesta viene en response.data.data
-            const uploadResult = response.data.data || response.data;
 
             const videoData = {
                 type: 'local',
