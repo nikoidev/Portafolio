@@ -342,7 +342,7 @@ export default function AboutClient() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    {experience.experience.map((exp, index) => (
+                                    {experience.experience.map((exp: any, index: number) => (
                                         <div key={index} className="relative">
                                             {index < experience.experience.length - 1 && (
                                                 <div className="absolute left-4 top-12 w-px h-full bg-border"></div>
@@ -359,7 +359,7 @@ export default function AboutClient() {
                                                     <p className="text-sm text-muted-foreground mb-2">{exp.company}</p>
                                                     <p className="text-sm mb-3">{exp.description}</p>
                                                     <ul className="text-sm text-muted-foreground space-y-1">
-                                                        {exp.achievements.map((achievement, i) => (
+                                                        {exp.achievements.map((achievement: any, i: number) => (
                                                             <li key={i} className="flex items-start gap-2">
                                                                 <Star className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
                                                                 {achievement}
@@ -384,7 +384,7 @@ export default function AboutClient() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {education.education.map((edu, index) => (
+                                    {education.education.map((edu: any, index: number) => (
                                         <div key={index}>
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
                                                 <h3 className="font-semibold">{edu.title}</h3>
@@ -495,7 +495,7 @@ export default function AboutClient() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {skills.skills.map((skill, index) => (
+                                    {skills.skills.map((skill: any, index: number) => (
                                         <div key={index}>
                                             <div className="flex justify-between items-center mb-2">
                                                 <span className="text-sm font-medium">{skill.name}</span>
@@ -518,7 +518,7 @@ export default function AboutClient() {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2">
-                                        {hobbies.hobbies.map((hobby, index) => (
+                                        {hobbies.hobbies.map((hobby: any, index: number) => (
                                             <Badge key={index} variant="secondary">{hobby}</Badge>
                                         ))}
                                     </div>
@@ -557,7 +557,7 @@ export default function AboutClient() {
                     <div className="mt-16">
                         <h2 className="text-3xl font-bold text-center mb-8">{testimonials.title}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {testimonials.testimonials.map((testimonial, index) => (
+                            {testimonials.testimonials.map((testimonial: any, index: number) => (
                                 <Card key={index}>
                                     <CardContent className="pt-6">
                                         <p className="text-sm text-muted-foreground mb-4">
