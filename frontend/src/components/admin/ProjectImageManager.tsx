@@ -84,7 +84,7 @@ export function ProjectImageManager({
                 const result = await api.uploadImage(formData);
 
                 uploadedImages.push({
-                    url: result.data.url,
+                    url: result.url,
                     title: pending.title,
                     order: images.length + uploadedImages.length + 1
                 });

@@ -191,24 +191,24 @@ class ApiClient {
     }
 
     // Métodos para uploads
-    async uploadImage(formData: FormData) {
-        return this.post('/api/v1/uploads/images', formData, {
+    async uploadImage(formData: FormData): Promise<{ url: string; filename: string; size: number }> {
+        return this.post<{ url: string; filename: string; size: number }>('/api/v1/uploads/images', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
     }
 
-    async uploadMultipleImages(formData: FormData) {
-        return this.post('/api/v1/uploads/images/multiple', formData, {
+    async uploadMultipleImages(formData: FormData): Promise<{ images: Array<{ url: string; filename: string; size: number }> }> {
+        return this.post<{ images: Array<{ url: string; filename: string; size: number }> }>('/api/v1/uploads/images/multiple', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
     }
 
-    async uploadFile(formData: FormData) {
-        return this.post('/api/v1/uploads/files', formData, {
+    async uploadFile(formData: FormData): Promise<{ url: string; filename: string; size: number }> {
+        return this.post<{ url: string; filename: string; size: number }>('/api/v1/uploads/files', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
