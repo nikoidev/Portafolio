@@ -46,7 +46,7 @@ export function HeroSection() {
     const data = content || defaultContent;
 
     // Usar social links globales si están disponibles
-    const useGlobalSocial = data.use_global_social_links ?? true;
+    const useGlobalSocial = (data as any).use_global_social_links ?? true;
     const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
         ? globalSocialLinks.map((link: any) => ({
             text: link.name,
