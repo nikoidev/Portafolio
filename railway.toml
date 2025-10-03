@@ -7,6 +7,3 @@ startCommand = "cd backend && alembic upgrade head && uvicorn app.main:app --hos
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
-[service]
-workdir = "backend"
-
