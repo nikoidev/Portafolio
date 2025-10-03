@@ -210,7 +210,7 @@ export default function AboutClient() {
     const testimonials = testimonialsContent || defaultTestimonials;
 
     // Integrar contact_links globales en personalInfo
-    const useGlobalContactLinks = personalInfo.use_global_contact_links ?? true;
+    const useGlobalContactLinks = (personalInfo as any).use_global_contact_links ?? true;
     const personalInfoWithGlobalLinks = {
         ...personalInfo,
         contact_links: useGlobalContactLinks && globalSocialLinks.length > 0
