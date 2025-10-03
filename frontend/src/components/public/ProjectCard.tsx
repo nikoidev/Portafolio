@@ -154,7 +154,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                                     </Button>
                                 )}
 
-                                {project.live_demo_url && (
+                                {project.demo_video_url && (
                                     <Button
                                         size="sm"
                                         variant="outline"
