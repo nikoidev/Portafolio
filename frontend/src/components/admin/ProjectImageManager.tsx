@@ -13,8 +13,8 @@ import { toast } from 'sonner';
 
 interface ProjectImage {
     url: string;
-    title: string;
-    order: number;
+    title?: string;
+    order?: number;
 }
 
 interface ProjectImageManagerProps {
@@ -236,18 +236,18 @@ export function ProjectImageManager({
                                     <div className="flex gap-4">
                                         <img
                                             src={`http://localhost:8004${image.url}`}
-                                            alt={image.title}
+                                            alt={image.title || 'Imagen del proyecto'}
                                             className="w-24 h-24 object-cover rounded"
                                         />
                                         <div className="flex-1 space-y-2">
                                             <Label>Descripción</Label>
                                             <Input
-                                                value={image.title}
+                                                value={image.title || ''}
                                                 onChange={(e) => updateImageTitle(index, e.target.value)}
                                                 placeholder="Descripción de la imagen"
                                             />
                                             <p className="text-xs text-muted-foreground">
-                                                Orden: {image.order}
+                                                Orden: {image.order || index + 1}
                                             </p>
                                         </div>
                                         <div className="flex flex-col gap-2">
