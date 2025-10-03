@@ -60,6 +60,9 @@ class CVBase(BaseSchema):
     email: EmailStr
     phone: Optional[str] = Field(None, max_length=50)
     location: Optional[str] = Field(None, max_length=200)
+    linkedin_url: Optional[str] = Field(None, max_length=500)
+    github_url: Optional[str] = Field(None, max_length=500)
+    portfolio_url: Optional[str] = Field(None, max_length=500)
     summary: Optional[str] = None
     work_experience: List[WorkExperience] = []
     education: List[Education] = []
@@ -83,6 +86,9 @@ class CVUpdate(BaseSchema):
     email: Optional[EmailStr] = None
     phone: Optional[str] = Field(None, max_length=50)
     location: Optional[str] = Field(None, max_length=200)
+    linkedin_url: Optional[str] = Field(None, max_length=500)
+    github_url: Optional[str] = Field(None, max_length=500)
+    portfolio_url: Optional[str] = Field(None, max_length=500)
     summary: Optional[str] = None
     work_experience: Optional[List[WorkExperience]] = None
     education: Optional[List[Education]] = None

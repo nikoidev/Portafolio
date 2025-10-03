@@ -17,6 +17,11 @@ class CV(BaseModel):
     phone = Column(String(50), nullable=True)
     location = Column(String(200), nullable=True)
     
+    # URLs de redes sociales y portfolio
+    linkedin_url = Column(String(500), nullable=True)
+    github_url = Column(String(500), nullable=True)
+    portfolio_url = Column(String(500), nullable=True)
+    
     # Resumen profesional
     summary = Column(Text, nullable=True)
     
@@ -48,7 +53,12 @@ class CV(BaseModel):
     pdf_template = Column(String(50), default="modern", nullable=False)
     pdf_color_scheme = Column(String(50), default="blue", nullable=False)
     
-    # Archivo PDF generado
+    # Sistema híbrido de CV
+    cv_source = Column(String(20), default="auto", nullable=False)  # "auto" o "manual"
+    manual_cv_url = Column(String(500), nullable=True)  # URL del PDF subido manualmente
+    manual_cv_filename = Column(String(255), nullable=True)  # Nombre original del archivo
+    
+    # Archivo PDF generado automáticamente
     pdf_url = Column(String(500), nullable=True)
     pdf_generated_at = Column(Date, nullable=True)
     

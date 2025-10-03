@@ -1,8 +1,9 @@
 """
 Servicio para gestión de CV
 """
+import os
 from typing import Optional
-from datetime import date
+from datetime import datetime, date
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.cv import CV
