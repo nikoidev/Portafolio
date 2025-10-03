@@ -289,7 +289,7 @@ export default function AboutClient() {
                 {/* Stats */}
                 <EditableSection pageKey="about" sectionKey="stats" onContentUpdate={refreshStats}>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-                        {stats.stats.map((stat, index) => {
+                        {stats.stats.map((stat: any, index: number) => {
                             const IconComponent = iconMap[stat.icon] || Calendar;
                             return (
                                 <Card key={index} className="text-center">
