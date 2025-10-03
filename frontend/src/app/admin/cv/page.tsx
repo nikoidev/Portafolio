@@ -15,16 +15,21 @@ export default function CVManagementPage() {
     // Cargar CV actual
     const loadCV = async () => {
         try {
+            console.log('Cargando CV desde backend...');
             const cvData = await api.getCV() as any;
+            console.log('CV obtenido del backend:', cvData);
+            
             if (cvData && cvData.manual_cv_url) {
+                console.log('CV encontrado con manual_cv_url:', cvData.manual_cv_url);
                 setCurrentCV(cvData.manual_cv_url);
                 setCvExists(true);
             } else {
+                console.log('No se encontró manual_cv_url en el CV');
                 setCurrentCV(null);
                 setCvExists(false);
             }
         } catch (error) {
-            console.log('No hay CV existente');
+            console.log('No hay CV existente o error al obtener:', error);
             setCurrentCV(null);
             setCvExists(false);
         }
@@ -56,6 +61,8 @@ export default function CVManagementPage() {
             const formData = new FormData();
             formData.append('file', file);
             const uploadResult = await api.uploadFile(formData);
+            
+            console.log('Archivo subido:', uploadResult);
 
             // Crear o actualizar el CV automáticamente
             const cvData = {
@@ -66,20 +73,36 @@ export default function CVManagementPage() {
                 manual_cv_url: uploadResult.url,
             };
 
+            let result;
             if (cvExists) {
-                await api.updateCV(cvData);
+                result = await api.updateCV(cvData);
+                console.log('CV actualizado:', result);
                 toast.success('CV actualizado correctamente');
             } else {
-                await api.createOrUpdateCV(cvData);
+                result = await api.createOrUpdateCV(cvData);
+                console.log('CV creado:', result);
                 toast.success('CV subido correctamente');
-                setCvExists(true);
             }
 
-            // Recargar el CV para actualizar la interfaz
-            await loadCV();
+            // Actualizar el estado inmediatamente
+            setCurrentCV(uploadResult.url);
+            setCvExists(true);
+            
+            // Recargar del backend para confirmar (con pequeño delay)
+            setTimeout(() => {
+                console.log('Recargando CV desde backend...');
+                loadCV();
+            }, 500);
+            
+            // Limpiar el input de archivo
+            event.target.value = '';
         } catch (error: any) {
             console.error('Error al subir CV:', error);
-            toast.error(error.response?.data?.detail || 'Error al subir el CV');
+            const errorMessage = error.response?.data?.detail || error.message || 'Error al subir el CV';
+            toast.error(errorMessage);
+            
+            // Limpiar el input en caso de error también
+            event.target.value = '';
         } finally {
             setIsUploading(false);
         }
