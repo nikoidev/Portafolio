@@ -44,11 +44,17 @@ class CV(BaseModel):
     featured_projects = Column(JSON, nullable=True, default=list)
     # Array de IDs de proyectos
     
-    # Configuración del PDF
+    # Fuente del CV
+    cv_source = Column(String(20), default="generated", nullable=False)  # "manual" o "generated"
+    
+    # CV Manual (subido por el usuario)
+    manual_cv_url = Column(String(500), nullable=True)
+    
+    # Configuración del PDF generado
     pdf_template = Column(String(50), default="modern", nullable=False)
     pdf_color_scheme = Column(String(50), default="blue", nullable=False)
     
-    # Archivo PDF generado
+    # Archivo PDF generado automáticamente
     pdf_url = Column(String(500), nullable=True)
     pdf_generated_at = Column(Date, nullable=True)
     

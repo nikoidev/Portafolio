@@ -2,7 +2,8 @@
 Servicio para gestión de CV
 """
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
+import os
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.cv import CV
@@ -79,6 +80,23 @@ class CVService:
             query = query.join(User).filter(User.is_active == True)
         
         return query.first()
+    
+    def get_cv_download_url(self, user: User) -> Optional[str]:
+        """Obtener URL del CV para descargar según cv_source"""
+        cv = self.get_cv_by_user(user)
+        
+        if not cv:
+            return None
+        
+        # Si es manual, retornar manual_cv_url
+        if cv.cv_source == "manual" and cv.manual_cv_url:
+            return cv.manual_cv_url
+        
+        # Si es generado, retornar pdf_url
+        if cv.cv_source == "generated" and cv.pdf_url:
+            return cv.pdf_url
+        
+        return None
     
     def generate_pdf(self, user: User, template: str = "modern", color_scheme: str = "blue") -> dict:
         """Generar PDF del CV"""

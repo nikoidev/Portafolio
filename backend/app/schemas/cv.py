@@ -67,6 +67,8 @@ class CVBase(BaseSchema):
     languages: List[Language] = []
     certifications: List[Certification] = []
     featured_projects: List[int] = []  # IDs de proyectos
+    cv_source: str = Field("generated", description="manual o generated")
+    manual_cv_url: Optional[str] = None
     pdf_template: str = Field("modern", max_length=50)
     pdf_color_scheme: str = Field("blue", max_length=50)
 
@@ -90,6 +92,8 @@ class CVUpdate(BaseSchema):
     languages: Optional[List[Language]] = None
     certifications: Optional[List[Certification]] = None
     featured_projects: Optional[List[int]] = None
+    cv_source: Optional[str] = None
+    manual_cv_url: Optional[str] = None
     pdf_template: Optional[str] = Field(None, max_length=50)
     pdf_color_scheme: Optional[str] = Field(None, max_length=50)
 
@@ -99,6 +103,9 @@ class CVResponse(CVBase, TimestampMixin):
     user_id: int
     pdf_url: Optional[str] = None
     pdf_generated_at: Optional[date] = None
+    
+    class Config:
+        from_attributes = True
 
 
 class CVPublic(BaseSchema):

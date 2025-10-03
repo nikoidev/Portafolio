@@ -114,30 +114,34 @@ async def generate_cv_pdf(
 
 @router.get("/download")
 async def download_cv(
-    db: Session = Depends(get_db),
-    current_user = Depends(get_optional_user)
+    db: Session = Depends(get_db)
 ):
-    """Descargar CV en formato PDF"""
+    """Descargar CV en formato PDF (público)"""
     cv_service = CVService(db)
     
-    # Obtener CV público o del usuario actual
-    if current_user and current_user.is_admin:
-        cv = cv_service.get_cv_by_user(current_user)
-    else:
-        cv = cv_service.get_public_cv()
+    # Obtener el primer usuario activo (admin principal)
+    from app.models.user import User
+    admin_user = db.query(User).filter(User.is_active == True).first()
     
-    if not cv or not cv.pdf_url:
+    if not admin_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="PDF del CV no disponible"
+            detail="Usuario no encontrado"
         )
     
-    # TODO: Implementar descarga real del archivo
-    # Por ahora, devolver información del PDF
+    # Obtener URL del CV según la fuente configurada
+    cv_download_url = cv_service.get_cv_download_url(admin_user)
+    
+    if not cv_download_url:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="CV no disponible para descarga"
+        )
+    
+    # Retornar la URL del CV
     return {
-        "pdf_url": cv.pdf_url,
-        "generated_at": cv.pdf_generated_at,
-        "download_url": f"/uploads{cv.pdf_url}"
+        "download_url": cv_download_url,
+        "message": "CV disponible para descarga"
     }
 
 

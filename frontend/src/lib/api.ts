@@ -162,6 +162,10 @@ class ApiClient {
         return this.get('/api/v1/cv/public');
     }
 
+    async getCVDownloadURL(): Promise<{ download_url: string; message: string }> {
+        return this.get<{ download_url: string; message: string }>('/api/v1/cv/download');
+    }
+
     async createOrUpdateCV(data: any) {
         return this.post('/api/v1/cv/', data);
     }

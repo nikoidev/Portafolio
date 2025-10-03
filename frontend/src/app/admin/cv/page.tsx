@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Download, Eye, FileText, Loader2, Plus, Save, Trash2 } from 'lucide-react';
+import { Download, Eye, FileText, Loader2, Plus, Save, Trash2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -67,6 +68,10 @@ const cvSchema = z.object({
     technical_skills: z.array(technicalSkillSchema).default([]),
     languages: z.array(languageSchema).default([]),
     certifications: z.array(certificationSchema).default([]),
+    cv_source: z.enum(['manual', 'generated']).default('generated'),
+    manual_cv_url: z.string().optional(),
+    pdf_template: z.string().default('modern'),
+    pdf_color_scheme: z.string().default('blue'),
 });
 
 type CVFormValues = z.infer<typeof cvSchema>;
@@ -75,12 +80,14 @@ export default function CVManagementPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+    const [isUploadingPDF, setIsUploadingPDF] = useState(false);
     const [cvExists, setCvExists] = useState(false);
     const [pdfUrl, setPdfUrl] = useState<string | null>(null);
     const [templates, setTemplates] = useState<any[]>([]);
     const [colorSchemes, setColorSchemes] = useState<any[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState('modern');
     const [selectedColorScheme, setSelectedColorScheme] = useState('blue');
+    const [cvSource, setCvSource] = useState<'manual' | 'generated'>('generated');
 
     const form = useForm<CVFormValues>({
         resolver: zodResolver(cvSchema),
@@ -98,6 +105,10 @@ export default function CVManagementPage() {
             technical_skills: [],
             languages: [],
             certifications: [],
+            cv_source: 'generated',
+            manual_cv_url: '',
+            pdf_template: 'modern',
+            pdf_color_scheme: 'blue',
         },
     });
 
@@ -153,6 +164,7 @@ export default function CVManagementPage() {
                 const cvData = await api.getCV() as any;
                 setCvExists(true);
                 setPdfUrl(cvData.pdf_url || '');
+                setCvSource(cvData.cv_source || 'generated');
 
                 // Llenar el formulario con los datos existentes
                 form.reset({
@@ -169,6 +181,10 @@ export default function CVManagementPage() {
                     technical_skills: cvData.technical_skills || [],
                     languages: cvData.languages || [],
                     certifications: cvData.certifications || [],
+                    cv_source: cvData.cv_source || 'generated',
+                    manual_cv_url: cvData.manual_cv_url || '',
+                    pdf_template: cvData.pdf_template || 'modern',
+                    pdf_color_scheme: cvData.pdf_color_scheme || 'blue',
                 });
             } catch (error) {
                 console.log('No hay CV existente, creando uno nuevo');
@@ -224,6 +240,36 @@ export default function CVManagementPage() {
         }
     };
 
+    const handleUploadManualCV = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validar que sea un PDF
+        if (file.type !== 'application/pdf') {
+            toast.error('Solo se permiten archivos PDF');
+            return;
+        }
+
+        setIsUploadingPDF(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const result = await api.uploadFile(formData);
+            
+            // Actualizar el formulario con la URL del PDF subido
+            form.setValue('manual_cv_url', result.url);
+            form.setValue('cv_source', 'manual');
+            setCvSource('manual');
+            
+            toast.success('CV subido correctamente');
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || 'Error al subir el CV');
+        } finally {
+            setIsUploadingPDF(false);
+        }
+    };
+
     return (
         <div className="container mx-auto py-8 space-y-8">
             <div className="flex items-center justify-between">
@@ -262,6 +308,111 @@ export default function CVManagementPage() {
                 <div className="lg:col-span-3">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+                            {/* Selector de fuente de CV */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Fuente del CV</CardTitle>
+                                    <CardDescription>
+                                        Elige cómo quieres proporcionar tu CV
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="cv_source"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Tipo de CV</FormLabel>
+                                                <Select
+                                                    value={field.value}
+                                                    onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        setCvSource(value as 'manual' | 'generated');
+                                                    }}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Selecciona el tipo de CV" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="generated">
+                                                            Generado automáticamente
+                                                        </SelectItem>
+                                                        <SelectItem value="manual">
+                                                            Subir mi propio PDF
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormDescription>
+                                                    {cvSource === 'generated'
+                                                        ? 'Completa el formulario y genera un PDF profesional automáticamente'
+                                                        : 'Sube tu propio CV en formato PDF'}
+                                                </FormDescription>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* Subir CV manual */}
+                                    {cvSource === 'manual' && (
+                                        <div className="space-y-4">
+                                            <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf"
+                                                    onChange={handleUploadManualCV}
+                                                    className="hidden"
+                                                    id="cv-upload"
+                                                    disabled={isUploadingPDF}
+                                                />
+                                                <label
+                                                    htmlFor="cv-upload"
+                                                    className="cursor-pointer flex flex-col items-center gap-2"
+                                                >
+                                                    {isUploadingPDF ? (
+                                                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                                                    ) : (
+                                                        <Upload className="w-8 h-8 text-muted-foreground" />
+                                                    )}
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            {isUploadingPDF ? 'Subiendo...' : 'Subir CV'}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Solo archivos PDF
+                                                        </p>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                            {form.watch('manual_cv_url') && (
+                                                <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+                                                    <div className="flex items-center gap-2">
+                                                        <FileText className="w-4 h-4" />
+                                                        <span className="text-sm">CV subido correctamente</span>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        asChild
+                                                    >
+                                                        <a
+                                                            href={`${process.env.NEXT_PUBLIC_API_URL}${form.watch('manual_cv_url')}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            <Eye className="w-4 h-4 mr-2" />
+                                                            Ver PDF
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
                             <Tabs defaultValue="personal" className="w-full">
                                 <TabsList className="grid w-full grid-cols-5">
                                     <TabsTrigger value="personal">Personal</TabsTrigger>
