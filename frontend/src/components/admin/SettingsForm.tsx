@@ -49,6 +49,16 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
     const newsletterEnabled = watch('newsletter_enabled', settings.newsletter_enabled);
 
     const onSubmit = async (data: SettingsUpdate) => {
+        // Validar que todas las redes sociales tengan campos completos
+        const incompleteSocialLinks = socialLinks.filter(
+            link => !link.name.trim() || !link.url.trim() || !link.icon.trim()
+        );
+
+        if (incompleteSocialLinks.length > 0) {
+            toast.error('Por favor completa todos los campos de las redes sociales o elimínalas');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
             await onSave({ ...data, social_links: socialLinks });
