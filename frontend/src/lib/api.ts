@@ -189,6 +189,10 @@ class ApiClient {
         return this.get('/api/v1/cv/color-schemes');
     }
 
+    async deleteCV() {
+        return this.delete('/api/v1/cv/');
+    }
+
     // Método para crear super admin inicial
     async createSuperAdmin() {
         return this.post('/api/v1/auth/create-super-admin');
