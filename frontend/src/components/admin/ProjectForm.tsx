@@ -42,7 +42,7 @@ interface ProjectFormProps {
 
 export function ProjectForm({ project, onSubmit, isLoading = false }: ProjectFormProps) {
     const router = useRouter();
-    const [projectImages, setProjectImages] = useState<Array<{ url: string; title: string; order: number }>>(
+    const [projectImages, setProjectImages] = useState<Array<{ url: string; title?: string; order?: number }>>(
         project?.demo_images || []
     );
     const [technologies, setTechnologies] = useState<Array<{ name: string; icon: string; enabled: boolean }>>(
