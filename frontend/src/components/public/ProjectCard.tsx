@@ -308,7 +308,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                         </Button>
                     )}
 
-                    {project.live_demo_url && (
+                    {project.demo_video_url && (
                         <Button
                             size="sm"
                             variant="outline"
@@ -328,11 +328,11 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
             </CardFooter>
 
             {/* Modal de Demo */}
-            {project.live_demo_url && (
+            {project.demo_video_url && (
                 <DemoModal
                     isOpen={isDemoOpen}
                     onClose={() => setIsDemoOpen(false)}
-                    demoUrl={project.live_demo_url}
+                    demoUrl={project.demo_video_url}
                     projectTitle={project.title}
                     demoType={project.demo_type as 'iframe' | 'link' | 'video' | 'images'}
                 />
