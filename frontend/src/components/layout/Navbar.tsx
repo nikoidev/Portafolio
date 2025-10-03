@@ -63,7 +63,7 @@ export function Navbar() {
     const enabledNavLinks = navData.navigation_links?.filter((link: any) => link.enabled) || [];
 
     // Usar social links globales si están habilitados en CMS, sino usar los del CMS
-    const useGlobalSocial = navData.use_global_social_links ?? true; // Por defecto usar globales
+    const useGlobalSocial = (navData as any).use_global_social_links ?? true; // Por defecto usar globales
     const socialLinksToUse = useGlobalSocial && globalSocialLinks.length > 0
         ? globalSocialLinks.map((link: any) => ({
             text: link.name,
