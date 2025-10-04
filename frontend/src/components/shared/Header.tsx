@@ -2,12 +2,21 @@
 
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth';
+import { Construction } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 interface HeaderProps {
     variant?: 'public' | 'admin';
@@ -17,6 +26,7 @@ export function Header({ variant = 'public' }: HeaderProps) {
     const { isAuthenticated, user, logout } = useAuthStore();
     const pathname = usePathname();
     const { hasPermission, isViewerOnly } = usePermissions();
+    const [showDevModal, setShowDevModal] = useState(false);
 
     // Cargar contenido desde CMS para header admin
     const { content, isLoading, refresh } = useCMSContent('admin_header', 'main');
@@ -130,57 +140,85 @@ export function Header({ variant = 'public' }: HeaderProps) {
     }
 
     return (
-        <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b">
-            <div className="container mx-auto px-4 py-4">
-                <div className="flex items-center justify-between">
-                    <Link href="/" className="text-xl font-bold">
-                        Portafolio
-                    </Link>
+        <>
+            <header className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b">
+                <div className="container mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <Link href="/" className="text-xl font-bold">
+                            Portafolio
+                        </Link>
 
-                    <nav className="hidden md:flex items-center space-x-6">
-                        <Link
-                            href="/"
-                            className="text-sm font-medium hover:text-primary transition-colors"
-                        >
-                            Inicio
-                        </Link>
-                        <Link
-                            href="/projects"
-                            className="text-sm font-medium hover:text-primary transition-colors"
-                        >
-                            Proyectos
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="text-sm font-medium hover:text-primary transition-colors"
-                        >
-                            Sobre mí
-                        </Link>
-                        <Link
-                            href="/contact"
-                            className="text-sm font-medium hover:text-primary transition-colors"
-                        >
-                            Contacto
-                        </Link>
-                    </nav>
-
-                    <div className="flex items-center space-x-4">
-                        <Button asChild variant="outline" size="sm">
-                            <Link href="/cv/download">
-                                Descargar CV
+                        <nav className="hidden md:flex items-center space-x-6">
+                            <Link
+                                href="/"
+                                className="text-sm font-medium hover:text-primary transition-colors"
+                            >
+                                Inicio
                             </Link>
-                        </Button>
+                            <Link
+                                href="/projects"
+                                className="text-sm font-medium hover:text-primary transition-colors"
+                            >
+                                Proyectos
+                            </Link>
+                            <Link
+                                href="/about"
+                                className="text-sm font-medium hover:text-primary transition-colors"
+                            >
+                                Sobre mí
+                            </Link>
+                            <Link
+                                href="/contact"
+                                className="text-sm font-medium hover:text-primary transition-colors"
+                            >
+                                Contacto
+                            </Link>
+                        </nav>
 
-                        {isAuthenticated ? (
-                            <Button asChild variant="default" size="sm">
-                                <Link href="/admin">
-                                    Admin
-                                </Link>
+                        <div className="flex items-center space-x-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowDevModal(true)}
+                            >
+                                Descargar CV
                             </Button>
-                        ) : null}
+
+                            {isAuthenticated ? (
+                                <Button asChild variant="default" size="sm">
+                                    <Link href="/admin">
+                                        Admin
+                                    </Link>
+                                </Button>
+                            ) : null}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>
+
+            {/* Modal de desarrollo */}
+            <Dialog open={showDevModal} onOpenChange={setShowDevModal}>
+                <DialogContent>
+                    <DialogHeader>
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
+                                <Construction className="w-8 h-8 text-yellow-600 dark:text-yellow-500" />
+                            </div>
+                        </div>
+                        <DialogTitle className="text-center text-2xl">EN DESARROLLO</DialogTitle>
+                        <DialogDescription className="text-center text-base pt-2">
+                            La función de descarga de CV está temporalmente deshabilitada.
+                            <br />
+                            Por favor, contacta directamente para solicitar el CV.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-center mt-4">
+                        <Button onClick={() => setShowDevModal(false)}>
+                            Entendido
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
