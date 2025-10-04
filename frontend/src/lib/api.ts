@@ -153,44 +153,55 @@ class ApiClient {
         return this.get('/api/v1/projects/stats');
     }
 
-    // Métodos para CV
+    // ========================================================================
+    // CV Methods
+    // ========================================================================
+
+    /**
+     * Get current CV (Admin only)
+     * Returns 404 if no CV exists
+     */
     async getCV() {
         return this.get('/api/v1/cv/');
     }
 
-    async getPublicCV() {
-        return this.get('/api/v1/cv/public');
+    /**
+     * Create or replace CV (Admin only)
+     * If a CV already exists, it will be replaced
+     */
+    async createOrUpdateCV(data: { file_url: string }) {
+        return this.post('/api/v1/cv/', data);
     }
 
+    /**
+     * Update existing CV (Admin only)
+     * Returns 404 if no CV exists
+     */
+    async updateCV(data: { file_url: string }) {
+        return this.put('/api/v1/cv/', data);
+    }
+
+    /**
+     * Delete current CV (Admin only)
+     * Returns 404 if no CV exists
+     */
+    async deleteCV() {
+        return this.delete('/api/v1/cv/');
+    }
+
+    /**
+     * Get CV download URL (Public - No authentication required)
+     * Returns 404 if no CV is available
+     */
     async getCVDownloadURL(): Promise<{ download_url: string; message: string }> {
         return this.get<{ download_url: string; message: string }>('/api/v1/cv/download');
     }
 
-    async createOrUpdateCV(data: any) {
-        return this.post('/api/v1/cv/', data);
-    }
-
-    async updateCV(data: any) {
-        return this.put('/api/v1/cv/', data);
-    }
-
-    async generateCVPDF(template = 'modern', colorScheme = 'blue') {
-        return this.post('/api/v1/cv/generate-pdf', {
-            template,
-            color_scheme: colorScheme,
-        });
-    }
-
-    async getCVTemplates() {
-        return this.get('/api/v1/cv/templates');
-    }
-
-    async getCVColorSchemes() {
-        return this.get('/api/v1/cv/color-schemes');
-    }
-
-    async deleteCV() {
-        return this.delete('/api/v1/cv/');
+    /**
+     * Check if a CV exists (Public - No authentication required)
+     */
+    async checkCVExists(): Promise<{ exists: boolean; message: string }> {
+        return this.get<{ exists: boolean; message: string }>('/api/v1/cv/exists');
     }
 
     // Método para crear super admin inicial

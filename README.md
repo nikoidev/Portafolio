@@ -32,6 +32,20 @@ El proyecto incluye un **sistema completo de autenticación con 4 niveles de rol
 
 Ver [SISTEMA_USUARIOS_ROLES.md](SISTEMA_USUARIOS_ROLES.md) para documentación completa.
 
+## 📄 Sistema de CV Simplificado
+
+Sistema completo de gestión de CV con las siguientes características:
+
+- **Un solo CV activo**: Almacena únicamente un CV en formato PDF
+- **CRUD completo**: Crear, Leer, Actualizar y Eliminar desde el panel admin
+- **Descarga pública**: Endpoint `/cv/download` accesible sin autenticación
+- **Reemplazo automático**: Al subir un nuevo CV, el anterior se reemplaza automáticamente
+- **Validaciones**: Solo archivos PDF de hasta 10MB
+
+### Uso:
+- **Admin**: Panel `/admin/cv` para gestionar el CV
+- **Público**: Ruta `/cv/download` para descargar el CV
+
 ## 🚀 Inicio Rápido
 
 ### Prerrequisitos
