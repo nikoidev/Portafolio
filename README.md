@@ -1,56 +1,141 @@
-# 🚀 Portafolio Personal Profesional
+# 🚀 Portfolio Profesional
 
-Un portafolio web moderno y completo con sistema de gestión de contenido, autenticación avanzada y demos interactivos.
+Sistema de portafolio web completo con gestión de contenido, autenticación y demos interactivos.
 
-## 🛠️ Stack Tecnológico
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- **Frontend**: Next.js 14 + TypeScript + Tailwind CSS
-- **Backend**: FastAPI + Python 3.11  
-- **Base de Datos**: PostgreSQL
-- **Autenticación**: JWT con sistema de roles y permisos
-- **Deployment**: Cloudflare (DNS) + Vercel (Frontend) + Railway (Backend)
+---
 
-## 📁 Estructura del Proyecto
+## 📋 Tabla de Contenidos
 
-```
-Portafolio/
-├── frontend/          # Next.js + TypeScript
-├── backend/           # FastAPI + Python
-├── docker/            # Configuraciones Docker
-└── docs/              # Documentación
-```
+- [Descripción](#-descripción)
+- [Características](#-características)
+- [Tecnologías](#-tecnologías)
+- [Instalación](#-instalación)
+- [Uso](#-uso)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Deployment](#-deployment)
+- [Contribuir](#-contribuir)
+- [Licencia](#-licencia)
 
-## 🔐 Sistema de Usuarios y Roles
+---
 
-El proyecto incluye un **sistema completo de autenticación con 4 niveles de roles**:
+## 📖 Descripción
 
-### Roles Disponibles:
-- **SUPER_ADMIN**: Control total del sistema
-- **ADMIN**: Gestión completa (proyectos, CV, usuarios)
-- **EDITOR**: Solo edición de contenido
-- **VIEWER**: Solo lectura
+Un sistema completo de portafolio web moderno que incluye:
 
-Ver [SISTEMA_USUARIOS_ROLES.md](SISTEMA_USUARIOS_ROLES.md) para documentación completa.
+- **Sistema de Gestión de Contenido (CMS)** - Edita tu portafolio dinámicamente
+- **Sistema de Autenticación** - Control de acceso basado en roles (4 niveles)
+- **Gestión de Proyectos** - Muestra tus proyectos con demos interactivos
+- **Generación de CV** - Crea y descarga tu CV en PDF
+- **Gestión de Archivos** - Sube y organiza imágenes, videos y documentos
+- **Diseño Responsive** - Funciona perfectamente en todos los dispositivos
 
-## 🚀 Inicio Rápido
+---
 
-### Prerrequisitos
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL (o Docker)
+## ✨ Características
 
-### 1. Backend
+### 🔐 Autenticación y Roles
+- **4 Niveles de Rol**: Super Admin, Admin, Editor, Viewer
+- **Autenticación JWT** con gestión segura de tokens
+- **Permisos granulares** para cada rol
+- **Gestión de usuarios** completa desde el panel admin
+
+### 📂 Gestión de Proyectos
+- **CRUD completo** con control de permisos
+- **Demos Interactivos**:
+  - 🖥️ Iframe - Integra aplicaciones web en vivo
+  - 🎥 Video - Muestra demos de apps móviles/escritorio
+  - 🔗 Enlaces - Links directos a proyectos en vivo
+- **Galería de imágenes** múltiples por proyecto
+- **Proyectos destacados** en la página principal
+- **Búsqueda y filtros** avanzados
+
+### 📄 Sistema de CV
+- **Múltiples templates** profesionales
+- **Generación de PDF** para descarga
+- **Vista previa en tiempo real**
+- **Contenido dinámico** desde el panel admin
+
+### 📁 Gestión de Archivos
+- **Subida de archivos** con drag and drop
+- **Soporte de videos** para demos
+- **Organización automática** por categorías
+- **Galería de medios** centralizada
+
+---
+
+## 🛠️ Tecnologías
+
+### Frontend
+- **[Next.js 14](https://nextjs.org/)** - Framework React con App Router
+- **[TypeScript](https://www.typescriptlang.org/)** - Tipado estático
+- **[Tailwind CSS](https://tailwindcss.com/)** - Framework CSS utility-first
+- **[Radix UI](https://www.radix-ui.com/)** - Componentes UI accesibles
+- **[Zustand](https://zustand-demo.pmnd.rs/)** - Gestión de estado
+- **[React Hook Form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)** - Validación de formularios
+
+### Backend
+- **[FastAPI](https://fastapi.tiangolo.com/)** - Framework Python moderno
+- **Python 3.11+** - Lenguaje de programación
+- **[PostgreSQL](https://www.postgresql.org/)** - Base de datos relacional
+- **[SQLAlchemy](https://www.sqlalchemy.org/)** - ORM asíncrono
+- **[Alembic](https://alembic.sqlalchemy.org/)** - Migraciones de BD
+- **JWT** - Autenticación con tokens
+- **[Pydantic v2](https://docs.pydantic.dev/)** - Validación de datos
+
+### DevOps
+- **[Docker](https://www.docker.com/)** - Contenedorización
+- **[Vercel](https://vercel.com/)** - Hosting del frontend
+- **[Railway](https://railway.app/)** - Hosting del backend
+- **[Supabase](https://supabase.com/)** - Base de datos PostgreSQL
+
+---
+
+## 🚀 Instalación
+
+### Requisitos Previos
+
+- **Node.js** 18 o superior ([Descargar](https://nodejs.org/))
+- **Python** 3.11 o superior ([Descargar](https://www.python.org/))
+- **PostgreSQL** 14+ ([Descargar](https://www.postgresql.org/download/)) o Docker
+- **Git** ([Descargar](https://git-scm.com/))
+- **pipenv** (Instalar: `pip install pipenv`)
+
+### Pasos de Instalación
+
+#### 1. Clonar el Repositorio
 
 ```bash
+git clone https://github.com/Nikoi18/Portafolio.git
+cd Portafolio
+```
+
+#### 2. Configurar la Base de Datos
+
+**Opción A: Usar Docker (Recomendado)**
+
+```bash
+docker-compose -f docker/docker-compose.dev.yml up -d postgres
+```
+
+Accede a PgAdmin en `http://localhost:5055`:
+- Email: `admin@portfolio.com`
+- Contraseña: `admin123`
+
+**Opción B: PostgreSQL Local**
+
+```sql
+CREATE DATABASE portfolio_db;
+CREATE USER portfolio_user WITH PASSWORD 'portfolio_pass';
+GRANT ALL PRIVILEGES ON DATABASE portfolio_db TO portfolio_user;
+```
+
+#### 3. Configurar el Backend
+
+```bash
+# Navegar al directorio backend
 cd backend
-
-# Configurar variables de entorno
-cp env.example .env
-
-# Editar .env con tus credenciales de super admin:
-# SUPER_ADMIN_EMAIL=tu-email@ejemplo.com
-# SUPER_ADMIN_PASSWORD=tu-contraseña-segura
-# SUPER_ADMIN_NAME=Tu Nombre
 
 # Instalar dependencias
 pipenv install
@@ -58,190 +143,272 @@ pipenv install
 # Activar entorno virtual
 pipenv shell
 
-# Migrar base de datos
-pipenv run alembic upgrade head
+# Copiar y configurar variables de entorno
+cp env.example .env
+```
 
-# Iniciar servidor
+**Editar `backend/.env`:**
+```env
+# Base de datos
+DATABASE_URL=postgresql://portfolio_user:portfolio_pass@localhost:5440/portfolio_db
+
+# Seguridad - ¡CAMBIAR EN PRODUCCIÓN!
+SECRET_KEY=tu-clave-secreta-super-segura-minimo-32-caracteres
+SUPER_ADMIN_EMAIL=aran.nick15@gmail.com
+SUPER_ADMIN_PASSWORD=tu-contraseña-segura
+SUPER_ADMIN_NAME=Nicolas A. Urbaez A.
+
+# Entorno
+ENVIRONMENT=development
+DEBUG=True
+
+# CORS
+ALLOWED_ORIGINS=["http://localhost:3004"]
+```
+
+```bash
+# Ejecutar migraciones de base de datos
+alembic upgrade head
+
+# Iniciar el servidor backend
 pipenv run dev
 ```
 
-### 2. Frontend
+El backend estará disponible en:
+- **API**: `http://localhost:8004`
+- **Documentación Swagger**: `http://localhost:8004/docs`
+
+#### 4. Configurar el Frontend
 
 ```bash
+# Abrir nueva terminal y navegar al directorio frontend
 cd frontend
 
 # Instalar dependencias
 npm install
 
-# Configurar variables de entorno
-cp .env.local.example .env.local
+# Copiar y configurar variables de entorno
+cp env.local.example .env.local
+```
 
-# Editar .env.local:
-# NEXT_PUBLIC_API_URL=http://localhost:8000
+**Editar `frontend/.env.local`:**
+```env
+# Configuración API
+NEXT_PUBLIC_API_URL=http://localhost:8004
 
-# Iniciar servidor
+# NextAuth (opcional por ahora)
+NEXTAUTH_SECRET=dev-secret-key-cambiar-en-produccion
+NEXTAUTH_URL=http://localhost:3004
+
+# Entorno
+NODE_ENV=development
+```
+
+```bash
+# Iniciar el servidor frontend
 npm run dev
 ```
 
-### 3. Configuración Inicial
+El frontend estará disponible en: `http://localhost:3004`
 
-1. **Crear Super Admin** (solo primera vez):
-   ```
-   http://localhost:3000/admin/setup
-   ```
-   Click en "Crear Super Administrador"
-   
-   Las credenciales se toman del archivo `backend/.env`:
-   - SUPER_ADMIN_EMAIL
-   - SUPER_ADMIN_PASSWORD
-   - SUPER_ADMIN_NAME
+#### 5. Configuración Inicial
+
+1. **Crear Super Admin** (primera vez):
+   - Ir a: `http://localhost:3004/admin/setup`
+   - Click en "Crear Super Administrador"
+   - Las credenciales se toman del archivo `backend/.env`
 
 2. **Iniciar Sesión**:
-   ```
-   http://localhost:3000/admin/login
-   ```
-   Usa las credenciales configuradas en el .env
+   - Ir a: `http://localhost:3004/admin/login`
+   - Usar las credenciales configuradas en el `.env`
 
-3. **Panel de Administración**:
-   ```
-   http://localhost:3000/admin
-   ```
-
-## 🎯 Características
-
-### ✅ Sistema de Autenticación Avanzado
-- Roles y permisos granulares
-- Super Admin configurable desde .env
-- CRUD completo de usuarios
-- Protecciones de seguridad integradas
-
-### ✅ Gestión de Proyectos
-- CRUD completo con permisos
-- **Sistema de demos interactivos** (Iframe, Video, Enlaces)
-- Galería de imágenes
-- Filtros y búsqueda avanzada
-- Proyectos destacados
-
-### ✅ Editor de CV
-- Generación de PDF
-- Múltiples templates
-- Vista previa en tiempo real
-
-### ✅ Gestión de Archivos
-- Upload de imágenes
-- Galería de medios
-- Gestor de archivos
-
-### ✅ Demo Interactivo
-El portafolio incluye un sistema avanzado para mostrar proyectos **en vivo**:
-- **Iframe Interactivo**: Los visitantes pueden interactuar con tu proyecto desde el portafolio
-- **Video Demo**: Muestra videos de apps móviles o escritorio
-- **Enlaces Externos**: Abre proyectos en nuevas pestañas
-- **Modal Full-Screen**: Experiencia inmersiva
-
-## 📚 Documentación
-
-- **[SISTEMA_USUARIOS_ROLES.md](SISTEMA_USUARIOS_ROLES.md)** - Sistema de autenticación completo
-- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) - Guía de deployment
-- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) - Guía de desarrollo
-
-## 🔌 API Endpoints
-
-### Autenticación
-```
-POST /api/v1/auth/login
-POST /api/v1/auth/create-super-admin
-GET  /api/v1/auth/me
-```
-
-### Usuarios (Nuevo)
-```
-GET    /api/v1/users/              # Listar usuarios
-POST   /api/v1/users/              # Crear usuario
-PUT    /api/v1/users/{id}          # Actualizar usuario
-DELETE /api/v1/users/{id}          # Eliminar usuario
-GET    /api/v1/users/roles/available  # Roles disponibles
-```
-
-### Proyectos
-```
-GET    /api/v1/projects/           # Listar proyectos
-POST   /api/v1/projects/           # Crear proyecto
-PUT    /api/v1/projects/{id}       # Actualizar proyecto
-DELETE /api/v1/projects/{id}       # Eliminar proyecto
-```
-
-Ver documentación completa en: `http://localhost:8000/docs`
-
-## 🌐 Deployment
-
-### Stack Recomendado:
-- **Dominio**: Cloudflare (DNS + CDN)
-- **Frontend**: Vercel
-- **Backend**: Railway
-- **Base de Datos**: Supabase (PostgreSQL)
-
-**Costo estimado**: ~$5/mes
-
-Ver [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) para instrucciones detalladas.
-
-## 🔒 Seguridad
-
-- Autenticación JWT
-- Sistema de roles y permisos
-- Validación con Pydantic
-- CORS configurado
-- Protección contra CSRF
-- Sanitización de inputs
-- Rate limiting (producción)
-
-## 🛡️ Variables de Entorno Importantes
-
-### Backend (`backend/.env`)
-```env
-# Super Admin (CAMBIAR EN PRODUCCIÓN)
-SUPER_ADMIN_EMAIL=admin@portfolio.com
-SUPER_ADMIN_PASSWORD=changeme123
-SUPER_ADMIN_NAME=Super Admin
-
-# Seguridad
-SECRET_KEY=tu-secret-key-super-seguro-64-caracteres
-DATABASE_URL=postgresql://user:pass@localhost:5432/db
-
-# CORS
-ALLOWED_ORIGINS=["http://localhost:3000"]
-```
-
-### Frontend (`frontend/.env.local`)
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
-
-## 🧪 Testing
-
-```bash
-# Backend
-cd backend
-pipenv run pytest
-
-# Frontend
-cd frontend
-npm test
-```
-
-## 📝 Próximos Pasos
-
-1. Configurar variables de entorno en `backend/.env`
-2. Crear super admin desde `/admin/setup`
-3. Crear usuarios adicionales con diferentes roles
-4. Agregar proyectos con demos interactivos
-5. Personalizar tu perfil y CV
-6. Deploy a producción
-
-## 📄 Licencia
-
-MIT License - ver [LICENSE](LICENSE) para más detalles.
+3. **Acceder al Panel Admin**:
+   - `http://localhost:3004/admin`
+   - Gestiona proyectos, usuarios, CV y más
 
 ---
 
-**Desarrollado con ❤️ usando Next.js y FastAPI**
+## 💻 Uso
+
+### Panel de Administración
+
+#### Dashboard (`/admin`)
+- Vista general de proyectos y usuarios
+- Acceso rápido a todas las funcionalidades
+
+#### Gestión de Proyectos (`/admin/projects`)
+- Crear, editar y eliminar proyectos
+- Configurar demos interactivos (Iframe, Video, Enlaces)
+- Subir imágenes y gestionar galerías
+- Marcar proyectos como destacados
+
+#### Gestión de Usuarios (`/admin/users`)
+- Crear usuarios con diferentes roles
+- Editar permisos y roles
+- Eliminar usuarios
+
+#### Gestión de CV (`/admin/cv`)
+- Editar secciones del CV
+- Seleccionar template
+- Generar y descargar PDF
+
+#### Gestión de Archivos (`/admin/uploads`)
+- Subir imágenes, videos y documentos
+- Organizar archivos por proyecto
+- Ver y eliminar archivos
+
+### Páginas Públicas
+
+- **Inicio** (`/`) - Página principal con proyectos destacados
+- **Proyectos** (`/projects`) - Lista completa de proyectos
+- **Detalle de Proyecto** (`/projects/[slug]`) - Ver proyecto individual
+- **Acerca de** (`/about`) - Información sobre ti
+- **Contacto** (`/contact`) - Formulario de contacto
+- **Descargar CV** (`/cv/download`) - Descargar tu CV en PDF
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+portafolio/
+├── frontend/                 # Aplicación Next.js
+│   ├── src/
+│   │   ├── app/             # Páginas (App Router)
+│   │   ├── components/      # Componentes React
+│   │   ├── lib/             # Utilidades y clientes API
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── store/           # Estado global (Zustand)
+│   │   └── types/           # Tipos TypeScript
+│   ├── public/              # Archivos estáticos
+│   └── package.json
+│
+├── backend/                 # API FastAPI
+│   ├── app/
+│   │   ├── api/v1/         # Endpoints de la API
+│   │   ├── core/           # Configuración core
+│   │   ├── models/         # Modelos SQLAlchemy
+│   │   ├── schemas/        # Schemas Pydantic
+│   │   ├── services/       # Lógica de negocio
+│   │   └── utils/          # Utilidades
+│   ├── alembic/            # Migraciones de BD
+│   └── Pipfile
+│
+├── docker/                  # Configuraciones Docker
+│   ├── docker-compose.dev.yml
+│   └── docker-compose.prod.yml
+│
+└── docs/                    # Documentación
+    ├── DEPLOYMENT.md
+    └── DEVELOPMENT.md
+```
+
+---
+
+## 🌐 Deployment
+
+### Stack Recomendado
+
+- **Frontend**: [Vercel](https://vercel.com/) (gratis)
+- **Backend**: [Railway](https://railway.app/) (~$5/mes)
+- **Base de Datos**: [Supabase](https://supabase.com/) (gratis)
+- **Dominio/CDN**: [Cloudflare](https://cloudflare.com/) (opcional)
+
+### Pasos Rápidos
+
+1. **Desplegar Frontend en Vercel**:
+   - Conectar repositorio GitHub
+   - Configurar variables de entorno
+   - Deploy automático
+
+2. **Desplegar Backend en Railway**:
+   - Conectar repositorio
+   - Configurar variables de entorno
+   - Deploy automático
+
+3. **Base de Datos en Supabase**:
+   - Crear proyecto
+   - Obtener URL de conexión
+   - Configurar en Railway
+
+Ver guía completa en: **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**
+
+---
+
+## 🤝 Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor lee [CONTRIBUTING.md](CONTRIBUTING.md) para conocer los detalles del proceso.
+
+### Pasos para Contribuir
+
+1. Fork el proyecto
+2. Crea tu rama de feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+### Convención de Commits
+
+Seguimos [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `feat:` - Nueva funcionalidad
+- `fix:` - Corrección de bug
+- `docs:` - Cambios en documentación
+- `style:` - Formato, punto y coma, etc (sin cambios en código)
+- `refactor:` - Refactorización de código
+- `test:` - Agregar o actualizar tests
+- `chore:` - Tareas de mantenimiento
+
+---
+
+## 🔒 Seguridad
+
+- Autenticación JWT segura
+- Hashing de contraseñas con bcrypt
+- Control de acceso basado en roles
+- Validación de datos con Pydantic
+- Protección contra SQL injection
+- CORS configurado adecuadamente
+- Rate limiting en producción
+
+**Reportar vulnerabilidades**: Si encuentras un problema de seguridad, por favor envía un email privado en lugar de crear un issue público.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
+
+```
+MIT License - Copyright (c) 2024
+
+Se permite el uso, copia, modificación y distribución de este software
+con o sin modificaciones, siempre que se incluya el aviso de copyright.
+```
+
+---
+
+## 📧 Contacto
+
+- **Email**: aran.nick15@gmail.com
+- **GitHub**: [@Nikoi18](https://github.com/Nikoi18)
+- **Repositorio**: [github.com/Nikoi18/Portafolio](https://github.com/Nikoi18/Portafolio)
+
+---
+
+## 🙏 Agradecimientos
+
+- [Next.js](https://nextjs.org/) - Framework React
+- [FastAPI](https://fastapi.tiangolo.com/) - Framework Python
+- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
+- [Radix UI](https://www.radix-ui.com/) - Componentes UI
+
+---
+
+<div align="center">
+
+**Hecho con ❤️ usando Next.js y FastAPI**
+
+⭐ Si este proyecto te fue útil, considera darle una estrella
+
+</div>

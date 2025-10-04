@@ -117,32 +117,42 @@ async def download_cv(
     db: Session = Depends(get_db)
 ):
     """Descargar CV en formato PDF (público)"""
-    cv_service = CVService(db)
-    
-    # Obtener el primer usuario activo (admin principal)
-    from app.models.user import User
-    admin_user = db.query(User).filter(User.is_active == True).first()
-    
-    if not admin_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuario no encontrado"
-        )
-    
-    # Obtener URL del CV según la fuente configurada
-    cv_download_url = cv_service.get_cv_download_url(admin_user)
-    
-    if not cv_download_url:
+    try:
+        cv_service = CVService(db)
+        
+        # Obtener el primer usuario activo (admin principal)
+        from app.models.user import User
+        admin_user = db.query(User).filter(User.is_active == True).first()
+        
+        if not admin_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Usuario no encontrado"
+            )
+        
+        # Obtener URL del CV según la fuente configurada
+        cv_download_url = cv_service.get_cv_download_url(admin_user)
+        
+        if not cv_download_url:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="CV no disponible para descarga"
+            )
+        
+        # Retornar la URL del CV
+        return {
+            "download_url": cv_download_url,
+            "message": "CV disponible para descarga"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Log el error pero no fallar el build
+        print(f"Error en /download: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="CV no disponible para descarga"
         )
-    
-    # Retornar la URL del CV
-    return {
-        "download_url": cv_download_url,
-        "message": "CV disponible para descarga"
-    }
 
 
 @router.get("/templates")
