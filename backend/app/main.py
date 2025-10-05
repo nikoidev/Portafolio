@@ -10,7 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 import os
 
 from app.core.config import settings as config_settings
-from app.api.v1 import auth, projects, admin, cms, users, settings, cv
+from app.api.v1 import auth, projects, admin, cms, users, settings, cv, uploads
 
 # Crear instancia de FastAPI con exception handlers desactivados por defecto
 app = FastAPI(
@@ -98,6 +98,7 @@ app.include_router(cv.router, prefix="/api/v1/cv", tags=["CV"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(cms.router, prefix="/api/v1/cms", tags=["CMS"])
 app.include_router(settings.router, prefix="/api/v1/settings", tags=["Settings"])
+app.include_router(uploads.router, prefix="/api/v1/uploads", tags=["Uploads"])
 
 
 @app.get("/")
