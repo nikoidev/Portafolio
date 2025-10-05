@@ -319,24 +319,24 @@ export default function ProjectsClient() {
                 {filteredProjects.length > 0 && (
                     <EditableSection pageKey="projects" sectionKey="cta" onContentUpdate={refreshCta}>
                         <div className="text-center mt-16">
-                            <Card className="max-w-2xl mx-auto">
-                                <CardContent className="pt-6">
+                            <Card className="max-w-2xl mx-auto border-primary/20">
+                                <CardContent className="pt-8 pb-8">
                                     <h3 className="text-2xl font-bold mb-4">{cta.title}</h3>
                                     <p className="text-muted-foreground mb-6">
                                         {cta.description}
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                         <Button asChild size="lg">
-                                            <a href={cta.button_primary_url}>
-                                                {cta.button_primary_text}
+                                            <a href={(cta as any).button_primary_url || (cta as any).button_url || '/contact'}>
+                                                {(cta as any).button_primary_text || (cta as any).button_text || 'Contactar'}
                                             </a>
                                         </Button>
                                         <Button
-                                            variant="outline"
+                                            variant="secondary"
                                             size="lg"
                                             onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
                                         >
-                                            {cta.button_secondary_text}
+                                            {(cta as any).button_secondary_text || 'Descargar CV'}
                                         </Button>
                                     </div>
                                 </CardContent>
