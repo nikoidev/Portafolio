@@ -1,6 +1,7 @@
 'use client';
 
 import { EditableSection } from '@/components/cms/EditableSection';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -117,6 +118,9 @@ export function Header({ variant = 'public' }: HeaderProps) {
                             </div>
 
                             <div className="flex items-center space-x-4">
+                                {/* Theme Toggle */}
+                                <ThemeToggle />
+
                                 {isAuthenticated && user && (
                                     <>
                                         <span className="text-sm text-muted-foreground">
