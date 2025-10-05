@@ -51,16 +51,25 @@ async def upload_cv(
     
     Only PDF files are allowed, max 10MB.
     """
-    # Validate file type
-    if file.content_type != 'application/pdf':
+    try:
+        # Validate file type
+        if file.content_type != 'application/pdf':
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Only PDF files are allowed"
+            )
+        
+        # Read file content
+        file_content = await file.read()
+        file_size = len(file_content)
+    except Exception as e:
+        # Prevent binary data from being serialized in error responses
+        if isinstance(e, HTTPException):
+            raise e
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only PDF files are allowed"
+            detail=f"Error processing file: {str(e)[:100]}"  # Limit error message length
         )
-    
-    # Read file content
-    file_content = await file.read()
-    file_size = len(file_content)
     
     # Validate file size (10MB)
     max_size = 10 * 1024 * 1024
