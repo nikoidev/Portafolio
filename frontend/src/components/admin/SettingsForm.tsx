@@ -13,7 +13,6 @@ import {
     Globe,
     Mail,
     Newspaper,
-    Palette,
     Plus,
     RotateCcw,
     Save,
@@ -366,63 +365,6 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
                 </CardContent>
             </Card>
 
-            {/* Apariencia */}
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
-                            <Palette className="w-5 h-5 text-pink-600 dark:text-pink-300" />
-                        </div>
-                        <div>
-                            <CardTitle>Apariencia</CardTitle>
-                            <CardDescription>Personalización visual del sitio</CardDescription>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="theme_mode">Modo de Tema</Label>
-                            <select
-                                id="theme_mode"
-                                {...register('theme_mode')}
-                                className="w-full px-3 py-2 border rounded-md"
-                            >
-                                <option value="auto">Automático</option>
-                                <option value="light">Claro</option>
-                                <option value="dark">Oscuro</option>
-                            </select>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="primary_color">Color Primario</Label>
-                            <div className="flex gap-2">
-                                <Input
-                                    id="primary_color"
-                                    type="color"
-                                    {...register('primary_color')}
-                                    className="w-20 h-10"
-                                />
-                                <Input
-                                    {...register('primary_color')}
-                                    placeholder="#3B82F6"
-                                    className="flex-1"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="font_family">Familia de Fuente</Label>
-                            <Input
-                                id="font_family"
-                                {...register('font_family')}
-                                placeholder="Inter, sans-serif"
-                            />
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
             {/* Avisos y Notificaciones */}
             <Card>
                 <CardHeader>
@@ -608,44 +550,27 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
             </Card>
 
             {/* Botones de Acción */}
-            <div className="flex items-center justify-between pt-6 border-t">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-6 border-t">
                 <Button
                     type="button"
                     variant="outline"
+                    size="lg"
                     onClick={handleReset}
                     disabled={isSubmitting || !onReset}
+                    className="w-full sm:w-auto"
                 >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Resetear a Predeterminados
                 </Button>
 
-                <Button type="submit" disabled={isSubmitting} size="lg">
-                    <Save className="w-4 h-4 mr-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Configuración'}
-                </Button>
-            </div>
-
-            {/* Botón flotante para guardar (siempre visible) */}
-            <div className="fixed bottom-8 right-8 z-50 flex gap-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    onClick={handleReset}
-                    disabled={isSubmitting || !onReset}
-                    className="shadow-lg"
-                >
-                    <RotateCcw className="w-5 h-5 mr-2" />
-                    Resetear
-                </Button>
                 <Button
                     type="submit"
                     disabled={isSubmitting}
                     size="lg"
-                    className="shadow-lg bg-primary hover:bg-primary/90"
+                    className="w-full sm:w-auto"
                 >
-                    <Save className="w-5 h-5 mr-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                    <Save className="w-4 h-4 mr-2" />
+                    {isSubmitting ? 'Guardando...' : 'Guardar Configuración'}
                 </Button>
             </div>
         </form>

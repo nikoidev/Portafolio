@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Permission, usePermissions } from '@/hooks/usePermissions';
 import { useAuthStore } from '@/store/auth';
 import { useProjectsStore } from '@/store/projects';
-import { Eye, FileText, FolderPlus, Pencil, Settings, Upload } from 'lucide-react';
+import { Eye, FileText, FolderPlus, Pencil, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo } from 'react';
 
@@ -37,14 +37,6 @@ export default function AdminDashboard() {
             href: '/admin/cv',
             color: 'bg-green-500',
             permission: 'update_cv' as Permission,
-        },
-        {
-            title: 'Subir Archivos',
-            description: 'Gestionar imágenes y demos',
-            icon: Upload,
-            href: '/admin/uploads',
-            color: 'bg-purple-500',
-            permission: 'upload_file' as Permission,
         },
         {
             title: 'Configuración',
@@ -121,7 +113,7 @@ export default function AdminDashboard() {
                         <div className="h-8 w-1 bg-primary rounded-full" />
                         <h2 className="text-2xl font-bold">Acciones Rápidas</h2>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {quickActions.map((action, index) => {
                             const Icon = action.icon;
                             const gradients = [

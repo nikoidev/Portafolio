@@ -1,6 +1,7 @@
 'use client';
 
 import { EditableSection } from '@/components/cms/EditableSection';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
@@ -154,6 +155,9 @@ export function Navbar() {
                                 </div>
                             )}
 
+                            {/* Theme Toggle */}
+                            <ThemeToggle />
+
                             {/* CV Download */}
                             {navData.cv_button?.enabled && (
                                 <Button
@@ -227,6 +231,11 @@ export function Navbar() {
 
                                     {/* Actions */}
                                     <div className="flex flex-col space-y-4">
+                                        {/* Theme Toggle */}
+                                        <div className="flex justify-center">
+                                            <ThemeToggle />
+                                        </div>
+
                                         {/* Login Button */}
                                         {navData.login_button?.enabled && (
                                             <Button asChild className="w-full">
