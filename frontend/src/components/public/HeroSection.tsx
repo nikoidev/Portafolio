@@ -4,6 +4,7 @@ import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { api } from '@/lib/api';
 import { ArrowDown, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -20,7 +21,7 @@ export function HeroSection() {
         primary_cta_text: 'Ver mis proyectos',
         primary_cta_link: '/projects',
         secondary_cta_text: 'Descargar CV',
-        secondary_cta_link: '/cv/download',
+        secondary_cta_link: '#', // Se manejará con onClick
         social_links: [
             {
                 text: 'GitHub',
@@ -102,12 +103,10 @@ export function HeroSection() {
                                 variant="outline"
                                 size="lg"
                                 className="text-lg px-8 py-6"
-                                asChild
+                                onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
                             >
-                                <a href={data.secondary_cta_link} target="_blank" rel="noopener noreferrer">
-                                    <Download className="w-5 h-5 mr-2" />
-                                    {data.secondary_cta_text}
-                                </a>
+                                <Download className="w-5 h-5 mr-2" />
+                                {data.secondary_cta_text}
                             </Button>
                         </div>
 

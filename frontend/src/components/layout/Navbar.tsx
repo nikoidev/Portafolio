@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { Download, LogIn, Menu } from 'lucide-react';
 import Link from 'next/link';
@@ -38,7 +39,7 @@ export function Navbar() {
         ],
         cv_button: {
             text: 'CV',
-            url: '/cv/download',
+            url: '#', // Se manejará con onClick
             enabled: true,
         },
         login_button: {
@@ -158,12 +159,10 @@ export function Navbar() {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    asChild
+                                    onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
                                 >
-                                    <a href={navData.cv_button.url} target="_blank" rel="noopener noreferrer">
-                                        <Download className="mr-2 h-4 w-4" />
-                                        {navData.cv_button.text}
-                                    </a>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    {navData.cv_button.text}
                                 </Button>
                             )}
 
@@ -246,17 +245,13 @@ export function Navbar() {
                                             <Button
                                                 className="w-full"
                                                 variant="outline"
-                                                asChild
+                                                onClick={() => {
+                                                    window.open(api.getCVDownloadURL(), '_blank');
+                                                    setIsOpen(false);
+                                                }}
                                             >
-                                                <a 
-                                                    href={navData.cv_button.url} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    onClick={() => setIsOpen(false)}
-                                                >
-                                                    <Download className="mr-2 h-4 w-4" />
-                                                    {navData.cv_button.text}
-                                                </a>
+                                                <Download className="mr-2 h-4 w-4" />
+                                                {navData.cv_button.text}
                                             </Button>
                                         )}
 

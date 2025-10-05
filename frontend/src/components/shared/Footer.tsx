@@ -3,6 +3,7 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { api } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,7 +23,7 @@ export function Footer() {
             { text: 'Proyectos', url: '/projects' },
             { text: 'Sobre mí', url: '/about' },
             { text: 'Contacto', url: '/contact' },
-            { text: 'Descargar CV', url: '/cv/download' }
+            { text: 'Descargar CV', url: '#', isCV: true }
         ],
         social_title: 'Sígueme',
         social_links: [
@@ -84,13 +85,26 @@ export function Footer() {
                             <h4 className="text-sm font-semibold">{data.links_title}</h4>
                             <nav className="flex flex-col space-y-2">
                                 {data.links.map((link: any, index: number) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url}
-                                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                                    >
-                                        {link.text}
-                                    </Link>
+                                    link.isCV ? (
+                                        <button
+                                            key={index}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                window.open(api.getCVDownloadURL(), '_blank');
+                                            }}
+                                            className="text-sm text-muted-foreground hover:text-primary transition-colors text-left cursor-pointer"
+                                        >
+                                            {link.text}
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            key={index}
+                                            href={link.url}
+                                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                                        >
+                                            {link.text}
+                                        </Link>
+                                    )
                                 ))}
                             </nav>
                         </div>

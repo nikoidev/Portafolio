@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { api } from '@/lib/api';
 import {
     Award,
     BookOpen,
@@ -270,12 +271,13 @@ export default function AboutClient() {
                             </Button>
                             <Button
                                 variant="outline"
-                                asChild
+                                onClick={() => {
+                                    const downloadUrl = api.getCVDownloadURL();
+                                    window.open(downloadUrl, '_blank');
+                                }}
                             >
-                                <a href="/cv/download" target="_blank" rel="noopener noreferrer">
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Descargar CV
-                                </a>
+                                <Download className="w-4 h-4 mr-2" />
+                                Descargar CV
                             </Button>
                             {/* Social Links con íconos dinámicos */}
                             {hero.social_links && hero.social_links.filter((link: any) => link.enabled).map((link: any, index: number) => (

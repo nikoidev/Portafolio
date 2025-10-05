@@ -174,11 +174,7 @@ class ApiClient {
     async uploadCV(file: File) {
         const formData = new FormData();
         formData.append('file', file);
-<<<<<<< HEAD
 
-=======
-        
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
         return fetch(`${this.baseURL}/api/v1/cv/`, {
             method: 'POST',
             headers: {

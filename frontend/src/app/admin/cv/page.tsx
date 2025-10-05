@@ -1,16 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileText, Download, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-<<<<<<< HEAD
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
-=======
-import apiClient from '@/lib/api';
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
 import type { CV } from '@/types/api';
+import { AlertCircle, CheckCircle, Download, FileText, Trash2, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function CVManagementPage() {
     const [cv, setCV] = useState<CV | null>(null);
@@ -27,11 +23,7 @@ export default function CVManagementPage() {
     const loadCV = async () => {
         try {
             setLoading(true);
-<<<<<<< HEAD
             const data = await api.getCV();
-=======
-            const data = await apiClient.getCV();
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
             setCV(data);
         } catch (error: any) {
             // If 404, no CV exists yet (this is expected)
@@ -64,13 +56,9 @@ export default function CVManagementPage() {
         try {
             setUploading(true);
             setMessage(null);
-            
-<<<<<<< HEAD
+
             await api.uploadCV(file);
-=======
-            await apiClient.uploadCV(file);
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
-            
+
             setMessage({ type: 'success', text: 'CV subido exitosamente' });
             await loadCV();
         } catch (error: any) {
@@ -85,7 +73,7 @@ export default function CVManagementPage() {
 
     const handleDelete = async () => {
         if (!cv) return;
-        
+
         if (!confirm('¿Estás seguro de que deseas eliminar el CV? Esta acción no se puede deshacer.')) {
             return;
         }
@@ -93,13 +81,9 @@ export default function CVManagementPage() {
         try {
             setDeleting(true);
             setMessage(null);
-            
-<<<<<<< HEAD
+
             await api.deleteCV();
-=======
-            await apiClient.deleteCV();
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
-            
+
             setMessage({ type: 'success', text: 'CV eliminado exitosamente' });
             setCV(null);
         } catch (error: any) {
@@ -111,11 +95,7 @@ export default function CVManagementPage() {
     };
 
     const handleDownload = () => {
-<<<<<<< HEAD
         const downloadUrl = api.getCVDownloadURL();
-=======
-        const downloadUrl = apiClient.getCVDownloadURL();
->>>>>>> 059ffb94bb37cf670d0457079c964399cecf5d88
         window.open(downloadUrl, '_blank');
     };
 
