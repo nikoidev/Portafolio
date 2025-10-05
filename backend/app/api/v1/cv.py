@@ -36,9 +36,9 @@ async def get_current_cv(
     return CVResponse.model_validate(cv)
 
 
-@router.post("/", response_model=CVResponse, tags=["CV - Admin"])
+@router.post("/", response_model=CVResponse, tags=["CV - Admin"], status_code=status.HTTP_201_CREATED)
 async def upload_cv(
-    file: UploadFile = File(...),
+    file: UploadFile = File(..., description="PDF file to upload (max 10MB)"),
     db: Session = Depends(get_db),
     current_user = Depends(get_current_admin_user)
 ):
@@ -51,32 +51,56 @@ async def upload_cv(
     
     Only PDF files are allowed, max 10MB.
     """
-    try:
-        # Validate file type
-        if file.content_type != 'application/pdf':
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Only PDF files are allowed"
-            )
-        
-        # Read file content
-        file_content = await file.read()
-        file_size = len(file_content)
-    except Exception as e:
-        # Prevent binary data from being serialized in error responses
-        if isinstance(e, HTTPException):
-            raise e
+    # Validate file is provided
+    if not file:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Error processing file: {str(e)[:100]}"  # Limit error message length
+            detail="No file provided"
         )
     
-    # Validate file size (10MB)
-    max_size = 10 * 1024 * 1024
-    if file_size > max_size:
+    # Validate file type
+    if file.content_type not in ['application/pdf', 'application/x-pdf']:
         raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-            detail="File size exceeds 10MB limit"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file type: {file.content_type}. Only PDF files are allowed"
+        )
+    
+    # Validate filename
+    if not file.filename or not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must have a .pdf extension"
+        )
+    
+    try:
+        # Read file content in chunks to avoid memory issues
+        file_content = bytearray()
+        max_size = 10 * 1024 * 1024  # 10MB
+        chunk_size = 1024 * 1024  # 1MB chunks
+        
+        while True:
+            chunk = await file.read(chunk_size)
+            if not chunk:
+                break
+            
+            file_content.extend(chunk)
+            
+            # Check size while reading to fail fast
+            if len(file_content) > max_size:
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail="File size exceeds 10MB limit"
+                )
+        
+        file_content = bytes(file_content)
+        file_size = len(file_content)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error reading file. Please try again."
         )
     
     # Validate file is not empty
@@ -86,15 +110,29 @@ async def upload_cv(
             detail="File is empty"
         )
     
-    # Save CV
-    cv_service = CVService(db)
-    cv = cv_service.create_or_replace_cv(
-        filename=file.filename or "CV.pdf",
-        file_data=file_content,
-        file_size=file_size
-    )
+    # Validate it's actually a PDF by checking magic bytes
+    if not file_content.startswith(b'%PDF'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid PDF file. File does not appear to be a valid PDF."
+        )
     
-    return CVResponse.model_validate(cv)
+    # Save CV
+    try:
+        cv_service = CVService(db)
+        cv = cv_service.create_or_replace_cv(
+            filename=file.filename,
+            file_data=file_content,
+            file_size=file_size
+        )
+        
+        return CVResponse.model_validate(cv)
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error saving CV. Please try again."
+        )
 
 
 @router.delete("/", response_model=CVDeleteResponse, tags=["CV - Admin"])

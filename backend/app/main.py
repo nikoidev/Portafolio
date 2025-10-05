@@ -1,10 +1,12 @@
 """
 Aplicación principal FastAPI para el Portafolio Personal
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import os
 
 from app.core.config import settings as config_settings
@@ -18,6 +20,43 @@ app = FastAPI(
     docs_url="/docs" if config_settings.DEBUG else None,
     redoc_url="/redoc" if config_settings.DEBUG else None,
 )
+
+# Exception handlers para evitar serialización de datos binarios
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Custom handler for validation errors to prevent binary data serialization
+    """
+    # Extract error details without including the actual input data
+    errors = []
+    for error in exc.errors():
+        error_detail = {
+            "loc": error["loc"],
+            "msg": error["msg"],
+            "type": error["type"],
+        }
+        errors.append(error_detail)
+    
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "detail": errors,
+            "message": "Validation error. Please check your request."
+        },
+    )
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """
+    Custom handler for HTTP exceptions
+    """
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": str(exc.detail),
+            "status_code": exc.status_code
+        },
+    )
 
 # Configurar CORS
 app.add_middleware(
