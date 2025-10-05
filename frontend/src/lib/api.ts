@@ -166,19 +166,23 @@ class ApiClient {
     }
 
     /**
-     * Create or replace CV (Admin only)
+     * Upload or replace CV (Admin only)
      * If a CV already exists, it will be replaced
      */
-    async createOrUpdateCV(data: { file_url: string }) {
-        return this.post('/api/v1/cv/', data);
-    }
-
-    /**
-     * Update existing CV (Admin only)
-     * Returns 404 if no CV exists
-     */
-    async updateCV(data: { file_url: string }) {
-        return this.put('/api/v1/cv/', data);
+    async uploadCV(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        return fetch(`${this.baseURL}/api/v1/cv/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.getToken()}`,
+            },
+            body: formData,
+        }).then(res => {
+            if (!res.ok) throw new Error('Failed to upload CV');
+            return res.json();
+        });
     }
 
     /**
@@ -190,11 +194,11 @@ class ApiClient {
     }
 
     /**
-     * Get CV download URL (Public - No authentication required)
-     * Returns 404 if no CV is available
+     * Download CV (Public - No authentication required)
+     * Returns the PDF file directly
      */
-    async getCVDownloadURL(): Promise<{ download_url: string; message: string }> {
-        return this.get<{ download_url: string; message: string }>('/api/v1/cv/download');
+    getCVDownloadURL(): string {
+        return `${this.baseURL}/api/v1/cv/download`;
     }
 
     /**
