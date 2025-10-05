@@ -327,8 +327,8 @@ export default function ProjectsClient() {
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                         <Button asChild size="lg">
-                                            <a href={cta.button_primary_url || cta.button_url}>
-                                                {cta.button_primary_text || cta.button_text}
+                                            <a href={(cta as any).button_primary_url || (cta as any).button_url || '/contact'}>
+                                                {(cta as any).button_primary_text || (cta as any).button_text || 'Contactar'}
                                             </a>
                                         </Button>
                                         <Button
@@ -336,7 +336,7 @@ export default function ProjectsClient() {
                                             size="lg"
                                             onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
                                         >
-                                            {cta.button_secondary_text || 'Descargar CV'}
+                                            {(cta as any).button_secondary_text || 'Descargar CV'}
                                         </Button>
                                     </div>
                                 </CardContent>

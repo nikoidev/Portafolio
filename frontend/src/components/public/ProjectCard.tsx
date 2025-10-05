@@ -1,6 +1,5 @@
 'use client';
 
-import { DemoModal } from '@/components/shared/DemoModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
 import { Eye, Github, Play } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 interface ProjectCardProps {
     project: Project;
@@ -17,7 +15,6 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, showViewCount = true, variant = 'vertical' }: ProjectCardProps) {
-    const [isDemoOpen, setIsDemoOpen] = useState(false);
 
     if (variant === 'horizontal') {
         return (
@@ -151,17 +148,6 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                                             <Github className="w-4 h-4 mr-1" />
                                             Código
                                         </a>
-                                    </Button>
-                                )}
-
-                                {project.demo_video_url && (
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setIsDemoOpen(true)}
-                                    >
-                                        <Play className="w-4 h-4 mr-1" />
-                                        Ver Demo
                                     </Button>
                                 )}
                             </div>
@@ -307,17 +293,6 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                             </a>
                         </Button>
                     )}
-
-                    {project.demo_video_url && (
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setIsDemoOpen(true)}
-                        >
-                            <Play className="w-4 h-4 mr-1" />
-                            Ver Demo
-                        </Button>
-                    )}
                 </div>
 
                 <Button asChild size="sm">
@@ -326,17 +301,6 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                     </Link>
                 </Button>
             </CardFooter>
-
-            {/* Modal de Demo */}
-            {project.demo_video_url && (
-                <DemoModal
-                    isOpen={isDemoOpen}
-                    onClose={() => setIsDemoOpen(false)}
-                    demoUrl={project.demo_video_url}
-                    projectTitle={project.title}
-                    demoType={project.demo_video_type as 'iframe' | 'link' | 'video' | 'images'}
-                />
-            )}
         </Card>
     );
 }
