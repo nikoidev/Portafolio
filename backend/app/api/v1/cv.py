@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
+import logging
 
 from app.core.deps import get_db, get_current_admin_user
 from app.schemas.cv import CVResponse, CVDeleteResponse
 from app.services.cv_service import CVService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -129,13 +132,11 @@ async def upload_cv(
         return CVResponse.model_validate(cv)
     
     except Exception as e:
-        # Log the actual error for debugging
-        import traceback
-        print(f"ERROR saving CV: {str(e)}")
-        print(f"Traceback: {traceback.format_exc()}")
+        # Log the error but don't expose details to client
+        logger.error(f"Error saving CV: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error saving CV: {str(e)}"
+            detail="Error saving CV. Please try again."
         )
 
 
