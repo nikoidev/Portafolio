@@ -104,77 +104,14 @@ export interface ProjectStats {
 }
 
 // CV types
-export interface WorkExperience {
-    company: string;
-    position: string;
-    start_date: string;
-    end_date?: string;
-    description?: string;
-    technologies: string[];
-    location?: string;
-}
-
-export interface Education {
-    institution: string;
-    degree: string;
-    field?: string;
-    start_date: string;
-    end_date?: string;
-    description?: string;
-    gpa?: string;
-}
-
-export interface TechnicalSkill {
-    category: string;
-    skills: string[];
-    level?: string;
-}
-
-export interface Language {
-    language: string;
-    level: string;
-    certification?: string;
-}
-
-export interface Certification {
-    name: string;
-    issuer: string;
-    date: string;
-    expiry_date?: string;
-    url?: string;
-    credential_id?: string;
-}
-
 export interface CV extends BaseEntity {
-    full_name: string;
-    title: string;
-    email: string;
-    phone?: string;
-    location?: string;
-    summary?: string;
-    work_experience: WorkExperience[];
-    education: Education[];
-    technical_skills: TechnicalSkill[];
-    languages: Language[];
-    certifications: Certification[];
-    featured_projects: number[];
-    pdf_template: string;
-    pdf_color_scheme: string;
-    pdf_url?: string;
-    pdf_generated_at?: string;
-    user_id: number;
+    filename: string;
+    file_size: number;
 }
 
-export interface CVPublic {
-    full_name: string;
-    title: string;
-    location?: string;
-    summary?: string;
-    work_experience: WorkExperience[];
-    education: Education[];
-    technical_skills: TechnicalSkill[];
-    languages: Language[];
-    certifications: Certification[];
+export interface CVDeleteResponse {
+    message: string;
+    success: boolean;
 }
 
 // API Response types

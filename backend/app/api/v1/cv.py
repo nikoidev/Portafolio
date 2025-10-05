@@ -1,181 +1,163 @@
-"""
-Endpoints para gestión del CV
-"""
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
-from typing import Optional
 
-from app.core.database import get_db
-from app.core.deps import get_current_admin_user, get_optional_user
-from app.schemas.cv import (
-    CVCreate, 
-    CVUpdate, 
-    CVResponse, 
-    CVPublic,
-    PDFGenerationRequest,
-    PDFResponse
-)
+from app.core.deps import get_db, get_current_admin_user
+from app.schemas.cv import CVResponse, CVDeleteResponse
 from app.services.cv_service import CVService
 
 router = APIRouter()
 
 
-@router.get("/", response_model=CVResponse)
-async def get_cv_data(
+# ============================================================================
+# ADMIN ENDPOINTS (Authentication required)
+# ============================================================================
+
+@router.get("/", response_model=CVResponse, tags=["CV - Admin"])
+async def get_current_cv(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_admin_user)
 ):
-    """Obtener datos del CV (solo admin)"""
+    """
+    Get the current CV information (Admin only)
+    
+    Returns the CV metadata (filename, size, timestamps).
+    Only one CV can exist in the system at any time.
+    """
     cv_service = CVService(db)
-    cv = cv_service.get_cv_by_user(current_user)
+    cv = cv_service.get_cv()
     
     if not cv:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="CV no encontrado"
+            detail="No CV found. Please upload a CV first."
         )
     
     return CVResponse.model_validate(cv)
 
 
-@router.get("/public", response_model=CVPublic)
-async def get_public_cv(
-    user_id: Optional[int] = None,
-    db: Session = Depends(get_db)
+@router.post("/", response_model=CVResponse, tags=["CV - Admin"])
+async def upload_cv(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_admin_user)
 ):
-    """Obtener CV público (sin datos sensibles)"""
-    cv_service = CVService(db)
-    cv = cv_service.get_public_cv(user_id)
+    """
+    Upload or replace the CV (Admin only)
     
-    if not cv:
+    This endpoint will:
+    - Create a new CV if none exists
+    - Replace the existing CV if one already exists
+    
+    Only PDF files are allowed, max 10MB.
+    """
+    # Validate file type
+    if file.content_type != 'application/pdf':
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="CV no encontrado"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only PDF files are allowed"
         )
     
-    return CVPublic.model_validate(cv)
-
-
-@router.post("/", response_model=CVResponse)
-async def create_or_update_cv(
-    cv_data: CVCreate,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
-):
-    """Crear o actualizar CV (solo admin)"""
-    cv_service = CVService(db)
-    cv = cv_service.create_or_update_cv(cv_data, current_user)
+    # Read file content
+    file_content = await file.read()
+    file_size = len(file_content)
     
-    return CVResponse.model_validate(cv)
-
-
-@router.put("/", response_model=CVResponse)
-async def update_cv_data(
-    cv_data: CVUpdate,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
-):
-    """Actualizar datos del CV (solo admin)"""
-    cv_service = CVService(db)
-    existing_cv = cv_service.get_cv_by_user(current_user)
-    
-    if not existing_cv:
+    # Validate file size (10MB)
+    max_size = 10 * 1024 * 1024
+    if file_size > max_size:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="CV no encontrado"
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File size exceeds 10MB limit"
         )
     
-    cv = cv_service.update_cv(existing_cv.id, cv_data, current_user)
-    return CVResponse.model_validate(cv)
-
-
-@router.post("/generate-pdf", response_model=PDFResponse)
-async def generate_cv_pdf(
-    pdf_request: PDFGenerationRequest,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_admin_user)
-):
-    """Generar PDF del CV (solo admin)"""
-    cv_service = CVService(db)
+    # Validate file is not empty
+    if file_size == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File is empty"
+        )
     
-    result = cv_service.generate_pdf(
-        current_user,
-        template=pdf_request.template,
-        color_scheme=pdf_request.color_scheme
+    # Save CV
+    cv_service = CVService(db)
+    cv = cv_service.create_or_replace_cv(
+        filename=file.filename or "CV.pdf",
+        file_data=file_content,
+        file_size=file_size
     )
     
-    return PDFResponse(
-        pdf_url=result["pdf_url"],
-        generated_at=result["generated_at"],
-        message="PDF generado correctamente"
-    )
+    return CVResponse.model_validate(cv)
 
 
-@router.get("/download")
-async def download_cv(
-    db: Session = Depends(get_db)
-):
-    """Descargar CV en formato PDF (público)"""
-    try:
-        cv_service = CVService(db)
-        
-        # Obtener el primer usuario activo (admin principal)
-        from app.models.user import User
-        admin_user = db.query(User).filter(User.is_active == True).first()
-        
-        if not admin_user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Usuario no encontrado"
-            )
-        
-        # Obtener URL del CV según la fuente configurada
-        cv_download_url = cv_service.get_cv_download_url(admin_user)
-        
-        if not cv_download_url:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="CV no disponible para descarga"
-            )
-        
-        # Retornar la URL del CV
-        return {
-            "download_url": cv_download_url,
-            "message": "CV disponible para descarga"
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        # Log el error pero no fallar el build
-        print(f"Error en /download: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="CV no disponible para descarga"
-        )
-
-
-@router.get("/templates")
-async def get_cv_templates(db: Session = Depends(get_db)):
-    """Obtener plantillas disponibles para CV"""
-    cv_service = CVService(db)
-    return {"templates": cv_service.get_cv_templates()}
-
-
-@router.get("/color-schemes")
-async def get_color_schemes(db: Session = Depends(get_db)):
-    """Obtener esquemas de colores disponibles"""
-    cv_service = CVService(db)
-    return {"color_schemes": cv_service.get_color_schemes()}
-
-
-@router.delete("/")
+@router.delete("/", response_model=CVDeleteResponse, tags=["CV - Admin"])
 async def delete_cv(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_admin_user)
 ):
-    """Eliminar CV (solo admin)"""
-    cv_service = CVService(db)
-    success = cv_service.delete_cv(current_user)
+    """
+    Delete the current CV (Admin only)
     
-    return {"message": "CV eliminado correctamente", "success": success}
+    Removes the CV from the database.
+    """
+    cv_service = CVService(db)
+    success = cv_service.delete_cv()
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No CV found to delete"
+        )
+    
+    return CVDeleteResponse(
+        message="CV deleted successfully",
+        success=True
+    )
+
+
+# ============================================================================
+# PUBLIC ENDPOINTS (No authentication required)
+# ============================================================================
+
+@router.get("/download", tags=["CV - Public"])
+async def download_cv(db: Session = Depends(get_db)):
+    """
+    Download CV (Public - No authentication required)
+    
+    This endpoint allows anyone to download the CV directly.
+    Returns the PDF file as a download response.
+    """
+    cv_service = CVService(db)
+    result = cv_service.get_cv_file_data()
+    
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="CV not available for download"
+        )
+    
+    file_data, filename = result
+    
+    return Response(
+        content=file_data,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(file_data))
+        }
+    )
+
+
+@router.get("/exists", tags=["CV - Public"])
+async def check_cv_exists(db: Session = Depends(get_db)):
+    """
+    Check if a CV exists (Public - No authentication required)
+    
+    Returns a simple boolean indicating whether a CV is available.
+    """
+    cv_service = CVService(db)
+    exists = cv_service.cv_exists()
+    
+    return {
+        "exists": exists,
+        "message": "CV is available" if exists else "No CV available"
+    }
+

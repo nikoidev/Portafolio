@@ -42,7 +42,6 @@ class User(BaseModel):
     
     # Relaciones
     projects = relationship("Project", back_populates="owner", cascade="all, delete-orphan")
-    cv_data = relationship("CV", back_populates="user", uselist=False, cascade="all, delete-orphan")
     
     @property
     def permissions(self):

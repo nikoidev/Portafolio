@@ -2,23 +2,15 @@
 
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
-import { ArrowDown, Construction, Download, Loader2 } from 'lucide-react';
+import { api } from '@/lib/api';
+import { ArrowDown, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 export function HeroSection() {
     const { content, isLoading, refresh } = useCMSContent('home', 'hero');
     const { socialLinks: globalSocialLinks } = useGlobalSettings();
-    const [showDevModal, setShowDevModal] = useState(false);
 
     // Contenido por defecto mientras carga o si no existe en DB
     const defaultContent = {
@@ -29,7 +21,7 @@ export function HeroSection() {
         primary_cta_text: 'Ver mis proyectos',
         primary_cta_link: '/projects',
         secondary_cta_text: 'Descargar CV',
-        secondary_cta_link: '/cv/download',
+        secondary_cta_link: '#', // Se manejará con onClick
         social_links: [
             {
                 text: 'GitHub',
@@ -111,7 +103,7 @@ export function HeroSection() {
                                 variant="outline"
                                 size="lg"
                                 className="text-lg px-8 py-6"
-                                onClick={() => setShowDevModal(true)}
+                                onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
                             >
                                 <Download className="w-5 h-5 mr-2" />
                                 {data.secondary_cta_text}
@@ -160,30 +152,6 @@ export function HeroSection() {
                     <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
                 </div>
             </section>
-
-            {/* Modal de desarrollo */}
-            <Dialog open={showDevModal} onOpenChange={setShowDevModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <div className="flex items-center justify-center mb-4">
-                            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                                <Construction className="w-8 h-8 text-yellow-600 dark:text-yellow-500" />
-                            </div>
-                        </div>
-                        <DialogTitle className="text-center text-2xl">EN DESARROLLO</DialogTitle>
-                        <DialogDescription className="text-center text-base pt-2">
-                            La función de descarga de CV está temporalmente deshabilitada.
-                            <br />
-                            Por favor, contacta directamente para solicitar el CV.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex justify-center mt-4">
-                        <Button onClick={() => setShowDevModal(false)}>
-                            Entendido
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </EditableSection>
     );
 }

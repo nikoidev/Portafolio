@@ -1,16 +1,18 @@
 /**
  * Cliente API para comunicación con el backend
  */
-import { Token } from '@/types/api';
+import { CV, Token } from '@/types/api';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 class ApiClient {
     private client: AxiosInstance;
     private token: string | null = null;
+    private baseURL: string;
 
     constructor() {
+        this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
         this.client = axios.create({
-            baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004',
+            baseURL: this.baseURL,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -153,44 +155,59 @@ class ApiClient {
         return this.get('/api/v1/projects/stats');
     }
 
-    // Métodos para CV
-    async getCV() {
-        return this.get('/api/v1/cv/');
+    // ========================================================================
+    // CV Methods
+    // ========================================================================
+
+    /**
+     * Get current CV (Admin only)
+     * Returns 404 if no CV exists
+     */
+    async getCV(): Promise<CV> {
+        return this.get<CV>('/api/v1/cv/');
     }
 
-    async getPublicCV() {
-        return this.get('/api/v1/cv/public');
-    }
+    /**
+     * Upload or replace CV (Admin only)
+     * If a CV already exists, it will be replaced
+     */
+    async uploadCV(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-    async getCVDownloadURL(): Promise<{ download_url: string; message: string }> {
-        return this.get<{ download_url: string; message: string }>('/api/v1/cv/download');
-    }
-
-    async createOrUpdateCV(data: any) {
-        return this.post('/api/v1/cv/', data);
-    }
-
-    async updateCV(data: any) {
-        return this.put('/api/v1/cv/', data);
-    }
-
-    async generateCVPDF(template = 'modern', colorScheme = 'blue') {
-        return this.post('/api/v1/cv/generate-pdf', {
-            template,
-            color_scheme: colorScheme,
+        return fetch(`${this.baseURL}/api/v1/cv/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.getToken()}`,
+            },
+            body: formData,
+        }).then(res => {
+            if (!res.ok) throw new Error('Failed to upload CV');
+            return res.json();
         });
     }
 
-    async getCVTemplates() {
-        return this.get('/api/v1/cv/templates');
-    }
-
-    async getCVColorSchemes() {
-        return this.get('/api/v1/cv/color-schemes');
-    }
-
+    /**
+     * Delete current CV (Admin only)
+     * Returns 404 if no CV exists
+     */
     async deleteCV() {
         return this.delete('/api/v1/cv/');
+    }
+
+    /**
+     * Download CV (Public - No authentication required)
+     * Returns the PDF file directly
+     */
+    getCVDownloadURL(): string {
+        return `${this.baseURL}/api/v1/cv/download`;
+    }
+
+    /**
+     * Check if a CV exists (Public - No authentication required)
+     */
+    async checkCVExists(): Promise<{ exists: boolean; message: string }> {
+        return this.get<{ exists: boolean; message: string }>('/api/v1/cv/exists');
     }
 
     // Método para crear super admin inicial

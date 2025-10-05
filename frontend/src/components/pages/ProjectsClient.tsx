@@ -45,7 +45,7 @@ export default function ProjectsClient() {
         button_primary_text: 'Contactar',
         button_primary_url: '/contact',
         button_secondary_text: 'Descargar CV',
-        button_secondary_url: '/cv/download'
+        button_secondary_url: '#' // Se manejará con onClick
     };
 
     const header = headerContent || defaultHeader;
@@ -331,10 +331,12 @@ export default function ProjectsClient() {
                                                 {cta.button_primary_text}
                                             </a>
                                         </Button>
-                                        <Button asChild variant="outline" size="lg">
-                                            <a href={cta.button_secondary_url} target="_blank">
-                                                {cta.button_secondary_text}
-                                            </a>
+                                        <Button
+                                            variant="outline"
+                                            size="lg"
+                                            onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
+                                        >
+                                            {cta.button_secondary_text}
                                         </Button>
                                     </div>
                                 </CardContent>
