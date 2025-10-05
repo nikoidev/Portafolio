@@ -12,41 +12,45 @@ import os
 from app.core.config import settings as config_settings
 from app.api.v1 import auth, projects, admin, cms, users, settings, cv
 
-# Crear instancia de FastAPI
+# Crear instancia de FastAPI con exception handlers desactivados por defecto
 app = FastAPI(
     title="Portfolio API",
     description="API para el portafolio personal con panel de administración",
     version="1.0.0",
     docs_url="/docs" if config_settings.DEBUG else None,
     redoc_url="/redoc" if config_settings.DEBUG else None,
+    # Disable default exception handlers to prevent binary data serialization
+    exception_handlers={},
 )
 
-# Exception handlers para evitar serialización de datos binarios
+# Custom exception handler para RequestValidationError
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
+async def custom_validation_exception_handler(request: Request, exc: RequestValidationError):
     """
-    Custom handler for validation errors to prevent binary data serialization
+    Custom handler for validation errors to prevent binary data serialization.
+    This replaces FastAPI's default handler that tries to serialize request body.
     """
-    # Extract error details without including the actual input data
-    errors = []
+    # Extract only safe error information without the input data
+    safe_errors = []
     for error in exc.errors():
-        error_detail = {
-            "loc": error["loc"],
-            "msg": error["msg"],
-            "type": error["type"],
+        # Only include location, message, and type - never the actual input
+        safe_error = {
+            "loc": error.get("loc", []),
+            "msg": error.get("msg", ""),
+            "type": error.get("type", ""),
         }
-        errors.append(error_detail)
+        safe_errors.append(safe_error)
     
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
-            "detail": errors,
-            "message": "Validation error. Please check your request."
+            "detail": safe_errors,
+            "message": "Validation error occurred"
         },
     )
 
 @app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     """
     Custom handler for HTTP exceptions
     """
@@ -55,6 +59,19 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         content={
             "detail": str(exc.detail),
             "status_code": exc.status_code
+        },
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """
+    Global exception handler to catch any unhandled exceptions
+    """
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "detail": "Internal server error",
+            "message": "An unexpected error occurred"
         },
     )
 
