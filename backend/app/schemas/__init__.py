@@ -9,7 +9,7 @@ from .project import (
     ProjectPublic, ProjectList, ProjectStats
 )
 from .cv import (
-    CVBase, CVCreate, CVUpdate, CVResponse, CVPublic, CVDeleteResponse
+    CVResponse, CVDeleteResponse
 )
 from .settings import (
     SocialLink, SettingsBase, SettingsCreate, SettingsUpdate,
@@ -30,7 +30,7 @@ __all__ = [
     "ProjectPublic", "ProjectList", "ProjectStats",
     
     # CV
-    "CVBase", "CVCreate", "CVUpdate", "CVResponse", "CVPublic", "CVDeleteResponse",
+    "CVResponse", "CVDeleteResponse",
     
     # Settings
     "SocialLink", "SettingsBase", "SettingsCreate", "SettingsUpdate",
