@@ -1,7 +1,7 @@
 /**
  * Cliente API para comunicación con el backend
  */
-import { Token, CV } from '@/types/api';
+import { CV, Token } from '@/types/api';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 class ApiClient {
@@ -174,7 +174,7 @@ class ApiClient {
     async uploadCV(file: File) {
         const formData = new FormData();
         formData.append('file', file);
-        
+
         return fetch(`${this.baseURL}/api/v1/cv/`, {
             method: 'POST',
             headers: {
