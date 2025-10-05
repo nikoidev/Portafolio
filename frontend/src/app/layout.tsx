@@ -1,6 +1,7 @@
 import { CreateSectionButton } from '@/components/cms/CreateSectionButton'
 import { EditModeToggle } from '@/components/cms/EditModeToggle'
 import { EditModeProvider } from '@/contexts/EditModeContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
@@ -56,16 +57,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang="es" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
-        <EditModeProvider>
-          <div className="min-h-screen bg-background text-foreground">
-            {children}
-          </div>
-          <EditModeToggle />
-          <CreateSectionButton />
-          <Toaster position="top-right" richColors />
-        </EditModeProvider>
+        <ThemeProvider>
+          <EditModeProvider>
+            <div className="min-h-screen bg-background text-foreground">
+              {children}
+            </div>
+            <EditModeToggle />
+            <CreateSectionButton />
+            <Toaster position="top-right" richColors />
+          </EditModeProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
