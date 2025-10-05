@@ -129,9 +129,13 @@ async def upload_cv(
         return CVResponse.model_validate(cv)
     
     except Exception as e:
+        # Log the actual error for debugging
+        import traceback
+        print(f"ERROR saving CV: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error saving CV. Please try again."
+            detail=f"Error saving CV: {str(e)}"
         )
 
 
