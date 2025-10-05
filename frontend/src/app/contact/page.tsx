@@ -5,10 +5,10 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Contacto',
-  description: '¿Tienes un proyecto en mente? ¿Quieres colaborar? Contacta conmigo a través del formulario o mis redes sociales. Respondo en 24-48 horas.',
+  description: '¿Tienes un proyecto en mente? Contacta conmigo directamente por email, LinkedIn o GitHub. Respondo en menos de 24 horas.',
   openGraph: {
     title: 'Contacto | Portfolio Personal',
-    description: '¿Tienes un proyecto en mente? ¿Quieres colaborar? Contacta conmigo y hablemos de tu próximo proyecto.',
+    description: 'Contacta conmigo directamente. Email, LinkedIn, GitHub y más canales de comunicación disponibles.',
   },
 };
 

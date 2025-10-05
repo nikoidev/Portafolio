@@ -3,39 +3,27 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Github, Linkedin, Loader2, Mail, MapPin, MessageSquare, Phone, Send } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Check, Copy, ExternalLink, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import * as z from 'zod';
-
-const contactFormSchema = z.object({
-    name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
-    email: z.string().email('Ingresa un email válido'),
-    subject: z.string().min(5, 'El asunto debe tener al menos 5 caracteres'),
-    message: z.string().min(10, 'El mensaje debe tener al menos 10 caracteres'),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactClient() {
-    // Configuración global
-    const { socialLinks: globalSocialLinks, contactEmail: globalEmail, contactPhone: globalPhone, contactLocation: globalLocation } = useGlobalSettings();
+    const [copiedEmail, setCopiedEmail] = useState(false);
+
+    // Global configuration
+    const { socialLinks: globalSocialLinks, contactEmail: globalEmail, contactPhone: globalPhone } = useGlobalSettings();
+
     // CMS Content
     const { content: headerContent, isLoading: headerLoading, refresh: refreshHeader } = useCMSContent('contact', 'header');
     const { content: contactInfoContent, isLoading: contactInfoLoading, refresh: refreshContactInfo } = useCMSContent('contact', 'contact_info');
     const { content: availabilityContent, isLoading: availabilityLoading, refresh: refreshAvailability } = useCMSContent('contact', 'availability');
-    const { content: callCtaContent, isLoading: callCtaLoading, refresh: refreshCallCta } = useCMSContent('contact', 'call_cta');
     const { content: faqContent, isLoading: faqLoading, refresh: refreshFaq } = useCMSContent('contact', 'faq');
 
     const defaultHeader = {
-        title: 'Contacto',
-        subtitle: '¿Tienes un proyecto en mente? ¿Quieres colaborar? Me encantaría escuchar de ti. Contacta conmigo y hablemos de tu próximo proyecto.',
+        title: '¿Tienes un proyecto en mente?',
+        subtitle: 'Me encantaría escuchar de ti. Contacta conmigo directamente a través de cualquiera de estos canales y hablemos de tu próximo proyecto.',
     };
 
     const defaultContactInfo = {
@@ -45,52 +33,35 @@ export default function ContactClient() {
                 label: 'Email',
                 value: 'tu@email.com',
                 href: 'mailto:tu@email.com',
-                description: 'Respondo en 24-48 horas'
-            },
-            {
-                icon: 'phone',
-                label: 'Teléfono',
-                value: '+34 XXX XXX XXX',
-                href: 'tel:+34XXXXXXXXX',
-                description: 'Lun - Vie, 9:00 - 18:00'
-            },
-            {
-                icon: 'map-pin',
-                label: 'Ubicación',
-                value: 'Madrid, España',
-                href: 'https://maps.google.com/?q=Madrid,Spain',
-                description: 'Disponible para trabajo remoto'
+                description: 'Respondo en menos de 24 horas',
+                primary: true
             },
             {
                 icon: 'linkedin',
                 label: 'LinkedIn',
-                value: 'linkedin.com/in/tu-perfil',
+                value: 'Conecta conmigo',
                 href: 'https://linkedin.com/in/tu-perfil',
-                description: 'Conecta conmigo profesionalmente'
+                description: 'Red profesional',
+                primary: true
             },
             {
                 icon: 'github',
                 label: 'GitHub',
-                value: 'github.com/tu-usuario',
+                value: 'Revisa mi código',
                 href: 'https://github.com/tu-usuario',
-                description: 'Revisa mi código y proyectos'
+                description: 'Proyectos y repositorios',
+                primary: true
             }
         ]
     };
 
     const defaultAvailability = {
         title: 'Disponibilidad',
-        status: 'Disponible',
+        status: 'Disponible para nuevos proyectos',
         status_color: 'green',
-        response_time: '24-48 horas',
-        work_mode: 'Remoto/Híbrido'
-    };
-
-    const defaultCallCta = {
-        title: '¿Prefieres una llamada?',
-        description: 'Si prefieres hablar directamente, podemos agendar una videollamada.',
-        button_text: 'Agendar llamada',
-        button_url: 'mailto:tu@email.com?subject=Solicitud de videollamada'
+        response_time: '24 horas',
+        work_mode: 'Remoto / Híbrido',
+        timezone: 'GMT+1 (Madrid)'
     };
 
     const defaultFaq = {
@@ -119,95 +90,75 @@ export default function ContactClient() {
     const contactInfoData = contactInfoContent ? {
         ...defaultContactInfo,
         ...contactInfoContent,
-        // Asegurar que contacts existe y es un array
         contacts: Array.isArray(contactInfoContent.contact_methods)
             ? contactInfoContent.contact_methods.map((method: any) => ({
-                icon: method.icon?.includes('simpleicons') ? 'mail' : 'mail', // Fallback icon
+                icon: method.icon?.includes('simpleicons') ? 'mail' : 'mail',
                 label: method.label || 'Contacto',
                 value: method.value || '',
                 href: method.link || '#',
-                description: method.description || ''
+                description: method.description || '',
+                primary: method.primary ?? true
             }))
             : (contactInfoContent.contacts || defaultContactInfo.contacts)
     } : defaultContactInfo;
 
-    // Integrar datos globales de contacto
+    // Integrate global contact data
     const useGlobalContactData = (contactInfoData as any).use_global_contact ?? true;
-    const contactInfoWithGlobals = {
-        ...contactInfoData,
-        contacts: useGlobalContactData && globalSocialLinks.length > 0
-            ? [
-                ...(globalEmail ? [{
-                    icon: 'mail',
-                    label: 'Email',
-                    value: globalEmail,
-                    href: `mailto:${globalEmail}`,
-                    description: 'Envíame un correo'
-                }] : []),
-                ...(globalPhone ? [{
-                    icon: 'phone',
-                    label: 'Teléfono',
-                    value: globalPhone,
-                    href: `tel:${globalPhone}`,
-                    description: 'Llámame'
-                }] : []),
-                ...globalSocialLinks.filter((l: any) => l.enabled).map((link: any) => ({
-                    icon: 'link',
-                    label: link.name,
-                    value: link.name,
-                    href: link.url,
-                    description: `Sígueme en ${link.name}`
-                }))
-            ]
-            : contactInfoData.contacts
-    };
+    const allContacts = useGlobalContactData && (globalEmail || globalSocialLinks.length > 0)
+        ? [
+            ...(globalEmail ? [{
+                icon: 'mail',
+                label: 'Email',
+                value: globalEmail,
+                href: `mailto:${globalEmail}`,
+                description: 'Respondo en menos de 24 horas',
+                primary: true
+            }] : []),
+            ...globalSocialLinks.filter((l: any) => l.enabled).map((link: any) => ({
+                icon: link.name.toLowerCase().includes('linkedin') ? 'linkedin' :
+                    link.name.toLowerCase().includes('github') ? 'github' : 'link',
+                label: link.name,
+                value: `Conecta en ${link.name}`,
+                href: link.url,
+                description: `Red ${link.name}`,
+                primary: true
+            })),
+            ...(globalPhone ? [{
+                icon: 'phone',
+                label: 'Teléfono',
+                value: globalPhone,
+                href: `tel:${globalPhone}`,
+                description: 'Lun - Vie, 9:00 - 18:00',
+                primary: false
+            }] : [])
+        ]
+        : contactInfoData.contacts;
+
     const availability = availabilityContent || defaultAvailability;
-    const callCta = callCtaContent || defaultCallCta;
     const faq = faqContent ? {
         ...defaultFaq,
         ...faqContent,
-        // Asegurar que faqs existe y es un array
         faqs: Array.isArray(faqContent.faqs) ? faqContent.faqs : defaultFaq.faqs
     } : defaultFaq;
 
-    // Mapeo de iconos
+    // Icon mapping
     const iconMap: Record<string, any> = {
         mail: Mail,
         phone: Phone,
         'map-pin': MapPin,
         linkedin: Linkedin,
         github: Github,
+        link: ExternalLink,
     };
 
-    const form = useForm<ContactFormValues>({
-        resolver: zodResolver(contactFormSchema),
-        defaultValues: {
-            name: '',
-            email: '',
-            subject: '',
-            message: '',
-        },
-    });
-
-    const onSubmit = async (data: ContactFormValues) => {
-        try {
-            // Aquí implementarías el envío del formulario
-            // Por ahora, solo mostramos un toast de éxito
-            console.log('Contact form data:', data);
-
-            toast.success('¡Mensaje enviado correctamente!', {
-                description: 'Te responderé en las próximas 24-48 horas.',
-            });
-
-            form.reset();
-        } catch (error) {
-            toast.error('Error al enviar el mensaje', {
-                description: 'Por favor, intenta nuevamente o contacta directamente por email.',
-            });
-        }
+    const handleCopyEmail = (email: string) => {
+        navigator.clipboard.writeText(email);
+        setCopiedEmail(true);
+        toast.success('Email copiado al portapapeles');
+        setTimeout(() => setCopiedEmail(false), 2000);
     };
 
-    const isLoadingData = headerLoading || contactInfoLoading || availabilityLoading || callCtaLoading || faqLoading;
+    const isLoadingData = headerLoading || contactInfoLoading || availabilityLoading || faqLoading;
 
     if (isLoadingData) {
         return (
@@ -222,200 +173,177 @@ export default function ContactClient() {
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
                 <EditableSection pageKey="contact" sectionKey="header" onContentUpdate={refreshHeader}>
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-16">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">
                             {header.title}
                         </h1>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                             {header.subtitle}
                         </p>
                     </div>
                 </EditableSection>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Formulario de contacto */}
-                    <div className="lg:col-span-2">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <MessageSquare className="w-5 h-5" />
-                                    Envíame un mensaje
-                                </CardTitle>
-                                <CardDescription>
-                                    Completa el formulario y te responderé lo antes posible
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <Form {...form}>
-                                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <FormField
-                                                control={form.control}
-                                                name="name"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Nombre completo</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Tu nombre" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="email"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Email</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="tu@email.com" type="email" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
+                {/* Main contact methods */}
+                <EditableSection pageKey="contact" sectionKey="contact_info" onContentUpdate={refreshContactInfo}>
+                    <div className="max-w-5xl mx-auto mb-12">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {allContacts.filter((c: any) => c.primary !== false).slice(0, 3).map((contact: any, index: number) => {
+                                const IconComponent = iconMap[contact.icon] || Mail;
+                                const isEmail = contact.icon === 'mail';
 
-                                        <FormField
-                                            control={form.control}
-                                            name="subject"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Asunto</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="¿De qué quieres hablar?" {...field} />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        Ej: Proyecto web, colaboración, consultoría, etc.
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
+                                return (
+                                    <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:scale-105 hover:border-primary/50">
+                                        <CardContent className="pt-8 pb-6 text-center">
+                                            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors mx-auto mb-4">
+                                                <IconComponent className="w-8 h-8 text-primary" />
+                                            </div>
+                                            <h3 className="font-semibold text-lg mb-2">{contact.label}</h3>
+                                            <p className="text-sm text-muted-foreground mb-4">{contact.description}</p>
+
+                                            {isEmail ? (
+                                                <div className="space-y-2">
+                                                    <Button
+                                                        asChild
+                                                        className="w-full"
+                                                        size="sm"
+                                                    >
+                                                        <a href={contact.href}>
+                                                            <Mail className="w-4 h-4 mr-2" />
+                                                            Enviar email
+                                                        </a>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full"
+                                                        size="sm"
+                                                        onClick={() => handleCopyEmail(contact.value)}
+                                                    >
+                                                        {copiedEmail ? (
+                                                            <>
+                                                                <Check className="w-4 h-4 mr-2" />
+                                                                ¡Copiado!
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Copy className="w-4 h-4 mr-2" />
+                                                                Copiar email
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                    <p className="text-xs text-muted-foreground mt-2">{contact.value}</p>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    asChild
+                                                    className="w-full"
+                                                    size="sm"
+                                                >
+                                                    <a
+                                                        href={contact.href}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <ExternalLink className="w-4 h-4 mr-2" />
+                                                        {contact.value}
+                                                    </a>
+                                                </Button>
                                             )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="message"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Mensaje</FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Cuéntame más detalles sobre tu proyecto o idea..."
-                                                            className="min-h-[120px]"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        Incluye todos los detalles que consideres relevantes
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <Button type="submit" className="w-full" size="lg">
-                                            <Send className="w-4 h-4 mr-2" />
-                                            Enviar mensaje
-                                        </Button>
-                                    </form>
-                                </Form>
-                            </CardContent>
-                        </Card>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
                     </div>
+                </EditableSection>
 
-                    {/* Información de contacto */}
-                    <div className="space-y-6">
-                        <EditableSection pageKey="contact" sectionKey="contact_info" onContentUpdate={refreshContactInfo}>
-                            <Card>
+                {/* Availability and additional contacts */}
+                <div className="max-w-5xl mx-auto mb-16">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Availability */}
+                        <EditableSection pageKey="contact" sectionKey="availability" onContentUpdate={refreshAvailability}>
+                            <Card className="h-full">
                                 <CardHeader>
-                                    <CardTitle>Información de contacto</CardTitle>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <div className={`w-3 h-3 rounded-full ${availability.status_color === 'green' ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`}></div>
+                                        {availability.title}
+                                    </CardTitle>
                                     <CardDescription>
-                                        Otras formas de ponerte en contacto conmigo
+                                        Estado actual y tiempos de respuesta
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {contactInfoWithGlobals.contacts.map((info: any, index: number) => {
-                                        const IconComponent = iconMap[info.icon] || Mail;
-                                        return (
-                                            <a
-                                                key={index}
-                                                href={info.href}
-                                                target={info.href.startsWith('http') ? '_blank' : undefined}
-                                                rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                                                className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
-                                            >
-                                                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                                    <IconComponent className="w-5 h-5 text-primary" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <h3 className="font-medium">{info.label}</h3>
-                                                    <p className="text-sm text-muted-foreground">{info.value}</p>
-                                                    <p className="text-xs text-muted-foreground mt-1">{info.description}</p>
-                                                </div>
-                                            </a>
-                                        );
-                                    })}
-                                </CardContent>
-                            </Card>
-                        </EditableSection>
-
-                        {/* Disponibilidad */}
-                        <EditableSection pageKey="contact" sectionKey="availability" onContentUpdate={refreshAvailability}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>{availability.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm">Estado actual:</span>
-                                        <span className={`text-sm font-medium text-${availability.status_color}-600 flex items-center gap-1`}>
-                                            <div className={`w-2 h-2 rounded-full bg-${availability.status_color}-600`}></div>
-                                            {availability.status}
-                                        </span>
+                                        <span className="text-sm text-muted-foreground">Estado:</span>
+                                        <span className="text-sm font-medium">{availability.status}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm">Tiempo de respuesta:</span>
+                                        <span className="text-sm text-muted-foreground">Respuesta:</span>
                                         <span className="text-sm font-medium">{availability.response_time}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm">Modalidad:</span>
+                                        <span className="text-sm text-muted-foreground">Modalidad:</span>
                                         <span className="text-sm font-medium">{availability.work_mode}</span>
                                     </div>
+                                    {availability.timezone && (
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-muted-foreground">Zona horaria:</span>
+                                            <span className="text-sm font-medium">{availability.timezone}</span>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </EditableSection>
 
-                        {/* Call to action */}
-                        <EditableSection pageKey="contact" sectionKey="call_cta" onContentUpdate={refreshCallCta}>
-                            <Card>
-                                <CardContent className="pt-6">
-                                    <h3 className="font-semibold mb-2">{callCta.title}</h3>
-                                    <p className="text-sm text-muted-foreground mb-4">
-                                        {callCta.description}
-                                    </p>
-                                    <Button asChild variant="outline" className="w-full">
-                                        <a href={callCta.button_url}>
-                                            {callCta.button_text}
+                        {/* Additional contacts */}
+                        <Card className="h-full">
+                            <CardHeader>
+                                <CardTitle>Otros canales</CardTitle>
+                                <CardDescription>
+                                    Más formas de conectar
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {allContacts.filter((c: any) => c.primary === false || allContacts.indexOf(c) >= 3).slice(0, 4).map((contact: any, index: number) => {
+                                    const IconComponent = iconMap[contact.icon] || ExternalLink;
+                                    return (
+                                        <a
+                                            key={index}
+                                            href={contact.href}
+                                            target={contact.href.startsWith('http') ? '_blank' : undefined}
+                                            rel={contact.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
+                                        >
+                                            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                                                <IconComponent className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h3 className="font-medium text-sm">{contact.label}</h3>
+                                                <p className="text-xs text-muted-foreground">{contact.description}</p>
+                                            </div>
+                                            <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                         </a>
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </EditableSection>
+                                    );
+                                })}
+                                {allContacts.filter((c: any) => c.primary === false || allContacts.indexOf(c) >= 3).length === 0 && (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <p className="text-sm">Los métodos principales están arriba 👆</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
 
                 {/* FAQ Section */}
                 <EditableSection pageKey="contact" sectionKey="faq" onContentUpdate={refreshFaq}>
-                    <div className="mt-16">
+                    <div className="max-w-5xl mx-auto">
                         <h2 className="text-3xl font-bold text-center mb-8">{faq.title}</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {faq.faqs.map((item: any, index: number) => (
-                                <Card key={index}>
+                                <Card key={index} className="hover:shadow-md transition-shadow">
                                     <CardContent className="pt-6">
-                                        <h3 className="font-semibold mb-2">{item.question}</h3>
-                                        <p className="text-sm text-muted-foreground">
+                                        <h3 className="font-semibold mb-3 text-primary">{item.question}</h3>
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
                                             {item.answer}
                                         </p>
                                     </CardContent>
@@ -428,4 +356,3 @@ export default function ContactClient() {
         </div>
     );
 }
-
