@@ -550,44 +550,27 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
             </Card>
 
             {/* Botones de Acción */}
-            <div className="flex items-center justify-between pt-6 border-t">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-6 border-t">
                 <Button
                     type="button"
                     variant="outline"
+                    size="lg"
                     onClick={handleReset}
                     disabled={isSubmitting || !onReset}
+                    className="w-full sm:w-auto"
                 >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Resetear a Predeterminados
                 </Button>
 
-                <Button type="submit" disabled={isSubmitting} size="lg">
-                    <Save className="w-4 h-4 mr-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Configuración'}
-                </Button>
-            </div>
-
-            {/* Botón flotante para guardar (siempre visible) */}
-            <div className="fixed bottom-8 right-8 z-50 flex gap-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    onClick={handleReset}
-                    disabled={isSubmitting || !onReset}
-                    className="shadow-lg"
-                >
-                    <RotateCcw className="w-5 h-5 mr-2" />
-                    Resetear
-                </Button>
                 <Button
                     type="submit"
                     disabled={isSubmitting}
                     size="lg"
-                    className="shadow-lg bg-primary hover:bg-primary/90"
+                    className="w-full sm:w-auto"
                 >
-                    <Save className="w-5 h-5 mr-2" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                    <Save className="w-4 h-4 mr-2" />
+                    {isSubmitting ? 'Guardando...' : 'Guardar Configuración'}
                 </Button>
             </div>
         </form>
