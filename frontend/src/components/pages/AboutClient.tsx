@@ -4,13 +4,6 @@ import { EditableSection } from '@/components/cms/EditableSection';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useCMSContent } from '@/hooks/useCMSContent';
@@ -22,7 +15,6 @@ import {
     Calendar,
     Code,
     Coffee,
-    Construction,
     Download,
     Loader2,
     Mail,
@@ -31,10 +23,8 @@ import {
     Users
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 
 export default function AboutClient() {
-    const [showDevModal, setShowDevModal] = useState(false);
     // Configuración global
     const { socialLinks: globalSocialLinks, contactEmail, contactPhone, contactLocation } = useGlobalSettings();
     // CMS Content
@@ -280,10 +270,12 @@ export default function AboutClient() {
                             </Button>
                             <Button
                                 variant="outline"
-                                onClick={() => setShowDevModal(true)}
+                                asChild
                             >
-                                <Download className="w-4 h-4 mr-2" />
-                                Descargar CV
+                                <a href="/cv/download" target="_blank" rel="noopener noreferrer">
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Descargar CV
+                                </a>
                             </Button>
                             {/* Social Links con íconos dinámicos */}
                             {hero.social_links && hero.social_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
@@ -590,30 +582,6 @@ export default function AboutClient() {
                     </div>
                 </EditableSection>
             </div>
-
-            {/* Modal de desarrollo */}
-            <Dialog open={showDevModal} onOpenChange={setShowDevModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <div className="flex items-center justify-center mb-4">
-                            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                                <Construction className="w-8 h-8 text-yellow-600 dark:text-yellow-500" />
-                            </div>
-                        </div>
-                        <DialogTitle className="text-center text-2xl">EN DESARROLLO</DialogTitle>
-                        <DialogDescription className="text-center text-base pt-2">
-                            La función de descarga de CV está temporalmente deshabilitada.
-                            <br />
-                            Por favor, contacta directamente para solicitar el CV.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex justify-center mt-4">
-                        <Button onClick={() => setShowDevModal(false)}>
-                            Entendido
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </div>
     );
 }

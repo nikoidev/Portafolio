@@ -1,16 +1,18 @@
 /**
  * Cliente API para comunicación con el backend
  */
-import { Token } from '@/types/api';
+import { Token, CV } from '@/types/api';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 class ApiClient {
     private client: AxiosInstance;
     private token: string | null = null;
+    private baseURL: string;
 
     constructor() {
+        this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
         this.client = axios.create({
-            baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004',
+            baseURL: this.baseURL,
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -161,24 +163,28 @@ class ApiClient {
      * Get current CV (Admin only)
      * Returns 404 if no CV exists
      */
-    async getCV() {
-        return this.get('/api/v1/cv/');
+    async getCV(): Promise<CV> {
+        return this.get<CV>('/api/v1/cv/');
     }
 
     /**
-     * Create or replace CV (Admin only)
+     * Upload or replace CV (Admin only)
      * If a CV already exists, it will be replaced
      */
-    async createOrUpdateCV(data: { file_url: string }) {
-        return this.post('/api/v1/cv/', data);
-    }
-
-    /**
-     * Update existing CV (Admin only)
-     * Returns 404 if no CV exists
-     */
-    async updateCV(data: { file_url: string }) {
-        return this.put('/api/v1/cv/', data);
+    async uploadCV(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        return fetch(`${this.baseURL}/api/v1/cv/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${this.getToken()}`,
+            },
+            body: formData,
+        }).then(res => {
+            if (!res.ok) throw new Error('Failed to upload CV');
+            return res.json();
+        });
     }
 
     /**
@@ -190,11 +196,11 @@ class ApiClient {
     }
 
     /**
-     * Get CV download URL (Public - No authentication required)
-     * Returns 404 if no CV is available
+     * Download CV (Public - No authentication required)
+     * Returns the PDF file directly
      */
-    async getCVDownloadURL(): Promise<{ download_url: string; message: string }> {
-        return this.get<{ download_url: string; message: string }>('/api/v1/cv/download');
+    getCVDownloadURL(): string {
+        return `${this.baseURL}/api/v1/cv/download`;
     }
 
     /**

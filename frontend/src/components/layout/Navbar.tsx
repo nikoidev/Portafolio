@@ -2,18 +2,11 @@
 
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { cn } from '@/lib/utils';
-import { Construction, Download, LogIn, Menu } from 'lucide-react';
+import { Download, LogIn, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -21,7 +14,6 @@ import { useState } from 'react';
 export function Navbar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
-    const [showDevModal, setShowDevModal] = useState(false);
 
     // Cargar contenido desde CMS
     const { content, isLoading, refresh } = useCMSContent('navbar', 'main');
@@ -166,10 +158,12 @@ export function Navbar() {
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => setShowDevModal(true)}
+                                    asChild
                                 >
-                                    <Download className="mr-2 h-4 w-4" />
-                                    {navData.cv_button.text}
+                                    <a href={navData.cv_button.url} target="_blank" rel="noopener noreferrer">
+                                        <Download className="mr-2 h-4 w-4" />
+                                        {navData.cv_button.text}
+                                    </a>
                                 </Button>
                             )}
 
@@ -252,13 +246,17 @@ export function Navbar() {
                                             <Button
                                                 className="w-full"
                                                 variant="outline"
-                                                onClick={() => {
-                                                    setIsOpen(false);
-                                                    setShowDevModal(true);
-                                                }}
+                                                asChild
                                             >
-                                                <Download className="mr-2 h-4 w-4" />
-                                                {navData.cv_button.text}
+                                                <a 
+                                                    href={navData.cv_button.url} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    onClick={() => setIsOpen(false)}
+                                                >
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    {navData.cv_button.text}
+                                                </a>
                                             </Button>
                                         )}
 
@@ -300,30 +298,6 @@ export function Navbar() {
                     </div>
                 </div>
             </nav>
-
-            {/* Modal de desarrollo */}
-            <Dialog open={showDevModal} onOpenChange={setShowDevModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <div className="flex items-center justify-center mb-4">
-                            <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/20">
-                                <Construction className="w-8 h-8 text-yellow-600 dark:text-yellow-500" />
-                            </div>
-                        </div>
-                        <DialogTitle className="text-center text-2xl">EN DESARROLLO</DialogTitle>
-                        <DialogDescription className="text-center text-base pt-2">
-                            La función de descarga de CV está temporalmente deshabilitada.
-                            <br />
-                            Por favor, contacta directamente para solicitar el CV.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="flex justify-center mt-4">
-                        <Button onClick={() => setShowDevModal(false)}>
-                            Entendido
-                        </Button>
-                    </div>
-                </DialogContent>
-            </Dialog>
         </EditableSection>
     );
 }
