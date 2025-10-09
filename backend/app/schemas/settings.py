@@ -10,7 +10,8 @@ class SocialLink(BaseModel):
     """Esquema para link social"""
     name: str = Field(..., min_length=1, max_length=50)
     url: str = Field(..., min_length=1)
-    icon: str = Field(..., min_length=1)  # URL del icono
+    icon: str = Field(..., min_length=1)  # URL del icono o path del archivo
+    icon_type: str = Field("url", pattern="^(url|upload)$")  # Tipo de icono: url o upload
     enabled: bool = True
 
 
@@ -146,6 +147,7 @@ class SettingsPublic(BaseSchema):
     # SEO (solo info pública)
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
+    google_analytics_id: Optional[str] = None
     
     # Apariencia
     theme_mode: str

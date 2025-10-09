@@ -4,13 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { settingsApi } from '@/lib/settings-api';
 import { Settings, SettingsUpdate, SocialLink } from '@/types/settings';
 import {
     Bell,
     Globe,
+    Image as ImageIcon,
+    Link as LinkIcon,
     Mail,
     Newspaper,
     Plus,
@@ -19,9 +23,10 @@ import {
     Search,
     Share2,
     Trash2,
-    TrendingUp
+    TrendingUp,
+    Upload
 } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -33,7 +38,15 @@ interface SettingsFormProps {
 
 export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [socialLinks, setSocialLinks] = useState<SocialLink[]>(settings.social_links || []);
+    // Ensure all social links have icon_type field
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>(
+        (settings.social_links || []).map(link => ({
+            ...link,
+            icon_type: link.icon_type || 'url'
+        }))
+    );
+    const [uploadingIcon, setUploadingIcon] = useState<number | null>(null);
+    const fileInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
     const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<SettingsUpdate>({
         defaultValues: {
@@ -86,7 +99,7 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
     };
 
     const addSocialLink = () => {
-        setSocialLinks([...socialLinks, { name: '', url: '', icon: '', enabled: true }]);
+        setSocialLinks([...socialLinks, { name: '', url: '', icon: '', icon_type: 'url', enabled: true }]);
     };
 
     const removeSocialLink = (index: number) => {
@@ -97,6 +110,47 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
         const updated = [...socialLinks];
         updated[index] = { ...updated[index], [field]: value };
         setSocialLinks(updated);
+    };
+
+    const handleIconUpload = async (index: number, file: File) => {
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Tipo de archivo no válido. Use SVG, PNG, JPG, GIF o WEBP');
+            return;
+        }
+
+        // Validate file size (2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('El archivo es demasiado grande. Máximo 2MB');
+            return;
+        }
+
+        try {
+            setUploadingIcon(index);
+            const result = await settingsApi.uploadSocialIcon(file);
+
+            // Update the social link with the uploaded icon path
+            const updated = [...socialLinks];
+            updated[index] = {
+                ...updated[index],
+                icon: result.icon_path,
+                icon_type: 'upload'
+            };
+            setSocialLinks(updated);
+
+            toast.success('Ícono subido correctamente');
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || 'Error al subir el ícono');
+        } finally {
+            setUploadingIcon(null);
+        }
+    };
+
+    const triggerFileInput = (index: number) => {
+        fileInputRefs.current[index]?.click();
     };
 
     return (
@@ -264,7 +318,7 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
                                         </Button>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Input
                                         placeholder="Nombre (ej: GitHub)"
                                         value={link.name}
@@ -275,11 +329,94 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
                                         value={link.url}
                                         onChange={(e) => updateSocialLink(index, 'url', e.target.value)}
                                     />
-                                    <Input
-                                        placeholder="Icono (URL o clase)"
-                                        value={link.icon}
-                                        onChange={(e) => updateSocialLink(index, 'icon', e.target.value)}
-                                    />
+                                </div>
+
+                                {/* Icon Type Selection */}
+                                <div className="space-y-3">
+                                    <Label>Tipo de ícono</Label>
+                                    <RadioGroup
+                                        value={link.icon_type || 'url'}
+                                        onValueChange={(value) => updateSocialLink(index, 'icon_type', value as 'url' | 'upload')}
+                                        className="flex gap-4"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="url" id={`icon_type_url_${index}`} />
+                                            <Label htmlFor={`icon_type_url_${index}`} className="flex items-center gap-2 cursor-pointer">
+                                                <LinkIcon className="w-4 h-4" />
+                                                URL del ícono
+                                            </Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="upload" id={`icon_type_upload_${index}`} />
+                                            <Label htmlFor={`icon_type_upload_${index}`} className="flex items-center gap-2 cursor-pointer">
+                                                <ImageIcon className="w-4 h-4" />
+                                                Subir ícono
+                                            </Label>
+                                        </div>
+                                    </RadioGroup>
+
+                                    {link.icon_type === 'url' ? (
+                                        <Input
+                                            placeholder="URL del ícono (ej: https://simpleicons.org/icons/github.svg)"
+                                            value={link.icon}
+                                            onChange={(e) => updateSocialLink(index, 'icon', e.target.value)}
+                                        />
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <input
+                                                ref={(el) => {
+                                                    fileInputRefs.current[index] = el;
+                                                }}
+                                                type="file"
+                                                accept=".svg,.png,.jpg,.jpeg,.gif,.webp"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleIconUpload(index, file);
+                                                }}
+                                            />
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => triggerFileInput(index)}
+                                                    disabled={uploadingIcon === index}
+                                                >
+                                                    {uploadingIcon === index ? (
+                                                        <>Subiendo...</>
+                                                    ) : (
+                                                        <>
+                                                            <Upload className="w-4 h-4 mr-2" />
+                                                            Subir ícono
+                                                        </>
+                                                    )}
+                                                </Button>
+                                                {link.icon && link.icon_type === 'upload' && (
+                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                        <ImageIcon className="w-4 h-4" />
+                                                        {link.icon.split('/').pop()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {link.icon && link.icon_type === 'upload' && (
+                                                <div className="p-2 border rounded-lg bg-muted/30">
+                                                    <img
+                                                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${link.icon}`}
+                                                        alt={link.name}
+                                                        className="w-8 h-8 object-contain"
+                                                        onError={(e) => {
+                                                            const target = e.target as HTMLImageElement;
+                                                            target.style.display = 'none';
+                                                        }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <p className="text-xs text-muted-foreground">
+                                                Formatos: SVG, PNG, JPG, GIF, WEBP (máx. 2MB)
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))

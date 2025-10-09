@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCMSContent } from '@/hooks/useCMSContent';
+import { trackCVDownload } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import { Project } from '@/types/api';
 import { ArrowUpDown, Filter, Grid, List, Loader2, Search } from 'lucide-react';
@@ -334,7 +335,10 @@ export default function ProjectsClient() {
                                         <Button
                                             variant="secondary"
                                             size="lg"
-                                            onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
+                                            onClick={() => {
+                                                trackCVDownload();
+                                                window.open(api.getCVDownloadURL(), '_blank');
+                                            }}
                                         >
                                             {(cta as any).button_secondary_text || 'Descargar CV'}
                                         </Button>

@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { trackCVDownload } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import {
     Award,
@@ -272,6 +273,7 @@ export default function AboutClient() {
                             <Button
                                 variant="outline"
                                 onClick={() => {
+                                    trackCVDownload();
                                     const downloadUrl = api.getCVDownloadURL();
                                     window.open(downloadUrl, '_blank');
                                 }}

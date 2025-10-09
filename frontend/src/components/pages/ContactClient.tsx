@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { trackContactAttempt, trackEmailCopy, trackSocialClick } from '@/lib/analytics';
 import { Check, Copy, ExternalLink, Github, Linkedin, Loader2, Mail, MapPin, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -114,15 +115,22 @@ export default function ContactClient() {
                 description: 'Respondo en menos de 24 horas',
                 primary: true
             }] : []),
-            ...globalSocialLinks.filter((l: any) => l.enabled).map((link: any) => ({
-                icon: link.name.toLowerCase().includes('linkedin') ? 'linkedin' :
-                    link.name.toLowerCase().includes('github') ? 'github' : 'link',
-                label: link.name,
-                value: `Conecta en ${link.name}`,
-                href: link.url,
-                description: `Red ${link.name}`,
-                primary: true
-            })),
+            ...globalSocialLinks.filter((l: any) => l.enabled).map((link: any) => {
+                const iconType = link.icon_type || 'url';
+                const isUpload = iconType === 'upload';
+
+                return {
+                    icon: isUpload ? 'custom' :
+                        (link.name.toLowerCase().includes('linkedin') ? 'linkedin' :
+                            link.name.toLowerCase().includes('github') ? 'github' : 'link'),
+                    customIconUrl: isUpload ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${link.icon}` : link.icon,
+                    label: link.name,
+                    value: `Conecta en ${link.name}`,
+                    href: link.url,
+                    description: `Red ${link.name}`,
+                    primary: true
+                };
+            }),
             ...(globalPhone ? [{
                 icon: 'phone',
                 label: 'Teléfono',
@@ -154,6 +162,7 @@ export default function ContactClient() {
     const handleCopyEmail = (email: string) => {
         navigator.clipboard.writeText(email);
         setCopiedEmail(true);
+        trackEmailCopy(email);
         toast.success('Email copiado al portapapeles');
         setTimeout(() => setCopiedEmail(false), 2000);
     };
@@ -195,7 +204,15 @@ export default function ContactClient() {
                                     <Card key={index} className="group hover:shadow-lg transition-all duration-300 hover:scale-105 hover:border-primary/50">
                                         <CardContent className="pt-8 pb-6 text-center">
                                             <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors mx-auto mb-4">
-                                                <IconComponent className="w-8 h-8 text-primary" />
+                                                {contact.icon === 'custom' && contact.customIconUrl ? (
+                                                    <img
+                                                        src={contact.customIconUrl}
+                                                        alt={contact.label}
+                                                        className="w-8 h-8 object-contain"
+                                                    />
+                                                ) : (
+                                                    <IconComponent className="w-8 h-8 text-primary" />
+                                                )}
                                             </div>
                                             <h3 className="font-semibold text-lg mb-2">{contact.label}</h3>
                                             <p className="text-sm text-muted-foreground mb-4">{contact.description}</p>
@@ -207,7 +224,7 @@ export default function ContactClient() {
                                                         className="w-full"
                                                         size="sm"
                                                     >
-                                                        <a href={contact.href}>
+                                                        <a href={contact.href} onClick={() => trackContactAttempt('email')}>
                                                             <Mail className="w-4 h-4 mr-2" />
                                                             Enviar email
                                                         </a>
@@ -242,6 +259,15 @@ export default function ContactClient() {
                                                         href={contact.href}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
+                                                        onClick={() => {
+                                                            const method = contact.icon === 'linkedin' ? 'linkedin' :
+                                                                contact.icon === 'github' ? 'github' :
+                                                                    contact.icon === 'phone' ? 'phone' : 'other';
+                                                            trackContactAttempt(method);
+                                                            if (contact.label) {
+                                                                trackSocialClick(contact.label, contact.href);
+                                                            }
+                                                        }}
                                                     >
                                                         <ExternalLink className="w-4 h-4 mr-2" />
                                                         {contact.value}
@@ -314,7 +340,15 @@ export default function ContactClient() {
                                             className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                                         >
                                             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                                <IconComponent className="w-4 h-4 text-primary" />
+                                                {contact.icon === 'custom' && contact.customIconUrl ? (
+                                                    <img
+                                                        src={contact.customIconUrl}
+                                                        alt={contact.label}
+                                                        className="w-4 h-4 object-contain"
+                                                    />
+                                                ) : (
+                                                    <IconComponent className="w-4 h-4 text-primary" />
+                                                )}
                                             </div>
                                             <div className="flex-1">
                                                 <h3 className="font-medium text-sm">{contact.label}</h3>

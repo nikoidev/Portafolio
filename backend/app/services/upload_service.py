@@ -16,6 +16,7 @@ class UploadService:
     def __init__(self):
         self.upload_dir = Path(settings.UPLOAD_DIR)
         self.projects_dir = self.upload_dir / "projects"
+        self.icons_dir = self.upload_dir / "icons"
     
     def delete_project_folder(self, project_id: int) -> bool:
         """
@@ -66,4 +67,38 @@ class UploadService:
         project_folder = self.get_project_folder(project_id)
         project_folder.mkdir(parents=True, exist_ok=True)
         return project_folder
+    
+    def ensure_icons_folder(self) -> Path:
+        """
+        Ensure icons folder exists, create if not
+        
+        Returns:
+            Path object to the icons folder
+        """
+        self.icons_dir.mkdir(parents=True, exist_ok=True)
+        return self.icons_dir
+    
+    def delete_icon(self, icon_path: str) -> bool:
+        """
+        Delete an icon file
+        
+        Args:
+            icon_path: Relative path to the icon file (e.g., 'icons/github.svg')
+            
+        Returns:
+            True if file was deleted, False if file doesn't exist
+        """
+        full_path = self.upload_dir / icon_path
+        
+        if not full_path.exists():
+            logger.info(f"Icon file not found: {full_path}")
+            return False
+        
+        try:
+            full_path.unlink()
+            logger.info(f"Deleted icon file: {full_path}")
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting icon file {full_path}: {str(e)}")
+            return False
 
