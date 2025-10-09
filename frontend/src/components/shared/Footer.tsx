@@ -3,6 +3,7 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { trackCVDownload } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -90,6 +91,7 @@ export function Footer() {
                                             key={index}
                                             onClick={(e) => {
                                                 e.preventDefault();
+                                                trackCVDownload();
                                                 window.open(api.getCVDownloadURL(), '_blank');
                                             }}
                                             className="text-sm text-muted-foreground hover:text-primary transition-colors text-left cursor-pointer"

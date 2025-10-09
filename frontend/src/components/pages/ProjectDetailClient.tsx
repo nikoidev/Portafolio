@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { trackProjectView } from '@/lib/analytics';
 import { api, getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
 import { ArrowLeft, Calendar, Eye, Share2 } from 'lucide-react';
@@ -26,6 +27,11 @@ export default function ProjectDetailClient() {
                 setIsLoading(true);
                 const data = await api.getProject(params.slug as string) as any;
                 setProject(data);
+
+                // Track project view
+                if (data && data.id && data.title) {
+                    trackProjectView(data.id, data.title);
+                }
             } catch (error: any) {
                 toast.error('Proyecto no encontrado');
                 router.push('/projects');

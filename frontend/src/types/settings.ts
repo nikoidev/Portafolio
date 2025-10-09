@@ -10,6 +10,7 @@ export interface SocialLink {
     name: string;
     url: string;
     icon: string;
+    icon_type: 'url' | 'upload';
     enabled: boolean;
 }
 
@@ -181,6 +182,7 @@ export interface SettingsPublic {
     // SEO (solo info pública)
     seo_title?: string;
     seo_description?: string;
+    google_analytics_id?: string;
 
     // Apariencia
     theme_mode: 'light' | 'dark' | 'auto';

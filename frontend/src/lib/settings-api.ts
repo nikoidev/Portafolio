@@ -47,5 +47,32 @@ export const settingsApi = {
     deleteSettings: async (): Promise<{ message: string }> => {
         return await api.delete<{ message: string }>('/api/v1/settings/');
     },
+
+    /**
+     * Upload social media icon
+     */
+    uploadSocialIcon: async (file: File): Promise<{ success: boolean; icon_path: string; filename: string }> => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        return await api.post<{ success: boolean; icon_path: string; filename: string }>(
+            '/api/v1/settings/upload-social-icon',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        );
+    },
+
+    /**
+     * Delete social media icon
+     */
+    deleteSocialIcon: async (iconPath: string): Promise<{ success: boolean; message: string }> => {
+        return await api.delete<{ success: boolean; message: string }>(
+            `/api/v1/settings/delete-social-icon?icon_path=${encodeURIComponent(iconPath)}`
+        );
+    },
 };
 

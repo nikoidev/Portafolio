@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
+import { trackCVDownload } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { Download, LogIn, Menu } from 'lucide-react';
@@ -255,6 +256,7 @@ export function Navbar() {
                                                 className="w-full"
                                                 variant="outline"
                                                 onClick={() => {
+                                                    trackCVDownload();
                                                     window.open(api.getCVDownloadURL(), '_blank');
                                                     setIsOpen(false);
                                                 }}
