@@ -2,7 +2,7 @@ import { api } from '@/lib/api'
 import { MetadataRoute } from 'next'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://tu-dominio.com'
+    const baseUrl = 'https://www.nikoidev.com'
 
     // Páginas estáticas
     const staticPages = [

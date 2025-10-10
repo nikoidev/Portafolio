@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_ES',
-    url: 'https://tu-dominio.com',
+    url: 'https://www.nikoidev.com',
     title: 'Portfolio Personal - Desarrollador Full Stack',
     description: 'Portafolio profesional de desarrollador Full Stack especializado en React, Next.js, Node.js y Python.',
     siteName: 'Portfolio Personal',
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Portfolio Personal - Desarrollador Full Stack',
     description: 'Portafolio profesional de desarrollador Full Stack especializado en React, Next.js, Node.js y Python.',
-    creator: '@tu_usuario',
+    creator: '@nikoidev',
   },
   robots: {
     index: true,
