@@ -123,7 +123,7 @@ export default function ProjectDetailClient() {
                         {/* Header del proyecto */}
                         <div>
                             <h1 className="text-3xl md:text-4xl font-bold mb-4">{project.title}</h1>
-                            <p className="text-xl text-muted-foreground mb-6">{project.description}</p>
+                            <p className="text-xl text-muted-foreground mb-6 whitespace-pre-wrap">{project.description}</p>
 
                             <div className="flex flex-wrap items-center gap-4 mb-6">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -215,7 +215,7 @@ export default function ProjectDetailClient() {
                         )}
 
                         {/* Descripción detallada */}
-                        {((project as any).longDescription || (project as any).long_description) && (
+                        {((project as any).content || (project as any).longDescription || (project as any).long_description) && (
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Descripción detallada</CardTitle>
@@ -223,7 +223,7 @@ export default function ProjectDetailClient() {
                                 <CardContent>
                                     <div className="prose prose-sm max-w-none">
                                         <p className="text-muted-foreground whitespace-pre-wrap">
-                                            {(project as any).longDescription || (project as any).long_description}
+                                            {(project as any).content || (project as any).longDescription || (project as any).long_description}
                                         </p>
                                     </div>
                                 </CardContent>
