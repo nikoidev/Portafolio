@@ -12,11 +12,13 @@ interface AuthState {
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
+    isValidating: boolean;
 
     // Actions
     login: (email: string, password: string) => Promise<boolean>;
     logout: () => void;
     getCurrentUser: () => Promise<void>;
+    validateSession: () => Promise<void>;
     clearError: () => void;
     setLoading: (loading: boolean) => void;
     isSuperAdmin: () => boolean;
@@ -30,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
             isLoading: false,
             error: null,
+            isValidating: false,
 
             login: async (email: string, password: string) => {
                 set({ isLoading: true, error: null });
@@ -89,6 +92,31 @@ export const useAuthStore = create<AuthState>()(
                     // Si falla, limpiar la sesión
                     get().logout();
                     set({ isLoading: false });
+                }
+            },
+
+            validateSession: async () => {
+                const state = get();
+
+                // Si no hay token o ya está validando, no hacer nada
+                if (!state.token || state.isValidating) return;
+
+                set({ isValidating: true });
+
+                try {
+                    // Intentar obtener el usuario actual (esto valida el token)
+                    const userData: User = await api.getCurrentUser() as any;
+                    set({
+                        user: userData,
+                        isAuthenticated: true,
+                        isValidating: false,
+                        error: null,
+                    });
+                } catch (error: any) {
+                    // Token expirado o inválido: limpiar sesión silenciosamente
+                    console.log('Sesión expirada, cerrando automáticamente...');
+                    get().logout();
+                    set({ isValidating: false });
                 }
             },
 

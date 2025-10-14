@@ -8,7 +8,7 @@ import { Edit, Eye } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function EditModeToggle() {
-    const { isAuthenticated } = useAuthStore();
+    const { isAuthenticated, isValidating, token } = useAuthStore();
     const { isEditMode, toggleEditMode } = useEditMode();
     const { hasPermission } = usePermissions();
     const pathname = usePathname();
@@ -28,7 +28,8 @@ export function EditModeToggle() {
     // No mostrar si no está autenticado, está en página excluida, o no tiene permiso para editar contenido
     const canEditContent = hasPermission('update_content');
 
-    if (!isAuthenticated || isExcludedPage || !canEditContent) {
+    // No mostrar mientras está validando la sesión para evitar parpadeos
+    if (isValidating || !isAuthenticated || !token || isExcludedPage || !canEditContent) {
         return null;
     }
 

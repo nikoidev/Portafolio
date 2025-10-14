@@ -1,4 +1,5 @@
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
+import { SessionValidator } from '@/components/auth/SessionValidator'
 import { CreateSectionButton } from '@/components/cms/CreateSectionButton'
 import { EditModeToggle } from '@/components/cms/EditModeToggle'
 import { EditModeProvider } from '@/contexts/EditModeContext'
@@ -77,6 +78,7 @@ export default function RootLayout({
           }}
         />
         <AnalyticsProvider />
+        <SessionValidator />
         <ThemeProvider>
           <EditModeProvider>
             <div className="min-h-screen bg-background text-foreground">
