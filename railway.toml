@@ -7,3 +7,8 @@ startCommand = "cd backend && alembic upgrade head && uvicorn app.main:app --hos
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
+# Persistent storage for uploads
+[[deploy.volumes]]
+name = "uploads"
+mountPath = "/app/backend/uploads"
+
