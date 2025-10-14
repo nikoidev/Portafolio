@@ -1,6 +1,8 @@
 'use client';
 
 import { EditableSection } from '@/components/cms/EditableSection';
+import { FeaturedProjects } from '@/components/public/FeaturedProjects';
+import { HeroSection } from '@/components/public/HeroSection';
 import { RoadmapSection } from '@/components/public/RoadmapSection';
 import { cmsApi } from '@/lib/cms-api';
 import { useEffect, useState } from 'react';
@@ -31,13 +33,10 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
     const loadSections = async () => {
         try {
             const allSections = await cmsApi.getPageSections(pageKey, true); // true = only active
-            // Filtrar solo secciones dinámicas (excluyendo hero y featured_projects que son estáticas)
-            const dynamicSections = allSections.filter((section: CMSSection) =>
-                !['hero', 'featured_projects'].includes(section.section_key)
-            );
+            // Incluir TODAS las secciones, incluyendo hero y featured_projects
             // Ordenar por order_index
-            dynamicSections.sort((a: CMSSection, b: CMSSection) => a.order_index - b.order_index);
-            setSections(dynamicSections);
+            allSections.sort((a: CMSSection, b: CMSSection) => a.order_index - b.order_index);
+            setSections(allSections);
         } catch (error) {
             console.error('Error loading dynamic sections:', error);
         } finally {
@@ -48,7 +47,17 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
     const renderSection = (section: CMSSection) => {
         const templateId = section.content?.template_id || section.template_id;
 
+        // Detectar secciones especiales por section_key si no tienen template_id
+        if (section.section_key === 'hero' || templateId === 'hero') {
+            return <HeroSection />;
+        }
+
+        if (section.section_key === 'featured_projects' || templateId === 'featured_projects') {
+            return <FeaturedProjects />;
+        }
+
         switch (templateId) {
+
             case 'roadmap':
                 return (
                     <RoadmapSection
