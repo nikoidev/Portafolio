@@ -149,6 +149,7 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
                     onDeleted={loadSections}
                     canMoveUp={index > 0}
                     canMoveDown={index < sections.length - 1}
+                    styles={(section as any).styles || {}}
                 >
                     {renderSection(section)}
                 </EditableSection>

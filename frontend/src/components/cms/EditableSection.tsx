@@ -28,6 +28,7 @@ interface EditableSectionProps {
     showActions?: boolean; // Para ocultar acciones si es necesario
     canMoveUp?: boolean; // Si se puede mover hacia arriba
     canMoveDown?: boolean; // Si se puede mover hacia abajo
+    styles?: Record<string, any>; // Estilos personalizados de la sección
 }
 
 export function EditableSection({
@@ -40,6 +41,7 @@ export function EditableSection({
     showActions = true,
     canMoveUp = true,
     canMoveDown = true,
+    styles = {},
 }: EditableSectionProps) {
     const { isEditMode } = useEditMode();
     const { hasPermission } = usePermissions();
@@ -126,10 +128,71 @@ export function EditableSection({
         }
     };
 
+    // Generar estilos CSS dinámicos
+    const generateStyles = (): React.CSSProperties => {
+        const cssStyles: React.CSSProperties = {};
+
+        if (styles.minHeight && styles.minHeight !== 'auto') {
+            cssStyles.minHeight = styles.minHeight;
+        }
+
+        if (styles.maxHeight && styles.maxHeight !== 'none') {
+            cssStyles.maxHeight = styles.maxHeight;
+        }
+
+        if (styles.padding) {
+            const p = styles.padding;
+            cssStyles.padding = `${p.top || '0'} ${p.right || '0'} ${p.bottom || '0'} ${p.left || '0'}`;
+        }
+
+        if (styles.margin) {
+            const m = styles.margin;
+            cssStyles.marginTop = m.top || '0';
+            cssStyles.marginBottom = m.bottom || '0';
+        }
+
+        if (styles.background && styles.background !== 'transparent') {
+            cssStyles.background = styles.background;
+        }
+
+        return cssStyles;
+    };
+
+    // Generar clases de ancho
+    const getWidthClass = () => {
+        switch (styles.width) {
+            case 'container':
+                return 'container mx-auto max-w-7xl';
+            case 'narrow':
+                return 'container mx-auto max-w-3xl';
+            case 'wide':
+                return 'container mx-auto max-w-screen-2xl';
+            case 'custom':
+                return '';
+            case 'full':
+            default:
+                return 'w-full';
+        }
+    };
+
+    const customWidthStyle = styles.width === 'custom' && styles.customWidth
+        ? { width: styles.customWidth, maxWidth: styles.customWidth }
+        : {};
+
     return (
         <div className={`relative ${className}`}>
-            {/* Contenido de la sección */}
-            <div className={isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}>
+            {/* Contenido de la sección con estilos aplicados */}
+            <div
+                className={`
+                    ${isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}
+                    ${getWidthClass()}
+                    ${styles.customClass || ''}
+                `}
+                style={{
+                    ...generateStyles(),
+                    ...customWidthStyle
+                }}
+            >
                 {children}
             </div>
 
