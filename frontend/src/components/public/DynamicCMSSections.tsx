@@ -140,20 +140,27 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
 
     return (
         <>
-            {sections.map((section, index) => (
-                <EditableSection
-                    key={section.id}
-                    pageKey={pageKey}
-                    sectionKey={section.section_key}
-                    onContentUpdate={loadSections}
-                    onDeleted={loadSections}
-                    canMoveUp={index > 0}
-                    canMoveDown={index < sections.length - 1}
-                    styles={(section as any).styles || {}}
-                >
-                    {renderSection(section)}
-                </EditableSection>
-            ))}
+            {sections.map((section, index) => {
+                // Las secciones hero y featured_projects ya tienen sus propios estilos,
+                // así que no aplicamos estilos adicionales
+                const isSpecialSection = ['hero', 'featured_projects'].includes(section.section_key);
+
+                return (
+                    <EditableSection
+                        key={section.id}
+                        pageKey={pageKey}
+                        sectionKey={section.section_key}
+                        onContentUpdate={loadSections}
+                        onDeleted={loadSections}
+                        canMoveUp={index > 0}
+                        canMoveDown={index < sections.length - 1}
+                        styles={(section as any).styles || {}}
+                        applyStyles={!isSpecialSection}
+                    >
+                        {renderSection(section)}
+                    </EditableSection>
+                );
+            })}
         </>
     );
 }

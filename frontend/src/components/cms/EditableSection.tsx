@@ -29,6 +29,7 @@ interface EditableSectionProps {
     canMoveUp?: boolean; // Si se puede mover hacia arriba
     canMoveDown?: boolean; // Si se puede mover hacia abajo
     styles?: Record<string, any>; // Estilos personalizados de la sección
+    applyStyles?: boolean; // Si debe aplicar estilos o dejar que el hijo los maneje
 }
 
 export function EditableSection({
@@ -42,6 +43,7 @@ export function EditableSection({
     canMoveUp = true,
     canMoveDown = true,
     styles = {},
+    applyStyles = true,
 }: EditableSectionProps) {
     const { isEditMode } = useEditMode();
     const { hasPermission } = usePermissions();
@@ -182,19 +184,25 @@ export function EditableSection({
     return (
         <div className={`relative ${className}`}>
             {/* Contenido de la sección con estilos aplicados */}
-            <div
-                className={`
-                    ${isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}
-                    ${getWidthClass()}
-                    ${styles.customClass || ''}
-                `}
-                style={{
-                    ...generateStyles(),
-                    ...customWidthStyle
-                }}
-            >
-                {children}
-            </div>
+            {applyStyles ? (
+                <div
+                    className={`
+                        ${isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}
+                        ${getWidthClass()}
+                        ${styles.customClass || ''}
+                    `}
+                    style={{
+                        ...generateStyles(),
+                        ...customWidthStyle
+                    }}
+                >
+                    {children}
+                </div>
+            ) : (
+                <div className={isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}>
+                    {children}
+                </div>
+            )}
 
             {/* Botones de acción (solo visible en modo edición Y con permisos) */}
             {isEditMode && showActions && canEditContent && (

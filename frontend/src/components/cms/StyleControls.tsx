@@ -1,29 +1,22 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Maximize2, Move } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { AlignCenter, AlignLeft, Maximize2, Palette, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SectionStyles {
-    width?: 'full' | 'container' | 'narrow' | 'wide' | 'custom';
-    customWidth?: string;
+    width?: 'full' | 'container' | 'narrow' | 'wide';
+    height?: 'auto' | 'small' | 'medium' | 'large' | 'fullscreen';
+    spacing?: 'none' | 'compact' | 'normal' | 'relaxed' | 'spacious';
+    background?: 'none' | 'light' | 'dark' | 'primary' | 'gradient';
+
+    // Campos técnicos (se generan automáticamente)
+    padding?: { top?: string; bottom?: string; left?: string; right?: string; };
+    margin?: { top?: string; bottom?: string; };
     minHeight?: string;
     maxHeight?: string;
-    padding?: {
-        top?: string;
-        bottom?: string;
-        left?: string;
-        right?: string;
-    };
-    margin?: {
-        top?: string;
-        bottom?: string;
-    };
-    background?: string;
     customClass?: string;
 }
 
@@ -32,265 +25,396 @@ interface StyleControlsProps {
     onChange: (styles: SectionStyles) => void;
 }
 
+// Mapeo de valores amigables a CSS
+const SPACING_MAP = {
+    none: { top: '0', bottom: '0', left: '1rem', right: '1rem' },
+    compact: { top: '2rem', bottom: '2rem', left: '1rem', right: '1rem' },
+    normal: { top: '5rem', bottom: '5rem', left: '1rem', right: '1rem' },
+    relaxed: { top: '8rem', bottom: '8rem', left: '1rem', right: '1rem' },
+    spacious: { top: '12rem', bottom: '12rem', left: '2rem', right: '2rem' },
+};
+
+const HEIGHT_MAP = {
+    auto: { min: 'auto', max: 'none' },
+    small: { min: '300px', max: 'none' },
+    medium: { min: '500px', max: 'none' },
+    large: { min: '700px', max: 'none' },
+    fullscreen: { min: '100vh', max: 'none' },
+};
+
+const BACKGROUND_MAP = {
+    none: { bg: 'transparent', class: '' },
+    light: { bg: '', class: 'bg-muted/30' },
+    dark: { bg: '', class: 'bg-secondary/50' },
+    primary: { bg: '', class: 'bg-primary/5' },
+    gradient: { bg: '', class: 'bg-gradient-to-br from-primary/5 via-background to-secondary/5' },
+};
+
 export function StyleControls({ styles, onChange }: StyleControlsProps) {
-    const [localStyles, setLocalStyles] = useState<SectionStyles>(styles || {
-        width: 'full',
-        padding: { top: '5rem', bottom: '5rem', left: '1rem', right: '1rem' },
-        margin: { top: '0', bottom: '0' }
-    });
+    const [width, setWidth] = useState<string>(styles?.width || 'full');
+    const [height, setHeight] = useState<string>(styles?.height || 'auto');
+    const [spacing, setSpacing] = useState<string>(styles?.spacing || 'normal');
+    const [background, setBackground] = useState<string>(styles?.background || 'none');
 
     useEffect(() => {
-        setLocalStyles(styles || {
-            width: 'full',
-            padding: { top: '5rem', bottom: '5rem', left: '1rem', right: '1rem' },
-            margin: { top: '0', bottom: '0' }
-        });
+        setWidth(styles?.width || 'full');
+        setHeight(styles?.height || 'auto');
+        setSpacing(styles?.spacing || 'normal');
+        setBackground(styles?.background || 'none');
     }, [styles]);
 
-    const updateStyles = (newStyles: Partial<SectionStyles>) => {
-        const updated = { ...localStyles, ...newStyles };
-        setLocalStyles(updated);
-        onChange(updated);
-    };
+    const applyChanges = (newWidth?: string, newHeight?: string, newSpacing?: string, newBg?: string) => {
+        const w = newWidth || width;
+        const h = newHeight || height;
+        const s = newSpacing || spacing;
+        const bg = newBg || background;
 
-    const updatePadding = (side: 'top' | 'bottom' | 'left' | 'right', value: string) => {
-        const updated = {
-            ...localStyles,
-            padding: { ...localStyles.padding, [side]: value }
+        const spacingValues = SPACING_MAP[s as keyof typeof SPACING_MAP];
+        const heightValues = HEIGHT_MAP[h as keyof typeof HEIGHT_MAP];
+        const bgValues = BACKGROUND_MAP[bg as keyof typeof BACKGROUND_MAP];
+
+        const updatedStyles: SectionStyles = {
+            width: w as any,
+            height: h as any,
+            spacing: s as any,
+            background: bg as any,
+            padding: spacingValues,
+            margin: { top: '0', bottom: '0' },
+            minHeight: heightValues.min,
+            maxHeight: heightValues.max,
+            customClass: bgValues.class,
         };
-        setLocalStyles(updated);
-        onChange(updated);
+
+        onChange(updatedStyles);
     };
 
-    const updateMargin = (side: 'top' | 'bottom', value: string) => {
-        const updated = {
-            ...localStyles,
-            margin: { ...localStyles.margin, [side]: value }
-        };
-        setLocalStyles(updated);
-        onChange(updated);
+    const handleWidthChange = (value: string) => {
+        setWidth(value);
+        applyChanges(value, undefined, undefined, undefined);
     };
 
-    const paddingPresets = [
-        { label: 'Sin padding', value: '0' },
-        { label: 'Pequeño', value: '2rem' },
-        { label: 'Medio', value: '5rem' },
-        { label: 'Grande', value: '8rem' },
-        { label: 'Extra grande', value: '12rem' },
-    ];
+    const handleHeightChange = (value: string) => {
+        setHeight(value);
+        applyChanges(undefined, value, undefined, undefined);
+    };
+
+    const handleSpacingChange = (value: string) => {
+        setSpacing(value);
+        applyChanges(undefined, undefined, value, undefined);
+    };
+
+    const handleBackgroundChange = (value: string) => {
+        setBackground(value);
+        applyChanges(undefined, undefined, undefined, value);
+    };
 
     return (
         <div className="space-y-6">
+            {/* Ancho de la sección */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <AlignLeft className="w-5 h-5 text-primary" />
+                        <CardTitle>Ancho de la sección</CardTitle>
+                    </div>
+                    <CardDescription>
+                        ¿Qué tan ancha quieres que sea esta sección?
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <RadioGroup value={width} onValueChange={handleWidthChange} className="space-y-4">
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="narrow" id="width-narrow" />
+                            <div className="flex-1">
+                                <Label htmlFor="width-narrow" className="cursor-pointer font-semibold">
+                                    📱 Estrecha
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Ideal para texto, fácil de leer</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="container" id="width-container" />
+                            <div className="flex-1">
+                                <Label htmlFor="width-container" className="cursor-pointer font-semibold">
+                                    💻 Normal
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Ancho estándar, equilibrado</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="wide" id="width-wide" />
+                            <div className="flex-1">
+                                <Label htmlFor="width-wide" className="cursor-pointer font-semibold">
+                                    🖥️ Amplia
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Para mostrar mucho contenido</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="full" id="width-full" />
+                            <div className="flex-1">
+                                <Label htmlFor="width-full" className="cursor-pointer font-semibold">
+                                    🔲 Toda la pantalla
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Ocupa todo el ancho disponible</p>
+                            </div>
+                        </div>
+                    </RadioGroup>
+                </CardContent>
+            </Card>
+
+            {/* Altura de la sección */}
             <Card>
                 <CardHeader>
                     <div className="flex items-center gap-2">
                         <Maximize2 className="w-5 h-5 text-primary" />
-                        <CardTitle>Dimensiones y Layout</CardTitle>
+                        <CardTitle>Altura de la sección</CardTitle>
                     </div>
                     <CardDescription>
-                        Controla el ancho, alto y espaciado de la sección
+                        ¿Qué tan alta quieres que sea esta sección?
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Ancho */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Ancho de la sección</Label>
-                        <Select
-                            value={localStyles.width || 'full'}
-                            onValueChange={(value: any) => updateStyles({ width: value })}
-                        >
-                            <SelectTrigger>
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="full">🔲 Ancho completo (100%)</SelectItem>
-                                <SelectItem value="container">📦 Contenedor estándar (1280px max)</SelectItem>
-                                <SelectItem value="narrow">📄 Estrecho (768px max)</SelectItem>
-                                <SelectItem value="wide">🖥️ Amplio (1536px max)</SelectItem>
-                                <SelectItem value="custom">⚙️ Personalizado</SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        {localStyles.width === 'custom' && (
-                            <div className="ml-4 space-y-2">
-                                <Label className="text-sm">Ancho personalizado</Label>
-                                <Input
-                                    value={localStyles.customWidth || '100%'}
-                                    onChange={(e) => updateStyles({ customWidth: e.target.value })}
-                                    placeholder="Ej: 80%, 1000px, 50vw"
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Usa unidades CSS: px, %, rem, vw, etc.
-                                </p>
+                <CardContent>
+                    <RadioGroup value={height} onValueChange={handleHeightChange} className="space-y-4">
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="auto" id="height-auto" />
+                            <div className="flex-1">
+                                <Label htmlFor="height-auto" className="cursor-pointer font-semibold">
+                                    📏 Automática
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Se ajusta al contenido</p>
                             </div>
-                        )}
-                    </div>
+                        </div>
 
-                    {/* Alto mínimo */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Alto mínimo</Label>
-                        <Input
-                            value={localStyles.minHeight || 'auto'}
-                            onChange={(e) => updateStyles({ minHeight: e.target.value })}
-                            placeholder="auto, 500px, 100vh, etc."
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Altura mínima de la sección (auto = ajuste automático)
-                        </p>
-                    </div>
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="small" id="height-small" />
+                            <div className="flex-1">
+                                <Label htmlFor="height-small" className="cursor-pointer font-semibold">
+                                    📐 Pequeña
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Mínimo 300 píxeles de alto</p>
+                            </div>
+                        </div>
 
-                    {/* Alto máximo */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Alto máximo</Label>
-                        <Input
-                            value={localStyles.maxHeight || 'none'}
-                            onChange={(e) => updateStyles({ maxHeight: e.target.value })}
-                            placeholder="none, 800px, 90vh, etc."
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Altura máxima de la sección (none = sin límite)
-                        </p>
-                    </div>
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="medium" id="height-medium" />
+                            <div className="flex-1">
+                                <Label htmlFor="height-medium" className="cursor-pointer font-semibold">
+                                    📊 Mediana
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Mínimo 500 píxeles de alto</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="large" id="height-large" />
+                            <div className="flex-1">
+                                <Label htmlFor="height-large" className="cursor-pointer font-semibold">
+                                    📈 Grande
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Mínimo 700 píxeles de alto</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="fullscreen" id="height-fullscreen" />
+                            <div className="flex-1">
+                                <Label htmlFor="height-fullscreen" className="cursor-pointer font-semibold">
+                                    🖼️ Pantalla completa
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Ocupa toda la altura de la pantalla</p>
+                            </div>
+                        </div>
+                    </RadioGroup>
                 </CardContent>
             </Card>
 
+            {/* Espaciado */}
             <Card>
                 <CardHeader>
                     <div className="flex items-center gap-2">
-                        <Move className="w-5 h-5 text-primary" />
-                        <CardTitle>Espaciado</CardTitle>
+                        <AlignCenter className="w-5 h-5 text-primary" />
+                        <CardTitle>Espaciado interior</CardTitle>
                     </div>
                     <CardDescription>
-                        Ajusta el padding interno y margin externo
+                        ¿Cuánto espacio quieres alrededor del contenido?
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                    {/* Padding */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Padding (espaciado interno)</Label>
-
-                        {/* Presets rápidos */}
-                        <div className="flex gap-2 flex-wrap">
-                            {paddingPresets.map(preset => (
-                                <Button
-                                    key={preset.value}
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                        updatePadding('top', preset.value);
-                                        updatePadding('bottom', preset.value);
-                                    }}
-                                    className="text-xs"
-                                >
-                                    {preset.label}
-                                </Button>
-                            ))}
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                            <div className="space-y-2">
-                                <Label className="text-sm">⬆️ Superior</Label>
-                                <Input
-                                    value={localStyles.padding?.top || '5rem'}
-                                    onChange={(e) => updatePadding('top', e.target.value)}
-                                    placeholder="5rem"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm">⬇️ Inferior</Label>
-                                <Input
-                                    value={localStyles.padding?.bottom || '5rem'}
-                                    onChange={(e) => updatePadding('bottom', e.target.value)}
-                                    placeholder="5rem"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm">⬅️ Izquierda</Label>
-                                <Input
-                                    value={localStyles.padding?.left || '1rem'}
-                                    onChange={(e) => updatePadding('left', e.target.value)}
-                                    placeholder="1rem"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm">➡️ Derecha</Label>
-                                <Input
-                                    value={localStyles.padding?.right || '1rem'}
-                                    onChange={(e) => updatePadding('right', e.target.value)}
-                                    placeholder="1rem"
-                                />
+                <CardContent>
+                    <RadioGroup value={spacing} onValueChange={handleSpacingChange} className="space-y-4">
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="none" id="spacing-none" />
+                            <div className="flex-1">
+                                <Label htmlFor="spacing-none" className="cursor-pointer font-semibold">
+                                    🔸 Sin espaciado
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Contenido pegado a los bordes</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Margin */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Margin (espaciado externo)</Label>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-sm">⬆️ Superior</Label>
-                                <Input
-                                    value={localStyles.margin?.top || '0'}
-                                    onChange={(e) => updateMargin('top', e.target.value)}
-                                    placeholder="0"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-sm">⬇️ Inferior</Label>
-                                <Input
-                                    value={localStyles.margin?.bottom || '0'}
-                                    onChange={(e) => updateMargin('bottom', e.target.value)}
-                                    placeholder="0"
-                                />
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="compact" id="spacing-compact" />
+                            <div className="flex-1">
+                                <Label htmlFor="spacing-compact" className="cursor-pointer font-semibold">
+                                    🔹 Compacto
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Poco espacio arriba y abajo</p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Background */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Color de fondo</Label>
-                        <Input
-                            value={localStyles.background || ''}
-                            onChange={(e) => updateStyles({ background: e.target.value })}
-                            placeholder="transparent, #ffffff, rgb(255,255,255)"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Usa transparent, hex (#fff), rgb, o clases de Tailwind
-                        </p>
-                    </div>
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="normal" id="spacing-normal" />
+                            <div className="flex-1">
+                                <Label htmlFor="spacing-normal" className="cursor-pointer font-semibold">
+                                    🔷 Normal
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Espaciado equilibrado (recomendado)</p>
+                            </div>
+                        </div>
 
-                    {/* Clase personalizada */}
-                    <div className="space-y-3">
-                        <Label className="text-base font-semibold">Clase CSS personalizada</Label>
-                        <Input
-                            value={localStyles.customClass || ''}
-                            onChange={(e) => updateStyles({ customClass: e.target.value })}
-                            placeholder="bg-gradient-to-r from-blue-500 to-purple-600"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                            Agrega clases de Tailwind o CSS personalizadas
-                        </p>
-                    </div>
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="relaxed" id="spacing-relaxed" />
+                            <div className="flex-1">
+                                <Label htmlFor="spacing-relaxed" className="cursor-pointer font-semibold">
+                                    🔶 Relajado
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Bastante espacio arriba y abajo</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="spacious" id="spacing-spacious" />
+                            <div className="flex-1">
+                                <Label htmlFor="spacing-spacious" className="cursor-pointer font-semibold">
+                                    🔲 Espacioso
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Mucho espacio arriba y abajo</p>
+                            </div>
+                        </div>
+                    </RadioGroup>
                 </CardContent>
             </Card>
 
-            {/* Preview de estilos aplicados */}
-            <Card className="border-primary/50">
+            {/* Fondo */}
+            <Card>
                 <CardHeader>
-                    <CardTitle className="text-sm">Vista previa de estilos CSS</CardTitle>
+                    <div className="flex items-center gap-2">
+                        <Palette className="w-5 h-5 text-primary" />
+                        <CardTitle>Color de fondo</CardTitle>
+                    </div>
+                    <CardDescription>
+                        Elige el fondo que quieres para esta sección
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto">
-                        {`width: ${localStyles.width === 'custom' ? localStyles.customWidth : localStyles.width}
-min-height: ${localStyles.minHeight || 'auto'}
-max-height: ${localStyles.maxHeight || 'none'}
-padding: ${localStyles.padding?.top} ${localStyles.padding?.right} ${localStyles.padding?.bottom} ${localStyles.padding?.left}
-margin: ${localStyles.margin?.top} auto ${localStyles.margin?.bottom}
-background: ${localStyles.background || 'transparent'}`}
-                    </pre>
+                    <RadioGroup value={background} onValueChange={handleBackgroundChange} className="space-y-4">
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer bg-transparent">
+                            <RadioGroupItem value="none" id="bg-none" />
+                            <div className="flex-1">
+                                <Label htmlFor="bg-none" className="cursor-pointer font-semibold">
+                                    ⚪ Transparente
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Sin color de fondo</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer bg-muted/30">
+                            <RadioGroupItem value="light" id="bg-light" />
+                            <div className="flex-1">
+                                <Label htmlFor="bg-light" className="cursor-pointer font-semibold">
+                                    ⚫ Gris claro
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Fondo gris suave</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer bg-secondary/50">
+                            <RadioGroupItem value="dark" id="bg-dark" />
+                            <div className="flex-1">
+                                <Label htmlFor="bg-dark" className="cursor-pointer font-semibold">
+                                    ⬛ Gris oscuro
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Fondo gris más intenso</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer bg-primary/5">
+                            <RadioGroupItem value="primary" id="bg-primary" />
+                            <div className="flex-1">
+                                <Label htmlFor="bg-primary" className="cursor-pointer font-semibold">
+                                    🎨 Color principal
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Usa el color principal del sitio</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-4 border-2 rounded-lg hover:border-primary transition-colors cursor-pointer">
+                            <RadioGroupItem value="gradient" id="bg-gradient" />
+                            <div className="flex-1">
+                                <Label htmlFor="bg-gradient" className="cursor-pointer font-semibold">
+                                    🌈 Degradado
+                                </Label>
+                                <p className="text-sm text-muted-foreground">Gradiente de colores suave</p>
+                            </div>
+                            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 via-background to-secondary/20 border" />
+                        </div>
+                    </RadioGroup>
+                </CardContent>
+            </Card>
+
+            {/* Preview simple */}
+            <Card className="border-primary/30 bg-primary/5">
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        <CardTitle className="text-sm">Vista previa</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Ancho:</span>
+                        <span className="font-medium">
+                            {width === 'full' && '🔲 Toda la pantalla'}
+                            {width === 'wide' && '🖥️ Amplia'}
+                            {width === 'container' && '💻 Normal'}
+                            {width === 'narrow' && '📱 Estrecha'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Altura:</span>
+                        <span className="font-medium">
+                            {height === 'auto' && '📏 Automática'}
+                            {height === 'small' && '📐 Pequeña'}
+                            {height === 'medium' && '📊 Mediana'}
+                            {height === 'large' && '📈 Grande'}
+                            {height === 'fullscreen' && '🖼️ Pantalla completa'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Espaciado:</span>
+                        <span className="font-medium">
+                            {spacing === 'none' && '🔸 Sin espaciado'}
+                            {spacing === 'compact' && '🔹 Compacto'}
+                            {spacing === 'normal' && '🔷 Normal'}
+                            {spacing === 'relaxed' && '🔶 Relajado'}
+                            {spacing === 'spacious' && '🔲 Espacioso'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-muted-foreground">Fondo:</span>
+                        <span className="font-medium">
+                            {background === 'none' && '⚪ Transparente'}
+                            {background === 'light' && '⚫ Gris claro'}
+                            {background === 'dark' && '⬛ Gris oscuro'}
+                            {background === 'primary' && '🎨 Color principal'}
+                            {background === 'gradient' && '🌈 Degradado'}
+                        </span>
+                    </div>
                 </CardContent>
             </Card>
         </div>
     );
 }
-
