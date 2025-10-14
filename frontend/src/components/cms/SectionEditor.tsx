@@ -19,6 +19,7 @@ import { PageContent } from '@/types/cms';
 import { Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { RoadmapEditor } from './editors/RoadmapEditor';
 
 interface SectionEditorProps {
     pageKey: string;
@@ -371,7 +372,16 @@ export function SectionEditor({
                     </div>
                 ) : (
                     <div className="space-y-6 py-4">
-                        {Object.entries(formData).map(([key, value]) => renderField(key, value))}
+                        {section?.content?.template_id === 'roadmap' ? (
+                            <RoadmapEditor
+                                content={formData}
+                                onChange={(newContent) => setFormData(newContent)}
+                            />
+                        ) : (
+                            <>
+                                {Object.entries(formData).map(([key, value]) => renderField(key, value))}
+                            </>
+                        )}
                     </div>
                 )}
 

@@ -57,9 +57,11 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
         category: 'list',
         fields: [
             { key: 'title', label: 'Título', type: 'text', defaultValue: '', placeholder: 'Título de la lista' },
-            { key: 'items', label: 'Elementos', type: 'array', defaultValue: [
-                { text: 'Elemento 1', url: '#', icon: '' }
-            ], description: 'Lista de elementos con texto, URL e icono' },
+            {
+                key: 'items', label: 'Elementos', type: 'array', defaultValue: [
+                    { text: 'Elemento 1', url: '#', icon: '' }
+                ], description: 'Lista de elementos con texto, URL e icono'
+            },
         ]
     },
     {
@@ -70,9 +72,11 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
         category: 'media',
         fields: [
             { key: 'title', label: 'Título', type: 'text', defaultValue: '', placeholder: 'Título de la galería' },
-            { key: 'images', label: 'Imágenes', type: 'array', defaultValue: [
-                { url: '', alt: '', title: '', description: '' }
-            ], description: 'Lista de imágenes con URL, alt text, título y descripción' },
+            {
+                key: 'images', label: 'Imágenes', type: 'array', defaultValue: [
+                    { url: '', alt: '', title: '', description: '' }
+                ], description: 'Lista de imágenes con URL, alt text, título y descripción'
+            },
         ]
     },
     {
@@ -83,9 +87,11 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
         category: 'content',
         fields: [
             { key: 'title', label: 'Título', type: 'text', defaultValue: 'Testimonios', placeholder: 'Título de la sección' },
-            { key: 'testimonials', label: 'Testimonios', type: 'array', defaultValue: [
-                { name: '', role: '', company: '', message: '', avatar: '' }
-            ], description: 'Lista de testimonios con nombre, rol, empresa, mensaje y avatar' },
+            {
+                key: 'testimonials', label: 'Testimonios', type: 'array', defaultValue: [
+                    { name: '', role: '', company: '', message: '', avatar: '' }
+                ], description: 'Lista de testimonios con nombre, rol, empresa, mensaje y avatar'
+            },
         ]
     },
     {
@@ -111,9 +117,35 @@ export const SECTION_TEMPLATES: SectionTemplate[] = [
         category: 'content',
         fields: [
             { key: 'title', label: 'Título', type: 'text', defaultValue: '', placeholder: 'Nuestros Números' },
-            { key: 'stats', label: 'Estadísticas', type: 'array', defaultValue: [
-                { label: 'Proyectos', value: '50+', icon: '' }
-            ], description: 'Lista de estadísticas con etiqueta, valor e icono' },
+            {
+                key: 'stats', label: 'Estadísticas', type: 'array', defaultValue: [
+                    { label: 'Proyectos', value: '50+', icon: '' }
+                ], description: 'Lista de estadísticas con etiqueta, valor e icono'
+            },
+        ]
+    },
+    {
+        id: 'roadmap',
+        name: 'Roadmap de Skills',
+        description: 'Tu trayectoria de aprendizaje con categorías y habilidades',
+        icon: '🚀',
+        category: 'content',
+        fields: [
+            { key: 'title', label: 'Título', type: 'text', defaultValue: 'Mi Trayectoria de Aprendizaje', placeholder: 'Título del roadmap' },
+            { key: 'description', label: 'Descripción', type: 'textarea', defaultValue: 'Un vistazo a las tecnologías que domino, las que estoy aprendiendo y mis próximos objetivos', placeholder: 'Descripción del roadmap' },
+            {
+                key: 'categories', label: 'Categorías de Skills', type: 'array', defaultValue: [
+                    {
+                        name: 'Frontend',
+                        icon: '💻',
+                        description: 'Tecnologías de interfaz de usuario',
+                        skills: [
+                            { name: 'React', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg', proficiency: 85, status: 'completed' },
+                            { name: 'Next.js', icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg', proficiency: 70, status: 'learning' }
+                        ]
+                    }
+                ], description: 'Categorías con sus skills. Status: completed (✅), learning (🔥), planned (🎯)'
+            },
         ]
     },
     {
