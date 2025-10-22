@@ -181,28 +181,24 @@ export function EditableSection({
         ? { width: styles.customWidth, maxWidth: styles.customWidth }
         : {};
 
+    // Aplicar estilos al contenedor principal
+    const containerStyle = {
+        ...generateStyles(),
+        ...customWidthStyle
+    };
+
+    const containerClassName = `
+        relative 
+        ${className}
+        ${isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}
+        ${applyStyles ? getWidthClass() : ''}
+        ${styles.customClass || ''}
+    `.trim().replace(/\s+/g, ' ');
+
     return (
-        <div className={`relative ${className}`}>
-            {/* Contenido de la sección con estilos aplicados */}
-            {applyStyles ? (
-                <div
-                    className={`
-                        ${isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}
-                        ${getWidthClass()}
-                        ${styles.customClass || ''}
-                    `}
-                    style={{
-                        ...generateStyles(),
-                        ...customWidthStyle
-                    }}
-                >
-                    {children}
-                </div>
-            ) : (
-                <div className={isEditMode ? 'ring-2 ring-orange-400 ring-opacity-50 rounded-lg' : ''}>
-                    {children}
-                </div>
-            )}
+        <div className={containerClassName} style={containerStyle}>
+            {/* Contenido de la sección */}
+            {children}
 
             {/* Botones de acción (solo visible en modo edición Y con permisos) */}
             {isEditMode && showActions && canEditContent && (
