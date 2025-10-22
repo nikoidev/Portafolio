@@ -126,6 +126,70 @@ async def health_check():
     )
 
 
+@app.get("/debug/volume")
+async def debug_volume():
+    """
+    TEMPORARY: Diagnostic endpoint to check volume mounting
+    DELETE THIS AFTER DEBUGGING
+    """
+    from pathlib import Path
+    
+    diagnostics = {
+        "working_directory": os.getcwd(),
+        "upload_dir_env": os.getenv('UPLOAD_DIR', 'NOT SET'),
+        "config_upload_dir": config_settings.UPLOAD_DIR,
+        "paths": {}
+    }
+    
+    # Check different possible paths
+    possible_paths = [
+        "/app/backend/uploads",
+        "/app/uploads",
+        "uploads",
+        "./uploads",
+    ]
+    
+    for path_str in possible_paths:
+        path = Path(path_str)
+        path_info = {
+            "exists": path.exists(),
+            "is_dir": path.is_dir() if path.exists() else False,
+            "absolute": str(path.absolute()),
+            "writable": False,
+            "contents": []
+        }
+        
+        if path.exists() and path.is_dir():
+            try:
+                # Try to write a test file
+                test_file = path / "test_diagnostic.txt"
+                test_file.write_text("test")
+                test_file.unlink()
+                path_info["writable"] = True
+                
+                # List contents
+                items = list(path.iterdir())
+                path_info["contents"] = [item.name for item in items[:10]]
+                path_info["total_items"] = len(items)
+            except Exception as e:
+                path_info["error"] = str(e)
+        
+        diagnostics["paths"][path_str] = path_info
+    
+    # Check mounts
+    try:
+        with open('/proc/mounts', 'r') as f:
+            mounts = f.read()
+            diagnostics["mounts"] = [
+                line for line in mounts.split('\n') 
+                if 'upload' in line.lower() or 'volume' in line.lower()
+            ]
+    except Exception as e:
+        diagnostics["mounts_error"] = str(e)
+    
+    return JSONResponse(content=diagnostics)
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
