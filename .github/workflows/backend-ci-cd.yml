@@ -39,7 +39,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ./backend
-      run: pipenv install --dev --deploy
+      run: pipenv install --dev
 
     - name: Lint with flake8
       working-directory: ./backend
