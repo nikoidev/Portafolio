@@ -204,8 +204,42 @@ async def debug_volume():
                 "total": len(project_folders),
                 "folders": [f.name for f in project_folders[:20]]
             }
+            
+            # Check each project folder for images
+            project_details = {}
+            for folder in project_folders:
+                if folder.is_dir():
+                    images = list(folder.glob("*"))
+                    project_details[folder.name] = {
+                        "total_files": len(images),
+                        "files": [img.name for img in images[:5]]
+                    }
+            diagnostics["project_details"] = project_details
         except Exception as e:
             diagnostics["projects_in_volume_error"] = str(e)
+    
+    # Check database projects (requires DB connection)
+    try:
+        from app.core.database import get_db
+        db = next(get_db())
+        from app.models.project import Project
+        
+        projects = db.query(Project).all()
+        diagnostics["database_projects"] = {
+            "total": len(projects),
+            "projects": [
+                {
+                    "id": p.id,
+                    "slug": p.slug,
+                    "title": p.title,
+                    "images_count": len(p.images) if p.images else 0,
+                    "images": p.images[:3] if p.images else []
+                }
+                for p in projects
+            ]
+        }
+    except Exception as e:
+        diagnostics["database_projects_error"] = str(e)
     
     return JSONResponse(content=diagnostics)
 
