@@ -8,7 +8,6 @@ restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
 # Persistent storage for uploads
-[[volumes]]
-name = "uploads"
-mountPath = "/app/backend/uploads"
+# Note: The volume "portafolio-volume" is manually created and attached in Railway Dashboard
+# It should be mounted at /app/backend/uploads
 
