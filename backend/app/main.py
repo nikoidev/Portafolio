@@ -138,6 +138,7 @@ async def debug_volume():
         "working_directory": os.getcwd(),
         "upload_dir_env": os.getenv('UPLOAD_DIR', 'NOT SET'),
         "config_upload_dir": config_settings.UPLOAD_DIR,
+        "config_upload_dir_absolute": str(Path(config_settings.UPLOAD_DIR).absolute()),
         "paths": {}
     }
     
@@ -147,6 +148,7 @@ async def debug_volume():
         "/app/uploads",
         "uploads",
         "./uploads",
+        config_settings.UPLOAD_DIR,  # Check the actual configured path
     ]
     
     for path_str in possible_paths:
@@ -167,14 +169,20 @@ async def debug_volume():
                 test_file.unlink()
                 path_info["writable"] = True
                 
-                # List contents
+                # List contents recursively (up to 2 levels)
                 items = list(path.iterdir())
-                path_info["contents"] = [item.name for item in items[:10]]
+                path_info["contents"] = []
+                for item in items[:10]:
+                    if item.is_dir():
+                        subitems = [sub.name for sub in item.iterdir()][:5]
+                        path_info["contents"].append(f"{item.name}/ ({len(subitems)} items)")
+                    else:
+                        path_info["contents"].append(item.name)
                 path_info["total_items"] = len(items)
             except Exception as e:
                 path_info["error"] = str(e)
         
-        diagnostics["paths"][path_str] = path_info
+        diagnostics["paths"][str(path_str)] = path_info
     
     # Check mounts
     try:
@@ -186,6 +194,18 @@ async def debug_volume():
             ]
     except Exception as e:
         diagnostics["mounts_error"] = str(e)
+    
+    # Check if projects folder exists in volume
+    projects_in_volume = Path("/app/backend/uploads/projects")
+    if projects_in_volume.exists():
+        try:
+            project_folders = list(projects_in_volume.iterdir())
+            diagnostics["projects_in_volume"] = {
+                "total": len(project_folders),
+                "folders": [f.name for f in project_folders[:20]]
+            }
+        except Exception as e:
+            diagnostics["projects_in_volume_error"] = str(e)
     
     return JSONResponse(content=diagnostics)
 
