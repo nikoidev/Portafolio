@@ -232,8 +232,9 @@ async def debug_volume():
                     "id": p.id,
                     "slug": p.slug,
                     "title": p.title,
-                    "images_count": len(p.images) if p.images else 0,
-                    "images": p.images[:3] if p.images else []
+                    "demo_images_count": len(p.demo_images) if p.demo_images else 0,
+                    "demo_images": p.demo_images[:3] if p.demo_images else [],
+                    "legacy_images_count": len(p.images) if p.images else 0,
                 }
                 for p in projects
             ]
@@ -242,6 +243,90 @@ async def debug_volume():
         diagnostics["database_projects_error"] = str(e)
     
     return JSONResponse(content=diagnostics)
+
+
+@app.post("/debug/sync-images")
+async def sync_project_images():
+    """
+    TEMPORARY: Sync physical images from disk to database
+    This will scan the uploads folder and update project.demo_images
+    DELETE THIS AFTER FIXING
+    """
+    from pathlib import Path
+    from app.core.database import get_db
+    from app.models.project import Project
+    
+    db = next(get_db())
+    
+    results = {
+        "updated_projects": [],
+        "errors": []
+    }
+    
+    try:
+        projects = db.query(Project).all()
+        
+        for project in projects:
+            try:
+                # Check physical folder
+                project_folder = Path(config_settings.UPLOAD_DIR) / "projects" / f"project_{project.id}"
+                
+                if not project_folder.exists():
+                    continue
+                
+                # Get all images from folder
+                image_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
+                image_files = []
+                
+                for ext in image_extensions:
+                    image_files.extend(project_folder.glob(f"*{ext}"))
+                    image_files.extend(project_folder.glob(f"*{ext.upper()}"))
+                
+                if not image_files:
+                    continue
+                
+                # Sort by filename (timestamp)
+                image_files.sort(key=lambda x: x.name)
+                
+                # Create demo_images array
+                demo_images = []
+                for idx, img_file in enumerate(image_files, 1):
+                    relative_path = img_file.relative_to(Path(config_settings.UPLOAD_DIR))
+                    url = f"/uploads/{relative_path.as_posix()}"
+                    
+                    demo_images.append({
+                        "url": url,
+                        "title": f"Captura {idx}",
+                        "order": idx
+                    })
+                
+                # Update project
+                project.demo_images = demo_images
+                if not project.thumbnail_url and demo_images:
+                    project.thumbnail_url = demo_images[0]["url"]
+                
+                db.commit()
+                
+                results["updated_projects"].append({
+                    "id": project.id,
+                    "slug": project.slug,
+                    "title": project.title,
+                    "images_synced": len(demo_images)
+                })
+                
+            except Exception as e:
+                results["errors"].append({
+                    "project_id": project.id,
+                    "error": str(e)
+                })
+        
+        return JSONResponse(content=results)
+        
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)}
+        )
 
 
 if __name__ == "__main__":
