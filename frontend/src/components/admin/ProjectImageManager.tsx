@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/lib/api';
+import { api, getImageUrl } from '@/lib/api';
 import { ImageIcon, Loader2, Trash2, Upload, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -235,7 +235,7 @@ export function ProjectImageManager({
                                 <div key={index} className="border rounded-lg p-4 space-y-3">
                                     <div className="flex gap-4">
                                         <img
-                                            src={`http://localhost:8004${image.url}`}
+                                            src={getImageUrl(image.url)}
                                             alt={image.title || 'Imagen del proyecto'}
                                             className="w-24 h-24 object-cover rounded"
                                         />
