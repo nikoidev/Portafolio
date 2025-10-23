@@ -3,6 +3,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { CheckCircle2, Flame, LayoutGrid, List, Target } from 'lucide-react';
 import { useState } from 'react';
 
@@ -31,6 +38,13 @@ interface RoadmapSectionProps {
 export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
     const { title, description, categories = [] } = content;
     const [viewMode, setViewMode] = useState<'vertical' | 'horizontal'>('horizontal');
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    const openSkillsDialog = (category: Category) => {
+        setSelectedCategory(category);
+        setIsDialogOpen(true);
+    };
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -251,9 +265,12 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                                                         </p>
                                                     )}
                                                     {category.skills && category.skills.length > 4 && (
-                                                        <p className="text-xs text-center text-muted-foreground">
+                                                        <button
+                                                            onClick={() => openSkillsDialog(category)}
+                                                            className="w-full text-xs text-center text-primary hover:text-primary/80 hover:underline transition-colors py-2 font-medium"
+                                                        >
                                                             +{category.skills.length - 4} más
-                                                        </p>
+                                                        </button>
                                                     )}
                                                 </div>
                                             </CardContent>
@@ -489,6 +506,121 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                     animation: pulse-horizontal-slower 4s ease-in-out infinite;
                 }
             `}</style>
+
+            {/* Dialog para mostrar todas las habilidades */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-3 text-2xl">
+                            {selectedCategory?.icon && (
+                                <span className="text-3xl">{selectedCategory.icon}</span>
+                            )}
+                            {selectedCategory?.name}
+                        </DialogTitle>
+                        {selectedCategory?.description && (
+                            <DialogDescription className="text-base">
+                                {selectedCategory.description}
+                            </DialogDescription>
+                        )}
+                    </DialogHeader>
+
+                    <div className="mt-4">
+                        {/* Estadísticas de la categoría */}
+                        {selectedCategory && (
+                            <>
+                                <div className="grid grid-cols-3 gap-4 mb-6">
+                                    <Card className="bg-green-500/10 border-green-500/20">
+                                        <CardContent className="pt-4 text-center">
+                                            <CheckCircle2 className="w-6 h-6 text-green-500 mx-auto mb-1" />
+                                            <p className="text-2xl font-bold text-green-500">
+                                                {selectedCategory.skills.filter(s => s.status === 'completed').length}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Dominadas</p>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="bg-orange-500/10 border-orange-500/20">
+                                        <CardContent className="pt-4 text-center">
+                                            <Flame className="w-6 h-6 text-orange-500 mx-auto mb-1" />
+                                            <p className="text-2xl font-bold text-orange-500">
+                                                {selectedCategory.skills.filter(s => s.status === 'learning').length}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Aprendiendo</p>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="bg-blue-500/10 border-blue-500/20">
+                                        <CardContent className="pt-4 text-center">
+                                            <Target className="w-6 h-6 text-blue-500 mx-auto mb-1" />
+                                            <p className="text-2xl font-bold text-blue-500">
+                                                {selectedCategory.skills.filter(s => s.status === 'planned').length}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">Planeadas</p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                {/* Grid de todas las habilidades */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {selectedCategory.skills.map((skill, idx) => (
+                                        <Card
+                                            key={idx}
+                                            className={`group hover:scale-105 transition-all duration-300 border-2 ${getStatusColor(skill.status)}`}
+                                        >
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    {skill.icon && (
+                                                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-background/80 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                                                            <img
+                                                                src={skill.icon}
+                                                                alt={skill.name}
+                                                                className="w-8 h-8 object-contain"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.style.display = 'none';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-1 mb-1">
+                                                            <h4 className="font-semibold text-sm truncate">
+                                                                {skill.name}
+                                                            </h4>
+                                                            <div className="flex-shrink-0">
+                                                                {getStatusIcon(skill.status)}
+                                                            </div>
+                                                        </div>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="text-xs"
+                                                        >
+                                                            {skill.status === 'completed' && '✓ Dominada'}
+                                                            {skill.status === 'learning' && '🔥 Aprendiendo'}
+                                                            {skill.status === 'planned' && '🎯 Planeada'}
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+
+                                                {/* Barra de progreso */}
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="text-muted-foreground">Dominio</span>
+                                                        <span className="font-bold">{skill.proficiency}%</span>
+                                                    </div>
+                                                    <div className="h-2 bg-background rounded-full overflow-hidden">
+                                                        <div
+                                                            className={`h-full transition-all duration-700 ${getProgressColor(skill.status)}`}
+                                                            style={{ width: `${skill.proficiency}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </section>
     );
 }
