@@ -162,8 +162,8 @@ export function RoadmapSectionHorizontal({ content }: RoadmapSectionProps) {
                 </div>
 
                 {/* Contenido de la categoría seleccionada */}
-                <div className="animate-fade-in">
-                    {categories[selectedCategory] && (
+                <div className="animate-fade-in" key={selectedCategory}>
+                    {categories[selectedCategory] ? (
                         <>
                             {/* Descripción de la categoría */}
                             {categories[selectedCategory].description && (
@@ -174,78 +174,91 @@ export function RoadmapSectionHorizontal({ content }: RoadmapSectionProps) {
                                 </div>
                             )}
 
+                            {/* Debug info */}
+                            {(!categories[selectedCategory].skills || categories[selectedCategory].skills.length === 0) && (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    No hay skills en esta categoría aún.
+                                </div>
+                            )}
+
                             {/* Skills organizadas por estado */}
-                            <div className="space-y-8">
-                                {/* Dominadas */}
-                                {categories[selectedCategory].skills.filter(s => s.status === 'completed').length > 0 && (
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <CheckCircle2 className="w-5 h-5 text-green-500" />
-                                            <h3 className="text-xl font-bold text-green-500">
-                                                Dominadas
-                                            </h3>
-                                            <Badge variant="outline" className="border-green-500 text-green-500">
-                                                {categories[selectedCategory].skills.filter(s => s.status === 'completed').length}
-                                            </Badge>
+                            {categories[selectedCategory].skills && categories[selectedCategory].skills.length > 0 && (
+                                <div className="space-y-8">
+                                    {/* Dominadas */}
+                                    {categories[selectedCategory].skills.filter(s => s.status === 'completed').length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                                                <h3 className="text-xl font-bold text-green-500">
+                                                    Dominadas
+                                                </h3>
+                                                <Badge variant="outline" className="border-green-500 text-green-500">
+                                                    {categories[selectedCategory].skills.filter(s => s.status === 'completed').length}
+                                                </Badge>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                                {categories[selectedCategory].skills
+                                                    .filter(skill => skill.status === 'completed')
+                                                    .map((skill, idx) => (
+                                                        <SkillCard key={idx} skill={skill} />
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                            {categories[selectedCategory].skills
-                                                .filter(skill => skill.status === 'completed')
-                                                .map((skill, idx) => (
-                                                    <SkillCard key={idx} skill={skill} />
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Aprendiendo */}
-                                {categories[selectedCategory].skills.filter(s => s.status === 'learning').length > 0 && (
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Flame className="w-5 h-5 text-orange-500" />
-                                            <h3 className="text-xl font-bold text-orange-500">
-                                                Aprendiendo Activamente
-                                            </h3>
-                                            <Badge variant="outline" className="border-orange-500 text-orange-500">
-                                                {categories[selectedCategory].skills.filter(s => s.status === 'learning').length}
-                                            </Badge>
+                                    {/* Aprendiendo */}
+                                    {categories[selectedCategory].skills.filter(s => s.status === 'learning').length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <Flame className="w-5 h-5 text-orange-500" />
+                                                <h3 className="text-xl font-bold text-orange-500">
+                                                    Aprendiendo Activamente
+                                                </h3>
+                                                <Badge variant="outline" className="border-orange-500 text-orange-500">
+                                                    {categories[selectedCategory].skills.filter(s => s.status === 'learning').length}
+                                                </Badge>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                                {categories[selectedCategory].skills
+                                                    .filter(skill => skill.status === 'learning')
+                                                    .map((skill, idx) => (
+                                                        <SkillCard key={idx} skill={skill} />
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                            {categories[selectedCategory].skills
-                                                .filter(skill => skill.status === 'learning')
-                                                .map((skill, idx) => (
-                                                    <SkillCard key={idx} skill={skill} />
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {/* Planeadas */}
-                                {categories[selectedCategory].skills.filter(s => s.status === 'planned').length > 0 && (
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Target className="w-5 h-5 text-blue-500" />
-                                            <h3 className="text-xl font-bold text-blue-500">
-                                                En el Roadmap
-                                            </h3>
-                                            <Badge variant="outline" className="border-blue-500 text-blue-500">
-                                                {categories[selectedCategory].skills.filter(s => s.status === 'planned').length}
-                                            </Badge>
+                                    {/* Planeadas */}
+                                    {categories[selectedCategory].skills.filter(s => s.status === 'planned').length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <Target className="w-5 h-5 text-blue-500" />
+                                                <h3 className="text-xl font-bold text-blue-500">
+                                                    En el Roadmap
+                                                </h3>
+                                                <Badge variant="outline" className="border-blue-500 text-blue-500">
+                                                    {categories[selectedCategory].skills.filter(s => s.status === 'planned').length}
+                                                </Badge>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                                {categories[selectedCategory].skills
+                                                    .filter(skill => skill.status === 'planned')
+                                                    .map((skill, idx) => (
+                                                        <SkillCard key={idx} skill={skill} />
+                                                    ))
+                                                }
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                            {categories[selectedCategory].skills
-                                                .filter(skill => skill.status === 'planned')
-                                                .map((skill, idx) => (
-                                                    <SkillCard key={idx} skill={skill} />
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
+                                </div>
+                            )}
                         </>
+                    ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                            Selecciona una categoría para ver las skills.
+                        </div>
                     )}
                 </div>
 

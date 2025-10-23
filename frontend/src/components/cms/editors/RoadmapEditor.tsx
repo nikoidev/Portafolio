@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronDown, ChevronUp, Plus, Trash2, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface Skill {
@@ -247,70 +247,128 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
                             </div>
 
                             {category.skills.map((skill, skillIndex) => (
-                                <Card key={skillIndex} className="bg-muted/30">
-                                    <CardContent className="pt-4 pb-3">
-                                        <div className="space-y-3">
-                                            <div className="flex items-start gap-2">
-                                                <div className="flex-1 grid grid-cols-2 gap-2">
-                                                    <div>
-                                                        <Label className="text-xs">Nombre</Label>
-                                                        <Input
-                                                            value={skill.name}
-                                                            onChange={(e) => updateSkill(catIndex, skillIndex, { ...skill, name: e.target.value })}
-                                                            placeholder="React, Python..."
-                                                            className="h-8"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <Label className="text-xs">URL del Ícono</Label>
-                                                        <Input
-                                                            value={skill.icon || ''}
-                                                            onChange={(e) => updateSkill(catIndex, skillIndex, { ...skill, icon: e.target.value })}
-                                                            placeholder="https://..."
-                                                            className="h-8"
-                                                        />
-                                                    </div>
-                                                </div>
+                                <Card key={skillIndex} className="bg-muted/30 border-2">
+                                    <CardContent className="pt-4 pb-4">
+                                        <div className="space-y-4">
+                                            {/* Header con número de skill y botón eliminar */}
+                                            <div className="flex items-center justify-between">
+                                                <Badge variant="outline">Skill #{skillIndex + 1}</Badge>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => deleteSkill(catIndex, skillIndex)}
-                                                    className="h-8 w-8 p-0 mt-5"
+                                                    className="h-8 w-8 p-0 hover:bg-destructive hover:text-destructive-foreground"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </div>
 
-                                            <div className="grid grid-cols-2 gap-3">
+                                            {/* Nombre de la skill */}
+                                            <div>
+                                                <Label className="text-sm font-medium mb-2 block">
+                                                    Nombre de la Skill *
+                                                </Label>
+                                                <Input
+                                                    value={skill.name || ''}
+                                                    onChange={(e) => updateSkill(catIndex, skillIndex, { ...skill, name: e.target.value })}
+                                                    placeholder="Ej: React, Python, Docker..."
+                                                    className="h-9"
+                                                />
+                                            </div>
+
+                                            {/* URL del Ícono con preview */}
+                                            <div>
+                                                <Label className="text-sm font-medium mb-2 block">
+                                                    URL del Ícono
+                                                    <span className="text-xs text-muted-foreground ml-2">
+                                                        (Usa https://cdn.simpleicons.org/[nombre])
+                                                    </span>
+                                                </Label>
+                                                <div className="flex gap-2">
+                                                    <div className="flex-1">
+                                                        <Input
+                                                            value={skill.icon || ''}
+                                                            onChange={(e) => updateSkill(catIndex, skillIndex, { ...skill, icon: e.target.value })}
+                                                            placeholder="https://cdn.simpleicons.org/react"
+                                                            className="h-9"
+                                                        />
+                                                    </div>
+                                                    {skill.icon && (
+                                                        <div className="w-9 h-9 rounded border flex items-center justify-center bg-background">
+                                                            <img
+                                                                src={skill.icon}
+                                                                alt="Preview"
+                                                                className="w-6 h-6 object-contain"
+                                                                onError={(e) => {
+                                                                    e.currentTarget.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    Ejemplos: react, python, typescript, docker, nodejs
+                                                </p>
+                                            </div>
+
+                                            {/* Estado y Dominio en dos columnas */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* Estado */}
                                                 <div>
-                                                    <Label className="text-xs flex items-center justify-between mb-2">
-                                                        <span>Dominio</span>
-                                                        <span className="font-bold">{skill.proficiency}%</span>
+                                                    <Label className="text-sm font-medium mb-2 block">
+                                                        Estado *
+                                                    </Label>
+                                                    <Select
+                                                        value={skill.status || 'learning'}
+                                                        onValueChange={(value: any) => updateSkill(catIndex, skillIndex, { ...skill, status: value })}
+                                                    >
+                                                        <SelectTrigger className="h-9">
+                                                            <SelectValue placeholder="Selecciona un estado" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="completed">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-green-500">✅</span>
+                                                                    <span>Dominado</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                            <SelectItem value="learning">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-orange-500">🔥</span>
+                                                                    <span>Aprendiendo</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                            <SelectItem value="planned">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-blue-500">🎯</span>
+                                                                    <span>Planeado</span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+
+                                                {/* Nivel de Dominio */}
+                                                <div>
+                                                    <Label className="text-sm font-medium mb-2 flex items-center justify-between">
+                                                        <span>Nivel de Dominio</span>
+                                                        <Badge variant="secondary" className="text-sm font-bold">
+                                                            {skill.proficiency || 0}%
+                                                        </Badge>
                                                     </Label>
                                                     <Slider
-                                                        value={[skill.proficiency]}
+                                                        value={[skill.proficiency || 0]}
                                                         onValueChange={(value) => updateSkill(catIndex, skillIndex, { ...skill, proficiency: value[0] })}
                                                         min={0}
                                                         max={100}
                                                         step={5}
-                                                        className="w-full"
+                                                        className="w-full mt-2"
                                                     />
-                                                </div>
-                                                <div>
-                                                    <Label className="text-xs mb-2 block">Estado</Label>
-                                                    <Select
-                                                        value={skill.status}
-                                                        onValueChange={(value: any) => updateSkill(catIndex, skillIndex, { ...skill, status: value })}
-                                                    >
-                                                        <SelectTrigger className="h-8">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="completed">✅ Dominado</SelectItem>
-                                                            <SelectItem value="learning">🔥 Aprendiendo</SelectItem>
-                                                            <SelectItem value="planned">🎯 Planeado</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                                                        <span>Básico</span>
+                                                        <span>Intermedio</span>
+                                                        <span>Avanzado</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
