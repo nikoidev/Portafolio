@@ -358,7 +358,7 @@ export function SectionEditor({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>
                         {readOnly ? 'Ver Sección' : 'Editar Sección'}: {section?.title}

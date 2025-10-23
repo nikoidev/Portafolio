@@ -107,7 +107,13 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
 
     const updateSkill = (categoryIndex: number, skillIndex: number, skill: Skill) => {
         const categories = [...(localContent.categories || [])];
+        // Deep copy of the category to ensure React detects the change
+        categories[categoryIndex] = {
+            ...categories[categoryIndex],
+            skills: [...categories[categoryIndex].skills]
+        };
         categories[categoryIndex].skills[skillIndex] = skill;
+
         updateContent({ ...localContent, categories });
     };
 
@@ -320,29 +326,26 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
                                                     </Label>
                                                     <Select
                                                         value={skill.status || 'learning'}
-                                                        onValueChange={(value: any) => updateSkill(catIndex, skillIndex, { ...skill, status: value })}
+                                                        onValueChange={(value: 'completed' | 'learning' | 'planned') => {
+                                                            updateSkill(catIndex, skillIndex, { ...skill, status: value });
+                                                        }}
                                                     >
                                                         <SelectTrigger className="h-9">
                                                             <SelectValue placeholder="Selecciona un estado" />
                                                         </SelectTrigger>
-                                                        <SelectContent>
+                                                        <SelectContent
+                                                            position="popper"
+                                                            sideOffset={5}
+                                                            className="z-[9999]"
+                                                        >
                                                             <SelectItem value="completed">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-green-500">✅</span>
-                                                                    <span>Dominado</span>
-                                                                </div>
+                                                                ✅ Dominado
                                                             </SelectItem>
                                                             <SelectItem value="learning">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-orange-500">🔥</span>
-                                                                    <span>Aprendiendo</span>
-                                                                </div>
+                                                                🔥 Aprendiendo
                                                             </SelectItem>
                                                             <SelectItem value="planned">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-blue-500">🎯</span>
-                                                                    <span>Planeado</span>
-                                                                </div>
+                                                                🎯 Planeado
                                                             </SelectItem>
                                                         </SelectContent>
                                                     </Select>
