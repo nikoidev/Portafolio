@@ -3,7 +3,7 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { FeaturedProjects } from '@/components/public/FeaturedProjects';
 import { HeroSection } from '@/components/public/HeroSection';
-import { RoadmapSection } from '@/components/public/RoadmapSection';
+import { RoadmapSectionHorizontal } from '@/components/public/RoadmapSectionHorizontal';
 import { cmsApi } from '@/lib/cms-api';
 import { useEffect, useState } from 'react';
 
@@ -60,7 +60,7 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
 
             case 'roadmap':
                 return (
-                    <RoadmapSection
+                    <RoadmapSectionHorizontal
                         content={{
                             title: section.content?.title,
                             description: section.content?.description,
