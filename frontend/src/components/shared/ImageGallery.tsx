@@ -2,7 +2,7 @@
 
 import { getImageUrl } from '@/lib/api';
 import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 
 interface GalleryImage {
@@ -21,6 +21,20 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
     const sortedImages = [...images].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    // Block body scroll when lightbox is open
+    useEffect(() => {
+        if (isLightboxOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isLightboxOpen]);
 
     const goToNext = () => {
         setCurrentIndex((prev) => (prev + 1) % sortedImages.length);
@@ -133,56 +147,82 @@ export function ImageGallery({ images, className = '' }: ImageGalleryProps) {
 
             {/* Lightbox */}
             {isLightboxOpen && (
-                <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4">
-                    {/* Close button */}
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute top-4 right-4 text-white hover:bg-white/20"
-                        onClick={() => setIsLightboxOpen(false)}
-                    >
-                        <X className="w-6 h-6" />
-                    </Button>
+                <div
+                    className="fixed inset-0 z-[200] bg-black/95 flex flex-col"
+                    onClick={() => setIsLightboxOpen(false)}
+                >
+                    {/* Header with close button and counter */}
+                    <div className="flex items-center justify-between p-4 flex-shrink-0">
+                        <div className="text-white text-lg font-medium">
+                            {currentIndex + 1} / {sortedImages.length}
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-white hover:bg-white/20"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsLightboxOpen(false);
+                            }}
+                        >
+                            <X className="w-6 h-6" />
+                        </Button>
+                    </div>
 
-                    {/* Navigation */}
+                    {/* Navigation buttons */}
                     {sortedImages.length > 1 && (
                         <>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-                                onClick={goToPrevious}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 z-10"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    goToPrevious();
+                                }}
                             >
                                 <ChevronLeft className="w-8 h-8" />
                             </Button>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20"
-                                onClick={goToNext}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 z-10"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    goToNext();
+                                }}
                             >
                                 <ChevronRight className="w-8 h-8" />
                             </Button>
                         </>
                     )}
 
-                    {/* Image */}
-                    <div className="max-w-7xl max-h-[90vh] w-full">
-                        <img
-                            src={getImageUrl(sortedImages[currentIndex].url)}
-                            alt={sortedImages[currentIndex].title || `Screenshot ${currentIndex + 1}`}
-                            className="w-full h-full object-contain"
-                        />
-                        {sortedImages[currentIndex].title && (
-                            <p className="text-white text-center mt-4 text-lg">
-                                {sortedImages[currentIndex].title}
-                            </p>
-                        )}
-                    </div>
+                    {/* Scrollable content area */}
+                    <div
+                        className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="max-w-7xl mx-auto flex flex-col items-center justify-start min-h-full py-4">
+                            {/* Image */}
+                            <img
+                                src={getImageUrl(sortedImages[currentIndex].url)}
+                                alt={sortedImages[currentIndex].title || `Screenshot ${currentIndex + 1}`}
+                                className="max-w-full h-auto object-contain rounded-lg"
+                                style={{ maxHeight: 'calc(100vh - 200px)' }}
+                            />
 
-                    {/* Counter */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white text-lg">
-                        {currentIndex + 1} / {sortedImages.length}
+                            {/* Description */}
+                            {sortedImages[currentIndex].title && (
+                                <div className="mt-6 w-full max-w-3xl">
+                                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                                        <p className="text-white text-base leading-relaxed">
+                                            <span className="font-semibold text-white/90">Descripción: </span>
+                                            {sortedImages[currentIndex].title}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

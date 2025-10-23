@@ -1,300 +1,549 @@
 # 🤝 Guía de Contribución
 
-¡Gracias por tu interés en contribuir a este proyecto! Esta guía te ayudará a empezar.
+¡Gracias por tu interés en contribuir al proyecto! Esta guía te ayudará a entender el proceso y las mejores prácticas.
+
+---
 
 ## 📋 Tabla de Contenidos
 
-- [Cómo Contribuir](#cómo-contribuir)
-- [Reportar Bugs](#reportar-bugs)
-- [Sugerir Mejoras](#sugerir-mejoras)
-- [Proceso de Pull Request](#proceso-de-pull-request)
-- [Estándares de Código](#estándares-de-código)
+- [Código de Conducta](#código-de-conducta)
+- [¿Cómo Contribuir?](#cómo-contribuir)
+- [Proceso de Desarrollo](#proceso-de-desarrollo)
+- [CI/CD Pipeline](#cicd-pipeline)
 - [Convención de Commits](#convención-de-commits)
+- [Estándares de Código](#estándares-de-código)
+- [Pull Request](#pull-request)
 
 ---
 
-## Cómo Contribuir
+## 📜 Código de Conducta
 
-### Reportar Bugs
+Este proyecto adhiere a un código de conducta. Al participar, se espera que mantengas este código:
 
-Si encuentras un bug, por favor crea un issue con la siguiente información:
-
-**Título**: Descripción breve del problema
-
-**Contenido**:
-```markdown
-**Descripción del bug**
-Descripción clara y concisa del problema.
-
-**Pasos para reproducir**
-1. Ir a '...'
-2. Hacer click en '...'
-3. Ver error
-
-**Comportamiento esperado**
-Lo que esperabas que sucediera.
-
-**Screenshots**
-Si es posible, agrega capturas de pantalla.
-
-**Entorno**:
-- OS: [ej. Windows 11, macOS 13]
-- Navegador: [ej. Chrome 120]
-- Node.js: [ej. 18.17.0]
-- Python: [ej. 3.11.5]
-```
-
-### Sugerir Mejoras
-
-Para sugerir nuevas funcionalidades:
-
-1. **Verifica** que no exista ya un issue similar
-2. **Crea un issue** con:
-   - Descripción clara de la funcionalidad
-   - Por qué sería útil
-   - Ejemplos de uso
-   - Posible implementación (opcional)
+- 🤝 Sé respetuoso y considerado
+- 💬 Usa lenguaje inclusivo
+- 🎯 Acepta críticas constructivas
+- 🚀 Enfócate en lo que es mejor para la comunidad
 
 ---
 
-## Proceso de Pull Request
+## 🚀 ¿Cómo Contribuir?
 
-### 1. Fork y Clonar
+### 1. Fork del Repositorio
 
 ```bash
-# Fork el repositorio en GitHub
-# Luego clona tu fork
-git clone https://github.com/Nikoidev/Portafolio.git
+# Clona tu fork
+git clone https://github.com/nikoidev/Portafolio.git
 cd Portafolio
+
+# Agrega el repositorio original como upstream
+git remote add upstream https://github.com/nikoidev/Portafolio.git
 ```
 
-### 2. Crear Rama
+### 2. Crea una Rama
 
 ```bash
-# Crea una rama desde main
-git checkout -b feature/mi-nueva-funcionalidad
+# Actualiza main
+git checkout main
+git pull upstream main
 
-# O para un fix
-git checkout -b fix/nombre-del-bug
+# Crea una nueva rama para tu feature/fix
+git checkout -b feature/nombre-descriptivo
+# o
+git checkout -b fix/descripcion-del-bug
 ```
 
-**Convención de nombres de rama**:
-- `feature/descripcion` - Nueva funcionalidad
-- `fix/descripcion` - Corrección de bug
-- `docs/descripcion` - Documentación
-- `refactor/descripcion` - Refactorización
+### 3. Realiza tus Cambios
 
-### 3. Hacer Cambios
+- Escribe código limpio y documentado
+- Sigue los estándares de código del proyecto
+- Agrega tests si es posible
+- Actualiza la documentación si es necesario
 
-- Escribe código limpio y legible
-- Sigue los estándares de código (ver abajo)
-- Agrega comentarios para lógica compleja
-- Actualiza documentación si es necesario
-
-### 4. Probar Cambios
-
-**Backend**:
-```bash
-cd backend
-pipenv run test    # Si hay tests
-pipenv run lint    # Verificar estilo
-```
-
-**Frontend**:
-```bash
-cd frontend
-npm run type-check # Verificar tipos TypeScript
-npm run lint       # Verificar estilo
-npm run build      # Asegurar que compila
-```
-
-### 5. Commit
+### 4. Commit tus Cambios
 
 ```bash
 git add .
-git commit -m "feat: agregar nueva funcionalidad"
+git commit -m "feat: descripción breve del cambio"
 ```
 
-Ver [Convención de Commits](#convención-de-commits) abajo.
-
-### 6. Push y Pull Request
+### 5. Push y Pull Request
 
 ```bash
-git push origin feature/mi-nueva-funcionalidad
+git push origin feature/nombre-descriptivo
 ```
 
-Luego en GitHub:
-1. Ve a tu fork
-2. Click en "Compare & pull request"
-3. Describe tus cambios
-4. Envía el PR
+Luego abre un Pull Request en GitHub desde tu fork hacia el repositorio original.
 
 ---
 
-## Estándares de Código
+## 🔄 Proceso de Desarrollo
 
-### Python (Backend)
+### Configuración del Entorno
 
-**Estilo**: Seguir [PEP 8](https://pep8.org/)
+1. **Requisitos**:
+   - Node.js 18+
+   - Python 3.11+
+   - PostgreSQL 14+
+   - Docker (opcional pero recomendado)
 
-```python
-# ✅ Bien
-def get_user_by_email(email: str) -> Optional[User]:
-    """
-    Obtiene un usuario por su email.
-    
-    Args:
-        email: Email del usuario
-        
-    Returns:
-        Usuario si existe, None en caso contrario
-    """
-    return db.query(User).filter(User.email == email).first()
+2. **Instalación**:
+   ```bash
+   # Backend
+   cd backend
+   pipenv install --dev
+   pipenv shell
+   
+   # Frontend
+   cd frontend
+   npm install
+   ```
 
+3. **Variables de Entorno**:
+   - Copia `backend/env.example` a `backend/.env`
+   - Copia `frontend/env.local.example` a `frontend/.env.local`
+   - Configura las variables según tu entorno
 
-# ❌ Mal
-def getUserByEmail(e):
-    return db.query(User).filter(User.email==e).first()
+### Ejecutar en Desarrollo
+
+```bash
+# Terminal 1 - Backend
+cd backend
+pipenv run dev
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
 ```
 
-**Puntos clave**:
-- Usar type hints
-- Escribir docstrings
-- Nombres descriptivos
-- Funciones pequeñas y enfocadas
-- Usar async/await para operaciones de BD
+### Ejecutar Tests
 
-### TypeScript (Frontend)
+```bash
+# Backend
+cd backend
+pipenv run pytest
 
-```typescript
-// ✅ Bien
-interface UserProfile {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-}
-
-const getUserProfile = async (userId: string): Promise<UserProfile> => {
-  const response = await api.get(`/users/${userId}`);
-  return response.data;
-};
-
-
-// ❌ Mal
-const getUser = async (id) => {
-  return await api.get('/users/' + id);
-}
+# Frontend
+cd frontend
+npm run test
 ```
-
-**Puntos clave**:
-- Usar TypeScript con tipos explícitos
-- Componentes funcionales con hooks
-- Nombres significativos
-- Extraer lógica reutilizable en hooks personalizados
-- Componentes pequeños y enfocados
 
 ---
 
-## Convención de Commits
+## 🔧 CI/CD Pipeline
 
-Seguimos [Conventional Commits](https://www.conventionalcommits.org/):
+El proyecto utiliza **GitHub Actions** para automatizar el proceso de integración y deployment.
+
+### 🎯 Workflows Automáticos
+
+#### Backend CI/CD (`.github/workflows/backend-ci-cd.yml`)
+
+**Triggers:**
+- Push a `main` con cambios en `backend/**`
+- Pull Request a `main` con cambios en `backend/**`
+
+**Jobs:**
+
+1. **Lint and Test**:
+   ```yaml
+   - Checkout code
+   - Setup Python 3.11
+   - Cache pip dependencies
+   - Install pipenv + dependencies
+   - Lint with flake8 (syntax errors)
+   - Type checking with mypy
+   - Run tests with pytest
+   ```
+
+2. **Deploy** (solo en push a `main`):
+   ```yaml
+   - Checkout code
+   - Install Railway CLI
+   - Deploy to Railway
+   ```
+
+#### Frontend CI/CD (`.github/workflows/frontend-ci-cd.yml`)
+
+**Triggers:**
+- Push a `main` con cambios en `frontend/**`
+- Pull Request a `main` con cambios en `frontend/**`
+
+**Jobs:**
+
+1. **Lint and Build**:
+   ```yaml
+   - Checkout code
+   - Setup Node.js 18
+   - Cache npm dependencies
+   - Install dependencies (npm ci)
+   - Lint with ESLint
+   - Type check with TypeScript
+   - Build Next.js
+   - Upload build artifacts
+   ```
+
+2. **Deploy** (solo en push a `main`):
+   ```yaml
+   - Checkout code
+   - Install Railway CLI
+   - Deploy to Railway
+   ```
+
+### 📊 Status Badges
+
+Los badges en el README muestran el estado de los pipelines:
+
+- 🟢 **Passing**: Todo funcionó correctamente
+- 🔴 **Failing**: Hay errores que necesitan atención
+- 🟡 **Running**: El pipeline está ejecutándose
+
+### 🔐 Secrets Requeridos
+
+Para que los workflows funcionen en tu fork, necesitas configurar estos secrets en GitHub:
+
+1. Ve a: `Settings` → `Secrets and variables` → `Actions`
+
+2. Agrega los siguientes secrets:
+
+| Secret | Descripción | Requerido para |
+|--------|-------------|----------------|
+| `RAILWAY_TOKEN` | Token de Railway CLI | Deploy automático |
+| `NEXT_PUBLIC_API_URL` | URL del backend | Build del frontend |
+
+### 🚦 Proceso de CI/CD
+
+```
+┌─────────────┐
+│  Git Push   │
+└─────┬───────┘
+      │
+      ▼
+┌─────────────────────┐
+│  GitHub Actions     │
+│  Trigger Workflow   │
+└─────┬───────────────┘
+      │
+      ├─────────────────────┐
+      │                     │
+      ▼                     ▼
+┌─────────────┐      ┌─────────────┐
+│   Backend   │      │  Frontend   │
+│   CI/CD     │      │   CI/CD     │
+└─────┬───────┘      └─────┬───────┘
+      │                     │
+      ▼                     ▼
+┌─────────────┐      ┌─────────────┐
+│ Lint + Test │      │ Lint + Build│
+└─────┬───────┘      └─────┬───────┘
+      │                     │
+      │   Success?          │   Success?
+      ├─────────────────────┤
+      │                     │
+      ▼                     ▼
+┌─────────────────────────────┐
+│  Deploy to Railway          │
+│  (solo si push a main)      │
+└─────────────────────────────┘
+```
+
+### 🛠️ Ejecutar CI Localmente
+
+Para validar antes de hacer push:
+
+```bash
+# Backend
+cd backend
+pipenv run flake8 app
+pipenv run mypy app --ignore-missing-imports
+pipenv run pytest
+
+# Frontend
+cd frontend
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+---
+
+## 💬 Convención de Commits
+
+Usamos [Conventional Commits](https://www.conventionalcommits.org/) para mantener un historial claro:
 
 ### Formato
 
 ```
-<tipo>(<alcance>): <descripción>
+<tipo>(<scope>): <descripción>
 
 [cuerpo opcional]
 
-[nota al pie opcional]
+[footer opcional]
 ```
 
 ### Tipos
 
-- **feat**: Nueva funcionalidad
-- **fix**: Corrección de bug
-- **docs**: Cambios en documentación
-- **style**: Formato de código (sin cambios funcionales)
-- **refactor**: Refactorización de código
-- **perf**: Mejoras de rendimiento
-- **test**: Agregar o actualizar tests
-- **chore**: Tareas de mantenimiento
+- `feat`: Nueva funcionalidad
+- `fix`: Corrección de bug
+- `docs`: Cambios en documentación
+- `style`: Formato, espacios en blanco, etc (sin cambios en lógica)
+- `refactor`: Refactorización de código
+- `perf`: Mejoras de rendimiento
+- `test`: Agregar o actualizar tests
+- `chore`: Tareas de mantenimiento, actualización de dependencias
+- `ci`: Cambios en configuración de CI/CD
+- `build`: Cambios en sistema de build o dependencias
 
 ### Ejemplos
 
 ```bash
-# Funcionalidad simple
-git commit -m "feat: agregar página de perfil de usuario"
+# Nueva funcionalidad
+git commit -m "feat(auth): add password reset functionality"
 
-# Bug fix con alcance
-git commit -m "fix(auth): resolver problema de expiración de token"
+# Corrección de bug
+git commit -m "fix(api): resolve CORS issue in production"
 
-# Breaking change
-git commit -m "feat!: rediseñar sistema de autenticación
+# Documentación
+git commit -m "docs(readme): update installation instructions"
 
-BREAKING CHANGE: Ahora se requiere verificación de email"
+# Refactorización
+git commit -m "refactor(components): simplify ProjectCard component"
 
-# Con cuerpo
-git commit -m "refactor(api): mejorar manejo de errores
+# CI/CD
+git commit -m "ci(workflows): add automated testing for PRs"
+```
 
-- Agregar clases de error personalizadas
-- Estandarizar respuestas de error
-- Agregar logging de errores"
+### Scope (Opcional)
+
+Indica el área afectada:
+
+- `auth` - Autenticación
+- `api` - Endpoints de la API
+- `ui` - Interfaz de usuario
+- `db` - Base de datos
+- `config` - Configuración
+- `deps` - Dependencias
+
+---
+
+## 📝 Estándares de Código
+
+### Backend (Python)
+
+- **PEP 8**: Seguir la guía de estilo de Python
+- **Type Hints**: Usar anotaciones de tipos
+- **Docstrings**: Documentar funciones y clases
+- **Longitud de línea**: Máximo 120 caracteres
+- **Imports**: Usar orden absoluto, agrupados
+
+```python
+# Bueno
+def get_user_by_email(email: str) -> User | None:
+    """
+    Retrieve a user by their email address.
+    
+    Args:
+        email: The user's email address
+        
+    Returns:
+        User object if found, None otherwise
+    """
+    return db.query(User).filter(User.email == email).first()
+```
+
+### Frontend (TypeScript)
+
+- **ESLint**: Seguir las reglas configuradas
+- **TypeScript**: Usar tipos estrictos
+- **Componentes**: Preferir funciones sobre clases
+- **Props**: Usar interfaces para definir props
+- **Naming**: camelCase para variables, PascalCase para componentes
+
+```typescript
+// Bueno
+interface UserCardProps {
+  user: User;
+  onEdit?: (id: string) => void;
+}
+
+export function UserCard({ user, onEdit }: UserCardProps) {
+  // ...
+}
+```
+
+### Tests
+
+- **Nombrado**: Descriptivo y claro
+- **AAA Pattern**: Arrange, Act, Assert
+- **Coverage**: Apuntar a >80% de cobertura
+
+```python
+# Backend test example
+def test_create_user_success():
+    # Arrange
+    user_data = {"email": "test@example.com", "password": "secure123"}
+    
+    # Act
+    response = client.post("/api/v1/users", json=user_data)
+    
+    # Assert
+    assert response.status_code == 201
+    assert response.json()["email"] == user_data["email"]
 ```
 
 ---
 
-## Guías Generales
+## 🔍 Pull Request
 
-### Código
+### Checklist
 
-1. **DRY (Don't Repeat Yourself)** - Evita duplicación
-2. **KISS (Keep It Simple)** - Mantén la simplicidad
-3. **SOLID** - Principios de programación orientada a objetos
-4. **Separación de responsabilidades** - Cada función/componente hace una cosa
+Antes de abrir un PR, verifica:
 
-### Documentación
+- [ ] El código sigue los estándares del proyecto
+- [ ] Todos los tests pasan localmente
+- [ ] Agregaste tests para nuevo código (si aplica)
+- [ ] Actualizaste la documentación (si aplica)
+- [ ] Los commits siguen la convención establecida
+- [ ] El PR tiene una descripción clara
+- [ ] Los cambios fueron probados manualmente
 
-- Comenta el **por qué**, no el **qué**
-- Actualiza README si agregas features importantes
-- Escribe docstrings para funciones complejas
+### Template de PR
 
-### Tests
+```markdown
+## 📝 Descripción
 
-- Escribe tests para nueva funcionalidad
-- Asegura que los tests existentes pasen
-- Cubre casos edge
+Breve descripción de los cambios realizados.
+
+## 🎯 Tipo de Cambio
+
+- [ ] 🐛 Bug fix
+- [ ] ✨ Nueva funcionalidad
+- [ ] 💥 Breaking change
+- [ ] 📝 Documentación
+- [ ] 🎨 Estilo/UI
+
+## 🧪 ¿Cómo se ha probado?
+
+Describe las pruebas realizadas.
+
+## 📸 Screenshots (si aplica)
+
+Agrega capturas de pantalla.
+
+## ✅ Checklist
+
+- [ ] Mi código sigue el estilo del proyecto
+- [ ] He realizado una auto-revisión
+- [ ] He comentado código complejo
+- [ ] He actualizado la documentación
+- [ ] Mis cambios no generan warnings
+- [ ] He agregado tests
+- [ ] Los tests existentes pasan
+```
+
+### Proceso de Revisión
+
+1. **Automated Checks**: Los workflows de CI/CD correrán automáticamente
+2. **Code Review**: Un mantenedor revisará tu código
+3. **Feedback**: Puede haber solicitudes de cambios
+4. **Merge**: Una vez aprobado, se hará merge a `main`
+
+### Tiempo de Respuesta
+
+- Reviews iniciales: 1-3 días
+- Cambios solicitados: según complejidad
+- Merge: después de aprobación y CI passing
 
 ---
 
-## Proceso de Revisión
+## 🐛 Reportar Bugs
 
-1. **Automático**: Los checks de CI deben pasar (si están configurados)
-2. **Revisión de código**: Un maintainer revisará tu código
-3. **Cambios solicitados**: Realiza cambios si se solicitan
-4. **Aprobación**: Una vez aprobado, se hará merge
+### Antes de Reportar
+
+1. Verifica que no exista un issue similar
+2. Reproduce el bug en la última versión
+3. Recopila información relevante
+
+### Template de Bug Report
+
+```markdown
+## 🐛 Descripción del Bug
+
+Descripción clara y concisa del bug.
+
+## 📋 Pasos para Reproducir
+
+1. Ve a '...'
+2. Click en '...'
+3. Scroll hasta '...'
+4. Observa el error
+
+## 🎯 Comportamiento Esperado
+
+Qué debería ocurrir.
+
+## 📸 Screenshots
+
+Si aplica, agrega capturas.
+
+## 🖥️ Entorno
+
+- OS: [ej: Windows 11]
+- Browser: [ej: Chrome 120]
+- Versión: [ej: v1.2.3]
+
+## 📝 Información Adicional
+
+Cualquier otro contexto relevante.
+```
 
 ---
 
-## Preguntas
+## 💡 Solicitar Features
 
-Si tienes dudas:
-- Crea un issue con la etiqueta `question`
-- Revisa issues y PRs existentes
-- Lee la documentación en `/docs`
+### Template de Feature Request
+
+```markdown
+## 🚀 Feature Request
+
+Descripción clara de la funcionalidad solicitada.
+
+## 🎯 Problema que Resuelve
+
+¿Qué problema o necesidad aborda?
+
+## 💡 Solución Propuesta
+
+¿Cómo te gustaría que funcionara?
+
+## 🔀 Alternativas Consideradas
+
+¿Hay otras formas de resolver esto?
+
+## 📝 Contexto Adicional
+
+Cualquier información adicional.
+```
 
 ---
 
-## Código de Conducta
+## 📞 Contacto
 
-- Sé respetuoso y profesional
-- Acepta críticas constructivas
-- Enfócate en el código, no en las personas
-- Ayuda a otros contributors
+Si tienes preguntas sobre cómo contribuir:
+
+- **Issues**: [GitHub Issues](https://github.com/nikoidev/Portafolio/issues)
+- **Email**: aran.nick15@gmail.com
+- **Discussions**: [GitHub Discussions](https://github.com/nikoidev/Portafolio/discussions)
 
 ---
 
-¡Gracias por contribuir! 🎉
+## 🙏 Agradecimientos
 
-Cada contribución, sin importar su tamaño, hace que este proyecto sea mejor.
+¡Gracias por contribuir! Cada contribución, grande o pequeña, es valiosa para el proyecto.
+
+---
+
+<div align="center">
+
+**¡Feliz Coding! 🚀**
+
+</div>

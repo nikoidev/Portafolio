@@ -5,9 +5,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { api } from '@/lib/api';
-import { ImageIcon, Loader2, Trash2, Upload, X } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { api, getImageUrl } from '@/lib/api';
+import { ImageIcon, Loader2, RefreshCw, Trash2, Upload, X } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
 
@@ -33,6 +33,8 @@ export function ProjectImageManager({
     const [isOpen, setIsOpen] = useState(false);
     const [images, setImages] = useState<ProjectImage[]>(currentImages);
     const [isUploading, setIsUploading] = useState(false);
+    const [replacingIndex, setReplacingIndex] = useState<number | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [pendingFiles, setPendingFiles] = useState<Array<{
         file: File;
         preview: string;
@@ -142,6 +144,62 @@ export function ProjectImageManager({
         onImagesUpdate(reordered);
     };
 
+    const handleReplaceClick = (index: number) => {
+        setReplacingIndex(index);
+        fileInputRef.current?.click();
+    };
+
+    const handleReplaceImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || replacingIndex === null) return;
+
+        // Validar tipo de archivo
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            toast.error('Tipo de archivo no válido. Usa JPG, PNG, WEBP o GIF');
+            return;
+        }
+
+        // Validar tamaño (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error('La imagen no debe superar 10MB');
+            return;
+        }
+
+        setIsUploading(true);
+
+        try {
+            // Subir la nueva imagen
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('optimize', 'true');
+            formData.append('project_slug', projectId.toString());
+
+            const result = await api.uploadImage(formData);
+
+            // Reemplazar la imagen manteniendo el título y orden
+            const updatedImages = images.map((img, i) =>
+                i === replacingIndex
+                    ? { ...img, url: result.url }
+                    : img
+            );
+
+            setImages(updatedImages);
+            onImagesUpdate(updatedImages);
+
+            toast.success('Imagen reemplazada correctamente');
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || 'Error al reemplazar la imagen');
+        } finally {
+            setIsUploading(false);
+            setReplacingIndex(null);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
@@ -158,6 +216,15 @@ export function ProjectImageManager({
                         Sube imágenes con descripciones para mostrar en la galería del proyecto
                     </DialogDescription>
                 </DialogHeader>
+
+                {/* Input oculto para reemplazar imágenes */}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
+                    onChange={handleReplaceImage}
+                    className="hidden"
+                />
 
                 <div className="space-y-6">
                     {/* Zona de carga */}
@@ -234,11 +301,36 @@ export function ProjectImageManager({
                             {images.map((image, index) => (
                                 <div key={index} className="border rounded-lg p-4 space-y-3">
                                     <div className="flex gap-4">
-                                        <img
-                                            src={`http://localhost:8004${image.url}`}
-                                            alt={image.title || 'Imagen del proyecto'}
-                                            className="w-24 h-24 object-cover rounded"
-                                        />
+                                        {/* Imagen con botón de reemplazar como overlay */}
+                                        <div className="relative group">
+                                            <img
+                                                src={getImageUrl(image.url)}
+                                                alt={image.title || 'Imagen del proyecto'}
+                                                className="w-24 h-24 object-cover rounded"
+                                            />
+                                            {/* Overlay con botón de reemplazar */}
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    onClick={() => handleReplaceClick(index)}
+                                                    disabled={isUploading}
+                                                    title="Reemplazar imagen"
+                                                    className="text-xs"
+                                                >
+                                                    {isUploading && replacingIndex === index ? (
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                    ) : (
+                                                        <>
+                                                            <RefreshCw className="w-3 h-3 mr-1" />
+                                                            Reemplazar
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </div>
+
                                         <div className="flex-1 space-y-2">
                                             <Label>Descripción</Label>
                                             <Input
@@ -256,7 +348,8 @@ export function ProjectImageManager({
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => moveImage(index, 'up')}
-                                                disabled={index === 0}
+                                                disabled={index === 0 || isUploading}
+                                                title="Mover arriba"
                                             >
                                                 ↑
                                             </Button>
@@ -265,7 +358,8 @@ export function ProjectImageManager({
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => moveImage(index, 'down')}
-                                                disabled={index === images.length - 1}
+                                                disabled={index === images.length - 1 || isUploading}
+                                                title="Mover abajo"
                                             >
                                                 ↓
                                             </Button>
@@ -274,6 +368,8 @@ export function ProjectImageManager({
                                                 variant="destructive"
                                                 size="icon"
                                                 onClick={() => removeImage(index)}
+                                                disabled={isUploading}
+                                                title="Eliminar imagen"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>

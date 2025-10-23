@@ -3,6 +3,8 @@
 Sistema de portafolio web completo con gestión de contenido, autenticación y demos interactivos.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Backend CI/CD](https://github.com/nikoidev/Portafolio/workflows/Backend%20CI/CD/badge.svg)](https://github.com/nikoidev/Portafolio/actions/workflows/backend-ci-cd.yml)
+[![Frontend CI/CD](https://github.com/nikoidev/Portafolio/workflows/Frontend%20CI/CD/badge.svg)](https://github.com/nikoidev/Portafolio/actions/workflows/frontend-ci-cd.yml)
 
 ---
 
@@ -84,11 +86,11 @@ Un sistema completo de portafolio web moderno que incluye:
 - **JWT** - Autenticación con tokens
 - **[Pydantic v2](https://docs.pydantic.dev/)** - Validación de datos
 
-### DevOps
+### DevOps & CI/CD
+- **[GitHub Actions](https://github.com/features/actions)** - CI/CD pipelines automáticos
 - **[Docker](https://www.docker.com/)** - Contenedorización
-- **[Vercel](https://vercel.com/)** - Hosting del frontend
-- **[Railway](https://railway.app/)** - Hosting del backend
-- **[Supabase](https://supabase.com/)** - Base de datos PostgreSQL
+- **[Railway](https://railway.app/)** - Hosting del backend y frontend
+- **[Supabase](https://supabase.com/)** - Base de datos PostgreSQL managed
 
 ---
 
@@ -107,7 +109,7 @@ Un sistema completo de portafolio web moderno que incluye:
 #### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/Nikoi18/Portafolio.git
+git clone https://github.com/nikoidev/Portafolio.git
 cd Portafolio
 ```
 
@@ -391,8 +393,8 @@ con o sin modificaciones, siempre que se incluya el aviso de copyright.
 ## 📧 Contacto
 
 - **Email**: aran.nick15@gmail.com
-- **GitHub**: [@Nikoi18](https://github.com/Nikoi18)
-- **Repositorio**: [github.com/Nikoi18/Portafolio](https://github.com/Nikoi18/Portafolio)
+- **GitHub**: [@nikoidev](https://github.com/nikoidev)
+- **Repositorio**: [github.com/nikoidev/Portafolio](https://github.com/nikoidev/Portafolio)
 
 ---
 

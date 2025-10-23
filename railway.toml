@@ -7,3 +7,7 @@ startCommand = "cd backend && alembic upgrade head && uvicorn app.main:app --hos
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
 
+# Persistent storage for uploads
+# Note: The volume "portafolio-volume" is manually created and attached in Railway Dashboard
+# It should be mounted at /app/backend/uploads
+
