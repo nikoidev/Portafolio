@@ -176,8 +176,8 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                                         </div>
 
                                         {/* Card de categoría */}
-                                        <Card className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm h-full min-h-[400px] flex flex-col">
-                                            <CardContent className="p-6 flex-1 flex flex-col">
+                                        <Card className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm flex flex-col">
+                                            <CardContent className="p-6 flex flex-col">
                                                 {/* Header */}
                                                 <div className="mb-4 text-center">
                                                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
@@ -224,7 +224,7 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                                                 </div>
 
                                                 {/* Habilidades */}
-                                                <div className="space-y-2 flex-1">
+                                                <div className="space-y-2">
                                                     {category.skills && category.skills.length > 0 ? (
                                                         category.skills.slice(0, 4).map((skill, skillIndex) => (
                                                             <div
@@ -421,7 +421,7 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                 )}
 
                 {/* Estadísticas globales - Aparecen en ambas vistas */}
-                <div className="mt-16 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
+                <div className="mt-24 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
                     <Card className="bg-green-500/10 border-green-500/20 hover:scale-105 transition-transform">
                         <CardContent className="pt-6 text-center">
                             <CheckCircle2 className="w-8 h-8 text-green-500 mx-auto mb-2" />
