@@ -1,8 +1,10 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle2, Flame, Target } from 'lucide-react';
+import { CheckCircle2, Flame, LayoutGrid, List, Target } from 'lucide-react';
+import { useState } from 'react';
 
 interface Skill {
     name: string;
@@ -28,6 +30,7 @@ interface RoadmapSectionProps {
 
 export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
     const { title, description, categories = [] } = content;
+    const [viewMode, setViewMode] = useState<'vertical' | 'horizontal'>('horizontal');
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -109,162 +112,315 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                             {description}
                         </p>
                     )}
+
+                    {/* Toggle de vista */}
+                    <div className="flex items-center justify-center gap-2 mt-6">
+                        <span className="text-sm text-muted-foreground">Vista:</span>
+                        <div className="inline-flex items-center gap-1 p-1 bg-muted rounded-lg">
+                            <Button
+                                variant={viewMode === 'horizontal' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('horizontal')}
+                                className="gap-2"
+                            >
+                                <LayoutGrid className="w-4 h-4" />
+                                <span className="hidden sm:inline">Horizontal</span>
+                            </Button>
+                            <Button
+                                variant={viewMode === 'vertical' ? 'default' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('vertical')}
+                                className="gap-2"
+                            >
+                                <List className="w-4 h-4" />
+                                <span className="hidden sm:inline">Vertical</span>
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Timeline Vertical con todas las categorías */}
-                <div className="relative space-y-12">
-                    {/* Línea de conexión vertical animada */}
-                    <div className="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-purple-500/40 to-primary/20">
-                        {/* Efecto de pulso que se mueve */}
-                        <div className="absolute inset-0 w-full bg-gradient-to-b from-transparent via-primary to-transparent animate-pulse-slow opacity-50" />
-                        <div className="absolute inset-0 w-full bg-gradient-to-b from-transparent via-purple-500 to-transparent animate-pulse-slower opacity-30" />
-                    </div>
+                {/* Vista Horizontal (Timeline) */}
+                {viewMode === 'horizontal' && (
+                    <div className="relative pb-8">
+                        {/* Línea horizontal animada */}
+                        <div className="absolute top-12 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/20 via-purple-500/40 to-primary/20 hidden md:block">
+                            {/* Efecto de pulso que se mueve */}
+                            <div className="absolute inset-0 h-full bg-gradient-to-r from-transparent via-primary to-transparent animate-pulse-horizontal opacity-50" />
+                            <div className="absolute inset-0 h-full bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-pulse-horizontal-slower opacity-30" />
+                        </div>
 
-                    {categories.map((category, catIndex) => {
-                        const stats = calculateCategoryStats(category);
-                        const avgProgress = category.skills.length > 0
-                            ? Math.round(category.skills.reduce((sum, s) => sum + s.proficiency, 0) / category.skills.length)
-                            : 0;
+                        {/* Categorías en fila */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+                            {categories.map((category, catIndex) => {
+                                const stats = calculateCategoryStats(category);
+                                const avgProgress = category.skills.length > 0
+                                    ? Math.round(category.skills.reduce((sum, s) => sum + s.proficiency, 0) / category.skills.length)
+                                    : 0;
 
-                        return (
-                            <div
-                                key={catIndex}
-                                className="relative animate-fade-in-up"
-                                style={{ animationDelay: `${catIndex * 150}ms` }}
-                            >
-                                {/* Nodo del timeline */}
-                                <div className="absolute left-4 md:left-8 top-0 z-10">
-                                    <div className="relative">
-                                        {/* Círculo principal */}
-                                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-3xl shadow-xl border-4 border-background">
-                                            {category.icon || '📚'}
+                                return (
+                                    <div
+                                        key={catIndex}
+                                        className="relative animate-fade-in-up"
+                                        style={{ animationDelay: `${catIndex * 150}ms` }}
+                                    >
+                                        {/* Nodo del timeline arriba */}
+                                        <div className="flex justify-center mb-4">
+                                            <div className="relative">
+                                                {/* Círculo principal */}
+                                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-3xl shadow-xl border-4 border-background">
+                                                    {category.icon || '📚'}
+                                                </div>
+                                                {/* Efecto de pulso */}
+                                                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                                            </div>
                                         </div>
-                                        {/* Efecto de pulso */}
-                                        <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                                    </div>
-                                </div>
 
-                                {/* Contenido de la categoría */}
-                                <div className="ml-24 md:ml-32">
-                                    <Card className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm">
-                                        <CardContent className="p-6">
-                                            {/* Header de categoría */}
-                                            <div className="mb-6">
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div className="flex-1">
-                                                        <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
-                                                            {category.name}
-                                                        </h3>
-                                                        {category.description && (
-                                                            <p className="text-muted-foreground text-sm">
-                                                                {category.description}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="ml-4 font-bold text-base px-3 py-1"
-                                                    >
+                                        {/* Card de categoría */}
+                                        <Card className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm h-full min-h-[400px] flex flex-col">
+                                            <CardContent className="p-6 flex-1 flex flex-col">
+                                                {/* Header */}
+                                                <div className="mb-4 text-center">
+                                                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                                                        {category.name}
+                                                    </h3>
+                                                    {category.description && (
+                                                        <p className="text-muted-foreground text-sm line-clamp-2">
+                                                            {category.description}
+                                                        </p>
+                                                    )}
+                                                    <Badge variant="outline" className="mt-2 font-bold">
                                                         {avgProgress}%
                                                     </Badge>
                                                 </div>
 
                                                 {/* Estadísticas mini */}
-                                                <div className="flex items-center gap-4 text-xs">
+                                                <div className="flex justify-center gap-3 text-xs mb-3 flex-wrap">
                                                     {stats.completed > 0 && (
                                                         <div className="flex items-center gap-1 text-green-500">
                                                             <CheckCircle2 className="w-3 h-3" />
-                                                            <span className="font-semibold">{stats.completed} dominadas</span>
+                                                            <span>{stats.completed}</span>
                                                         </div>
                                                     )}
                                                     {stats.learning > 0 && (
                                                         <div className="flex items-center gap-1 text-orange-500">
                                                             <Flame className="w-3 h-3" />
-                                                            <span className="font-semibold">{stats.learning} aprendiendo</span>
+                                                            <span>{stats.learning}</span>
                                                         </div>
                                                     )}
                                                     {stats.planned > 0 && (
                                                         <div className="flex items-center gap-1 text-blue-500">
                                                             <Target className="w-3 h-3" />
-                                                            <span className="font-semibold">{stats.planned} planeadas</span>
+                                                            <span>{stats.planned}</span>
                                                         </div>
                                                     )}
                                                 </div>
 
-                                                {/* Barra de progreso general */}
-                                                <div className="mt-3 h-2 bg-secondary rounded-full overflow-hidden">
+                                                {/* Barra de progreso */}
+                                                <div className="mb-4 h-2 bg-secondary rounded-full overflow-hidden">
                                                     <div
-                                                        className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-1000 rounded-full"
+                                                        className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-1000"
                                                         style={{ width: `${avgProgress}%` }}
                                                     />
                                                 </div>
-                                            </div>
 
-                                            {/* Grid de habilidades */}
-                                            {category.skills && category.skills.length > 0 ? (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                                    {category.skills.map((skill, skillIndex) => (
-                                                        <Card
-                                                            key={skillIndex}
-                                                            className={`group/skill hover:scale-105 transition-all duration-300 border-2 ${getStatusColor(skill.status)}`}
+                                                {/* Habilidades */}
+                                                <div className="space-y-2 flex-1">
+                                                    {category.skills && category.skills.length > 0 ? (
+                                                        category.skills.slice(0, 4).map((skill, skillIndex) => (
+                                                            <div
+                                                                key={skillIndex}
+                                                                className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                                                            >
+                                                                {skill.icon && (
+                                                                    <img
+                                                                        src={skill.icon}
+                                                                        alt={skill.name}
+                                                                        className="w-5 h-5 object-contain"
+                                                                        onError={(e) => {
+                                                                            e.currentTarget.style.display = 'none';
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                                <span className="text-sm font-medium flex-1 truncate">{skill.name}</span>
+                                                                {getStatusIcon(skill.status)}
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <p className="text-xs text-center text-muted-foreground py-2">
+                                                            Sin habilidades
+                                                        </p>
+                                                    )}
+                                                    {category.skills && category.skills.length > 4 && (
+                                                        <p className="text-xs text-center text-muted-foreground">
+                                                            +{category.skills.length - 4} más
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Vista Vertical (Lista expandida) */}
+                {viewMode === 'vertical' && (
+                    <div className="relative space-y-12">
+                        {/* Línea de conexión vertical animada */}
+                        <div className="absolute left-8 md:left-12 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-purple-500/40 to-primary/20">
+                            {/* Efecto de pulso que se mueve */}
+                            <div className="absolute inset-0 w-full bg-gradient-to-b from-transparent via-primary to-transparent animate-pulse-slow opacity-50" />
+                            <div className="absolute inset-0 w-full bg-gradient-to-b from-transparent via-purple-500 to-transparent animate-pulse-slower opacity-30" />
+                        </div>
+
+                        {categories.map((category, catIndex) => {
+                            const stats = calculateCategoryStats(category);
+                            const avgProgress = category.skills.length > 0
+                                ? Math.round(category.skills.reduce((sum, s) => sum + s.proficiency, 0) / category.skills.length)
+                                : 0;
+
+                            return (
+                                <div
+                                    key={catIndex}
+                                    className="relative animate-fade-in-up"
+                                    style={{ animationDelay: `${catIndex * 150}ms` }}
+                                >
+                                    {/* Nodo del timeline */}
+                                    <div className="absolute left-4 md:left-8 top-0 z-10">
+                                        <div className="relative">
+                                            {/* Círculo principal */}
+                                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-3xl shadow-xl border-4 border-background">
+                                                {category.icon || '📚'}
+                                            </div>
+                                            {/* Efecto de pulso */}
+                                            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                                        </div>
+                                    </div>
+
+                                    {/* Contenido de la categoría */}
+                                    <div className="ml-24 md:ml-32">
+                                        <Card className="group hover:shadow-2xl transition-all duration-300 border-2 hover:border-primary/50 bg-card/50 backdrop-blur-sm">
+                                            <CardContent className="p-6">
+                                                {/* Header de categoría */}
+                                                <div className="mb-6">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <div className="flex-1">
+                                                            <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                                                                {category.name}
+                                                            </h3>
+                                                            {category.description && (
+                                                                <p className="text-muted-foreground text-sm">
+                                                                    {category.description}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className="ml-4 font-bold text-base px-3 py-1"
                                                         >
-                                                            <CardContent className="p-3">
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    {skill.icon && (
-                                                                        <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-background/80 flex items-center justify-center group-hover/skill:scale-110 transition-transform shadow-sm">
-                                                                            <img
-                                                                                src={skill.icon}
-                                                                                alt={skill.name}
-                                                                                className="w-6 h-6 object-contain"
-                                                                                onError={(e) => {
-                                                                                    e.currentTarget.style.display = 'none';
-                                                                                }}
-                                                                            />
-                                                                        </div>
-                                                                    )}
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-1">
-                                                                            <h4 className="font-semibold text-sm truncate">
-                                                                                {skill.name}
-                                                                            </h4>
-                                                                            <div className="flex-shrink-0">
-                                                                                {getStatusIcon(skill.status)}
+                                                            {avgProgress}%
+                                                        </Badge>
+                                                    </div>
+
+                                                    {/* Estadísticas mini */}
+                                                    <div className="flex items-center gap-4 text-xs">
+                                                        {stats.completed > 0 && (
+                                                            <div className="flex items-center gap-1 text-green-500">
+                                                                <CheckCircle2 className="w-3 h-3" />
+                                                                <span className="font-semibold">{stats.completed} dominadas</span>
+                                                            </div>
+                                                        )}
+                                                        {stats.learning > 0 && (
+                                                            <div className="flex items-center gap-1 text-orange-500">
+                                                                <Flame className="w-3 h-3" />
+                                                                <span className="font-semibold">{stats.learning} aprendiendo</span>
+                                                            </div>
+                                                        )}
+                                                        {stats.planned > 0 && (
+                                                            <div className="flex items-center gap-1 text-blue-500">
+                                                                <Target className="w-3 h-3" />
+                                                                <span className="font-semibold">{stats.planned} planeadas</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Barra de progreso general */}
+                                                    <div className="mt-3 h-2 bg-secondary rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-gradient-to-r from-primary to-purple-500 transition-all duration-1000 rounded-full"
+                                                            style={{ width: `${avgProgress}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Grid de habilidades */}
+                                                {category.skills && category.skills.length > 0 ? (
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                                        {category.skills.map((skill, skillIndex) => (
+                                                            <Card
+                                                                key={skillIndex}
+                                                                className={`group/skill hover:scale-105 transition-all duration-300 border-2 ${getStatusColor(skill.status)}`}
+                                                            >
+                                                                <CardContent className="p-3">
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        {skill.icon && (
+                                                                            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-background/80 flex items-center justify-center group-hover/skill:scale-110 transition-transform shadow-sm">
+                                                                                <img
+                                                                                    src={skill.icon}
+                                                                                    alt={skill.name}
+                                                                                    className="w-6 h-6 object-contain"
+                                                                                    onError={(e) => {
+                                                                                        e.currentTarget.style.display = 'none';
+                                                                                    }}
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="flex items-center gap-1">
+                                                                                <h4 className="font-semibold text-sm truncate">
+                                                                                    {skill.name}
+                                                                                </h4>
+                                                                                <div className="flex-shrink-0">
+                                                                                    {getStatusIcon(skill.status)}
+                                                                                </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
 
-                                                                {/* Barra de progreso */}
-                                                                <div className="space-y-1">
-                                                                    <div className="flex items-center justify-between text-xs">
-                                                                        <span className="text-muted-foreground">Dominio</span>
-                                                                        <span className="font-bold">{skill.proficiency}%</span>
+                                                                    {/* Barra de progreso */}
+                                                                    <div className="space-y-1">
+                                                                        <div className="flex items-center justify-between text-xs">
+                                                                            <span className="text-muted-foreground">Dominio</span>
+                                                                            <span className="font-bold">{skill.proficiency}%</span>
+                                                                        </div>
+                                                                        <div className="h-1.5 bg-background rounded-full overflow-hidden">
+                                                                            <div
+                                                                                className={`h-full transition-all duration-700 ${getProgressColor(skill.status)}`}
+                                                                                style={{ width: `${skill.proficiency}%` }}
+                                                                            />
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="h-1.5 bg-background rounded-full overflow-hidden">
-                                                                        <div
-                                                                            className={`h-full transition-all duration-700 ${getProgressColor(skill.status)}`}
-                                                                            style={{ width: `${skill.proficiency}%` }}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            </CardContent>
-                                                        </Card>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-8 text-muted-foreground text-sm">
-                                                    No hay habilidades en esta categoría aún.
-                                                </div>
-                                            )}
-                                        </CardContent>
-                                    </Card>
+                                                                </CardContent>
+                                                            </Card>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-center py-8 text-muted-foreground text-sm">
+                                                        No hay habilidades en esta categoría aún.
+                                                    </div>
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
 
-                {/* Estadísticas globales */}
+                {/* Estadísticas globales - Aparecen en ambas vistas */}
                 <div className="mt-16 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
                     <Card className="bg-green-500/10 border-green-500/20 hover:scale-105 transition-transform">
                         <CardContent className="pt-6 text-center">
@@ -312,11 +468,25 @@ export function RoadmapSectionTimeline({ content }: RoadmapSectionProps) {
                     0%, 100% { transform: translateY(100%); opacity: 0; }
                     50% { transform: translateY(0); opacity: 0.5; }
                 }
+                @keyframes pulse-horizontal {
+                    0%, 100% { transform: translateX(0); opacity: 0; }
+                    50% { transform: translateX(100%); opacity: 1; }
+                }
+                @keyframes pulse-horizontal-slower {
+                    0%, 100% { transform: translateX(100%); opacity: 0; }
+                    50% { transform: translateX(0); opacity: 0.5; }
+                }
                 .animate-pulse-slow {
                     animation: pulse-slow 3s ease-in-out infinite;
                 }
                 .animate-pulse-slower {
                     animation: pulse-slower 4s ease-in-out infinite;
+                }
+                .animate-pulse-horizontal {
+                    animation: pulse-horizontal 3s ease-in-out infinite;
+                }
+                .animate-pulse-horizontal-slower {
+                    animation: pulse-horizontal-slower 4s ease-in-out infinite;
                 }
             `}</style>
         </section>
