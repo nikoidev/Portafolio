@@ -1,6 +1,5 @@
 import { Navbar } from '@/components/layout/Navbar';
-import { FeaturedProjects } from '@/components/public/FeaturedProjects';
-import { HeroSection } from '@/components/public/HeroSection';
+import { DynamicCMSSections } from '@/components/public/DynamicCMSSections';
 import { Footer } from '@/components/shared/Footer';
 
 export default function Home() {
@@ -8,8 +7,8 @@ export default function Home() {
     <>
       <Navbar />
       <main>
-        <HeroSection />
-        <FeaturedProjects />
+        {/* Todas las secciones (hero, featured_projects, roadmap, etc.) ahora se gestionan desde el CMS */}
+        <DynamicCMSSections pageKey="home" />
       </main>
       <Footer />
     </>

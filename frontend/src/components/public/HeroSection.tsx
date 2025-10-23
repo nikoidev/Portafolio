@@ -8,7 +8,13 @@ import { api } from '@/lib/api';
 import { ArrowDown, Download, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export function HeroSection() {
+interface HeroSectionProps {
+    canMoveUp?: boolean;
+    canMoveDown?: boolean;
+    onReorder?: () => void;
+}
+
+export function HeroSection({ canMoveUp, canMoveDown, onReorder }: HeroSectionProps = {}) {
     const { content, isLoading, refresh } = useCMSContent('home', 'hero');
     const { socialLinks: globalSocialLinks } = useGlobalSettings();
 
@@ -68,8 +74,21 @@ export function HeroSection() {
         );
     }
 
+    const handleContentUpdate = () => {
+        refresh();
+        if (onReorder) {
+            onReorder();
+        }
+    };
+
     return (
-        <EditableSection pageKey="home" sectionKey="hero" onContentUpdate={refresh}>
+        <EditableSection
+            pageKey="home"
+            sectionKey="hero"
+            onContentUpdate={handleContentUpdate}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+        >
             <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
                 <div className="container mx-auto px-4 py-20">
                     <div className="max-w-4xl mx-auto text-center">

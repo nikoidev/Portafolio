@@ -4,11 +4,12 @@ import { ProjectDemo } from '@/components/shared/ProjectDemo';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { trackProjectView } from '@/lib/analytics';
 import { api, getImageUrl } from '@/lib/api';
 import { Project } from '@/types/api';
-import { ArrowLeft, Calendar, Eye, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, ChevronLeft, ChevronRight, Eye, Share2, X, ZoomIn } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,6 +21,8 @@ export default function ProjectDetailClient() {
     const [project, setProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [modalImageIndex, setModalImageIndex] = useState(0);
 
     useEffect(() => {
         const loadProject = async () => {
@@ -63,6 +66,21 @@ export default function ProjectDetailClient() {
             navigator.clipboard.writeText(window.location.href);
             toast.success('Enlace copiado al portapapeles');
         }
+    };
+
+    const handleOpenImageModal = (index: number) => {
+        setModalImageIndex(index);
+        setIsImageModalOpen(true);
+    };
+
+    const handleNextImage = () => {
+        const images = project?.image_urls || [];
+        setModalImageIndex((prev) => (prev + 1) % images.length);
+    };
+
+    const handlePrevImage = () => {
+        const images = project?.image_urls || [];
+        setModalImageIndex((prev) => (prev - 1 + images.length) % images.length);
     };
 
     if (isLoading) {
@@ -180,12 +198,23 @@ export default function ProjectDetailClient() {
                                 <CardContent>
                                     <div className="space-y-4">
                                         {/* Imagen principal */}
-                                        <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                                        <div
+                                            className="relative aspect-video rounded-lg overflow-hidden bg-muted cursor-pointer group"
+                                            onClick={() => handleOpenImageModal(currentImageIndex)}
+                                        >
                                             <img
                                                 src={getImageUrl(images[currentImageIndex])}
                                                 alt={`${project.title} - Imagen ${currentImageIndex + 1}`}
-                                                className="w-full h-full object-cover"
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <ZoomIn className="w-12 h-12 text-white drop-shadow-lg" />
+                                                </div>
+                                            </div>
+                                            <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                                                Click para ampliar
+                                            </div>
                                         </div>
 
                                         {/* Miniaturas */}
@@ -314,6 +343,77 @@ export default function ProjectDetailClient() {
                     </div>
                 </div>
             </div>
+
+            {/* Modal de imagen ampliada */}
+            <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+                <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 overflow-hidden bg-black/95 border-none">
+                    <div className="relative w-full h-[95vh] flex items-center justify-center">
+                        {/* Botón cerrar */}
+                        <button
+                            onClick={() => setIsImageModalOpen(false)}
+                            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+
+                        {/* Contador de imágenes */}
+                        <div className="absolute top-4 left-4 z-50 bg-black/50 text-white px-4 py-2 rounded-full backdrop-blur-sm">
+                            {modalImageIndex + 1} / {images.length}
+                        </div>
+
+                        {/* Botón anterior */}
+                        {images.length > 1 && (
+                            <button
+                                onClick={handlePrevImage}
+                                className="absolute left-4 z-50 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                            >
+                                <ChevronLeft className="w-8 h-8" />
+                            </button>
+                        )}
+
+                        {/* Imagen ampliada con scroll */}
+                        <div className="w-full h-full overflow-auto flex items-center justify-center p-8">
+                            <img
+                                src={getImageUrl(images[modalImageIndex])}
+                                alt={`${project?.title} - Imagen ${modalImageIndex + 1}`}
+                                className="max-w-full max-h-full object-contain"
+                            />
+                        </div>
+
+                        {/* Botón siguiente */}
+                        {images.length > 1 && (
+                            <button
+                                onClick={handleNextImage}
+                                className="absolute right-4 z-50 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                            >
+                                <ChevronRight className="w-8 h-8" />
+                            </button>
+                        )}
+
+                        {/* Miniaturas en el modal */}
+                        {images.length > 1 && (
+                            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 overflow-x-auto max-w-[90vw] pb-2 px-4">
+                                {images.map((image: any, index: number) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setModalImageIndex(index)}
+                                        className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${index === modalImageIndex
+                                            ? 'border-white'
+                                            : 'border-transparent hover:border-white/50'
+                                            }`}
+                                    >
+                                        <img
+                                            src={getImageUrl(image)}
+                                            alt={`Miniatura ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

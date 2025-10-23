@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { cmsApi } from '@/lib/cms-api';
 import { PageContentCreate } from '@/types/cms';
-import { getTemplateById, SECTION_TEMPLATES, SectionTemplate } from '@/types/cms-templates';
+import { SECTION_TEMPLATES, SectionTemplate } from '@/types/cms-templates';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -43,7 +43,7 @@ export function CreateSectionModal({
     const handleTemplateSelect = (template: SectionTemplate) => {
         setSelectedTemplate(template);
         setStep('configure');
-        
+
         // Auto-generar section_key basado en el template
         const timestamp = Date.now();
         setSectionKey(`${template.id.replace(/-/g, '_')}_${timestamp}`);
@@ -61,7 +61,9 @@ export function CreateSectionModal({
             setIsCreating(true);
 
             // Crear el contenido inicial basado en la plantilla
-            const initialContent: Record<string, any> = {};
+            const initialContent: Record<string, any> = {
+                template_id: selectedTemplate.id, // Guardar el template_id para identificar el tipo
+            };
             selectedTemplate.fields.forEach(field => {
                 initialContent[field.key] = field.defaultValue;
             });
@@ -78,7 +80,7 @@ export function CreateSectionModal({
 
             await cmsApi.createSection(newSection);
             toast.success('Sección creada correctamente');
-            
+
             // Reset y cerrar
             handleClose();
             onCreated();

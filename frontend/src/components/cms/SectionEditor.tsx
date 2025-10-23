@@ -13,12 +13,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { cmsApi } from '@/lib/cms-api';
 import { PageContent } from '@/types/cms';
 import { Loader2, Plus, Save, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { RoadmapEditor } from './editors/RoadmapEditor';
+import { StyleControls } from './StyleControls';
 
 interface SectionEditorProps {
     pageKey: string;
@@ -41,6 +44,7 @@ export function SectionEditor({
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<Record<string, any>>({});
+    const [styles, setStyles] = useState<Record<string, any>>({});
 
     useEffect(() => {
         if (isOpen && pageKey && sectionKey) {
@@ -54,6 +58,7 @@ export function SectionEditor({
             const data = await cmsApi.getSection(pageKey, sectionKey);
             setSection(data);
             setFormData(data.content);
+            setStyles(data.styles || {});
         } catch (error: any) {
             // Si es un 404, la sección no existe aún
             if (error.response?.status === 404) {
@@ -72,6 +77,7 @@ export function SectionEditor({
             setIsSaving(true);
             await cmsApi.updateSection(pageKey, sectionKey, {
                 content: formData,
+                styles: styles,
             });
             toast.success('Sección actualizada correctamente');
             onSaved();
@@ -352,7 +358,7 @@ export function SectionEditor({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto z-[120]" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>
                         {readOnly ? 'Ver Sección' : 'Editar Sección'}: {section?.title}
@@ -370,9 +376,32 @@ export function SectionEditor({
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     </div>
                 ) : (
-                    <div className="space-y-6 py-4">
-                        {Object.entries(formData).map(([key, value]) => renderField(key, value))}
-                    </div>
+                    <Tabs defaultValue="content" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="content">📝 Contenido</TabsTrigger>
+                            <TabsTrigger value="styles">🎨 Estilos y Diseño</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="content" className="space-y-6 py-4">
+                            {section?.content?.template_id === 'roadmap' ? (
+                                <RoadmapEditor
+                                    content={formData}
+                                    onChange={(newContent) => setFormData(newContent)}
+                                />
+                            ) : (
+                                <>
+                                    {Object.entries(formData).map(([key, value]) => renderField(key, value))}
+                                </>
+                            )}
+                        </TabsContent>
+
+                        <TabsContent value="styles" className="py-4">
+                            <StyleControls
+                                styles={styles}
+                                onChange={(newStyles) => setStyles(newStyles)}
+                            />
+                        </TabsContent>
+                    </Tabs>
                 )}
 
                 <DialogFooter>

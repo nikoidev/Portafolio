@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     """Configuración de la aplicación"""
     
     # Database
-    DATABASE_URL: str = "postgresql://portfolio_user:portfolio_pass@localhost:5432/portfolio_db"
+    DATABASE_URL: str = "postgresql://portfolio_user:portfolio_pass@localhost:5440/portfolio_db"
     
     # Security
     SECRET_KEY: str = "your-super-secret-key-change-this-in-production"
