@@ -8,9 +8,12 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 import os
+import logging
 
 from app.core.config import settings as config_settings
 from app.api.v1 import auth, projects, admin, cms, users, settings, cv, uploads
+
+logger = logging.getLogger(__name__)
 
 # Crear instancia de FastAPI con exception handlers desactivados por defecto
 app = FastAPI(
@@ -22,6 +25,21 @@ app = FastAPI(
     # Disable default exception handlers to prevent binary data serialization
     exception_handlers={},
 )
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database connection on startup"""
+    from app.core.database import wait_for_db
+    
+    logger.info("🚀 Starting Portfolio API...")
+    
+    # Wait for database to be ready
+    if not wait_for_db():
+        logger.error("❌ Could not connect to database. Please check your database configuration.")
+        raise Exception("Database connection failed")
+    
+    logger.info("✓ Database connection established")
+    logger.info("✓ Portfolio API started successfully")
 
 # Custom exception handler para RequestValidationError
 @app.exception_handler(RequestValidationError)
