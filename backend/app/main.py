@@ -29,7 +29,8 @@ app = FastAPI(
 @app.on_event("startup")
 async def startup_event():
     """Initialize database connection on startup"""
-    from app.core.database import wait_for_db
+    from app.core.database import wait_for_db, SessionLocal
+    from app.services.cms_service import CMSService
     
     logger.info("🚀 Starting Portfolio API...")
     
@@ -39,6 +40,25 @@ async def startup_event():
         raise Exception("Database connection failed")
     
     logger.info("✓ Database connection established")
+    
+    # Auto-seed CMS content if empty
+    try:
+        db = SessionLocal()
+        cms_service = CMSService(db)
+        existing_sections = cms_service.get_all_sections()
+        
+        if not existing_sections:
+            logger.info("📝 No CMS content found. Initializing default content...")
+            cms_service.seed_default_content()
+            logger.info("✓ Default CMS content created successfully")
+        else:
+            logger.info(f"✓ Found {len(existing_sections)} existing CMS sections")
+        
+        db.close()
+    except Exception as e:
+        logger.warning(f"⚠️ Could not auto-seed CMS content: {str(e)}")
+        logger.warning("You may need to manually seed content via /api/v1/cms/seed")
+    
     logger.info("✓ Portfolio API started successfully")
 
 # Custom exception handler para RequestValidationError

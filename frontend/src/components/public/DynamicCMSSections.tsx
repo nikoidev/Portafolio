@@ -4,6 +4,7 @@ import { EditableSection } from '@/components/cms/EditableSection';
 import { FeaturedProjects } from '@/components/public/FeaturedProjects';
 import { HeroSection } from '@/components/public/HeroSection';
 import { RoadmapSectionTimeline } from '@/components/public/RoadmapSectionTimeline';
+import { useEditMode } from '@/contexts/EditModeContext';
 import { cmsApi } from '@/lib/cms-api';
 import { useEffect, useState } from 'react';
 
@@ -25,20 +26,38 @@ interface DynamicCMSSectionsProps {
 export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
     const [sections, setSections] = useState<CMSSection[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { isEditMode } = useEditMode();
 
     useEffect(() => {
         loadSections();
-    }, [pageKey]);
+    }, [pageKey, isEditMode]);
 
     const loadSections = async () => {
         try {
-            const allSections = await cmsApi.getPageSections(pageKey, true); // true = only active
-            // Incluir TODAS las secciones, incluyendo hero y featured_projects
-            // Ordenar por order_index
-            allSections.sort((a: CMSSection, b: CMSSection) => a.order_index - b.order_index);
-            setSections(allSections);
+            // Si está en modo edición, usar endpoint admin para obtener todos los datos (incluido id)
+            // Si no, usar endpoint público
+            if (isEditMode) {
+                const allSections = await cmsApi.getPageSections(pageKey, true); // true = only active
+                allSections.sort((a: CMSSection, b: CMSSection) => a.order_index - b.order_index);
+                setSections(allSections);
+            } else {
+                const pageData = await cmsApi.getPagePublic(pageKey);
+                setSections(pageData.sections as any);
+            }
         } catch (error) {
             console.error('Error loading dynamic sections:', error);
+            // Si falla el endpoint admin, intentar con el público
+            if (isEditMode) {
+                try {
+                    const pageData = await cmsApi.getPagePublic(pageKey);
+                    setSections(pageData.sections as any);
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
+                    setSections([]);
+                }
+            } else {
+                setSections([]);
+            }
         } finally {
             setIsLoading(false);
         }
