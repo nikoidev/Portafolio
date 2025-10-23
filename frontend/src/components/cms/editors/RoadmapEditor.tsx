@@ -241,14 +241,14 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
 
                         <CardContent className="space-y-3">
                             <div className="flex items-center justify-between">
-                                <Label className="text-sm font-semibold">Skills ({category.skills.length})</Label>
+                                <Label className="text-sm font-semibold">Habilidades ({category.skills.length})</Label>
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={() => addSkill(catIndex)}
                                 >
                                     <Plus className="w-3 h-3 mr-1" />
-                                    Agregar Skill
+                                    Agregar Habilidad
                                 </Button>
                             </div>
 
@@ -256,9 +256,9 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
                                 <Card key={skillIndex} className="bg-muted/30 border-2">
                                     <CardContent className="pt-4 pb-4">
                                         <div className="space-y-4">
-                                            {/* Header con número de skill y botón eliminar */}
+                                            {/* Header con número de habilidad y botón eliminar */}
                                             <div className="flex items-center justify-between">
-                                                <Badge variant="outline">Skill #{skillIndex + 1}</Badge>
+                                                <Badge variant="outline">Habilidad #{skillIndex + 1}</Badge>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
@@ -269,10 +269,10 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
                                                 </Button>
                                             </div>
 
-                                            {/* Nombre de la skill */}
+                                            {/* Nombre de la habilidad */}
                                             <div>
                                                 <Label className="text-sm font-medium mb-2 block">
-                                                    Nombre de la Skill *
+                                                    Nombre de la Habilidad *
                                                 </Label>
                                                 <Input
                                                     value={skill.name || ''}
@@ -381,7 +381,7 @@ export function RoadmapEditor({ content, onChange }: RoadmapEditorProps) {
 
                             {category.skills.length === 0 && (
                                 <div className="text-center py-4 text-sm text-muted-foreground border-2 border-dashed rounded-lg">
-                                    No hay skills. Click en "Agregar Skill" para comenzar.
+                                    No hay habilidades. Click en "Agregar Habilidad" para comenzar.
                                 </div>
                             )}
                         </CardContent>
