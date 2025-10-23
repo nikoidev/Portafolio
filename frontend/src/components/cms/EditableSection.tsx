@@ -122,8 +122,12 @@ export function EditableSection({
             await cmsApi.reorderSection(pageKey, sectionKey, direction);
             toast.success(`Sección movida ${direction === 'up' ? 'arriba' : 'abajo'}`);
 
-            // Recargar la página para ver los cambios
-            window.location.reload();
+            // Usar el callback para recargar las secciones sin reload completo
+            if (onContentUpdate) {
+                onContentUpdate();
+            }
+
+            setIsReordering(false);
         } catch (error: any) {
             toast.error(error.response?.data?.detail || 'Error al reordenar la sección');
             setIsReordering(false);

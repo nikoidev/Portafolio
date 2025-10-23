@@ -6,7 +6,7 @@ import { HeroSection } from '@/components/public/HeroSection';
 import { RoadmapSectionTimeline } from '@/components/public/RoadmapSectionTimeline';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { cmsApi } from '@/lib/cms-api';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface CMSSection {
     id: number;
@@ -26,13 +26,11 @@ interface DynamicCMSSectionsProps {
 export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
     const [sections, setSections] = useState<CMSSection[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
     const { isEditMode } = useEditMode();
 
-    useEffect(() => {
-        loadSections();
-    }, [pageKey, isEditMode]);
-
-    const loadSections = async () => {
+    const loadSections = useCallback(async () => {
+        setIsLoading(true);
         try {
             // Si está en modo edición, usar endpoint admin para obtener todos los datos (incluido id)
             // Si no, usar endpoint público
@@ -61,18 +59,40 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [pageKey, isEditMode, refreshKey]);
 
-    const renderSection = (section: CMSSection) => {
+    useEffect(() => {
+        loadSections();
+    }, [loadSections]);
+
+    // Función para forzar recarga después de reordenar
+    const handleReorder = useCallback(() => {
+        setRefreshKey(prev => prev + 1);
+    }, []);
+
+    const renderSection = (section: CMSSection, index: number, totalSections: number) => {
         const templateId = section.content?.template_id || section.template_id;
 
         // Detectar secciones especiales por section_key si no tienen template_id
+        // Estas secciones ya tienen su propio EditableSection wrapper
         if (section.section_key === 'hero' || templateId === 'hero') {
-            return <HeroSection />;
+            return (
+                <HeroSection
+                    canMoveUp={index > 0}
+                    canMoveDown={index < totalSections - 1}
+                    onReorder={handleReorder}
+                />
+            );
         }
 
         if (section.section_key === 'featured_projects' || templateId === 'featured_projects') {
-            return <FeaturedProjects />;
+            return (
+                <FeaturedProjects
+                    canMoveUp={index > 0}
+                    canMoveDown={index < totalSections - 1}
+                    onReorder={handleReorder}
+                />
+            );
         }
 
         switch (templateId) {
@@ -160,23 +180,33 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
     return (
         <>
             {sections.map((section, index) => {
-                // Las secciones hero y featured_projects ya tienen sus propios estilos,
-                // así que no aplicamos estilos adicionales
-                const isSpecialSection = ['hero', 'featured_projects'].includes(section.section_key);
+                // Las secciones hero y featured_projects ya tienen su propio EditableSection wrapper interno
+                // así que las renderizamos directamente sin wrapper adicional
+                const hasOwnWrapper = ['hero', 'featured_projects'].includes(section.section_key);
 
+                if (hasOwnWrapper) {
+                    // Renderizar directamente sin wrapper adicional, pasando props de movimiento
+                    return (
+                        <div key={section.id || section.section_key}>
+                            {renderSection(section, index, sections.length)}
+                        </div>
+                    );
+                }
+
+                // Para otras secciones, usar el wrapper EditableSection normal
                 return (
                     <EditableSection
-                        key={section.id}
+                        key={section.id || section.section_key}
                         pageKey={pageKey}
                         sectionKey={section.section_key}
-                        onContentUpdate={loadSections}
-                        onDeleted={loadSections}
+                        onContentUpdate={handleReorder}
+                        onDeleted={handleReorder}
                         canMoveUp={index > 0}
                         canMoveDown={index < sections.length - 1}
                         styles={(section as any).styles || {}}
-                        applyStyles={!isSpecialSection}
+                        applyStyles={true}
                     >
-                        {renderSection(section)}
+                        {renderSection(section, index, sections.length)}
                     </EditableSection>
                 );
             })}

@@ -9,7 +9,13 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 import { ProjectCard } from './ProjectCard';
 
-export function FeaturedProjects() {
+interface FeaturedProjectsProps {
+    canMoveUp?: boolean;
+    canMoveDown?: boolean;
+    onReorder?: () => void;
+}
+
+export function FeaturedProjects({ canMoveUp, canMoveDown, onReorder }: FeaturedProjectsProps = {}) {
     const { featuredProjects, isLoading, error, fetchFeaturedProjects } = useProjectsStore();
     const { content, isLoading: cmsLoading, refresh } = useCMSContent('home', 'featured_projects');
 
@@ -60,8 +66,21 @@ export function FeaturedProjects() {
         );
     }
 
+    const handleContentUpdate = () => {
+        refresh();
+        if (onReorder) {
+            onReorder();
+        }
+    };
+
     return (
-        <EditableSection pageKey="home" sectionKey="featured_projects" onContentUpdate={refresh}>
+        <EditableSection
+            pageKey="home"
+            sectionKey="featured_projects"
+            onContentUpdate={handleContentUpdate}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+        >
             <section className="py-20 bg-accent/5">
                 <div className="container mx-auto px-4">
                     {/* Header */}

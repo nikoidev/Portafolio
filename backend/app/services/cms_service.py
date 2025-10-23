@@ -134,8 +134,8 @@ class CMSService:
                 detail=f"Sección '{section_key}' no encontrada"
             )
         
-        # Obtener todas las secciones de la página ordenadas
-        all_sections = self.get_page_sections(page_key, active_only=False)
+        # Obtener todas las secciones de la página ordenadas (solo activas)
+        all_sections = self.get_page_sections(page_key, active_only=True)
         
         # Encontrar el índice actual
         current_index = None
