@@ -19,7 +19,7 @@ export function FeaturedProjects({ canMoveUp, canMoveDown, onReorder }: Featured
     const { featuredProjects, isLoading, error, fetchFeaturedProjects } = useProjectsStore();
     const { content, isLoading: cmsLoading, refresh } = useCMSContent('home', 'featured_projects');
     const [currentPage, setCurrentPage] = useState(1);
-    const projectsPerPage = 8;
+    const projectsPerPage = 6;
 
     // Contenido por defecto
     const defaultContent = {
