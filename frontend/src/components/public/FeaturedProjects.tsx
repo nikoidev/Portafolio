@@ -110,7 +110,7 @@ export function FeaturedProjects({ canMoveUp, canMoveDown, onReorder }: Featured
                     {/* Grid de proyectos */}
                     {featuredProjects.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                                 {currentProjects.map((project) => (
                                     <ProjectCard key={project.id} project={project} />
                                 ))}
