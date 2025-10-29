@@ -41,6 +41,13 @@ class Settings(BaseSettings):
     SUPER_ADMIN_PASSWORD: str = "changeme123"  # CAMBIAR EN PRODUCCIÓN
     SUPER_ADMIN_NAME: str = "Super Admin"
     
+    # Chatbot Configuration
+    GOOGLE_API_KEY: str = ""
+    CHATBOT_NAME: str = "NikoiDev"
+    CHATBOT_RATE_LIMIT: int = 10  # messages per window
+    CHATBOT_RATE_WINDOW: int = 300  # 5 minutes in seconds
+    CHATBOT_MAX_HISTORY: int = 10  # max messages to keep in context
+    
     # Mantener compatibilidad con variables antiguas (deprecated)
     ADMIN_EMAIL: Optional[str] = None
     ADMIN_PASSWORD: Optional[str] = None  

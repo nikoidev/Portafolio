@@ -23,6 +23,8 @@ aiofiles = "*"
 pillow = "*"
 reportlab = "*"
 python-slugify = "*"
+langchain = "*"
+langchain-google-genai = "*"
 
 [dev-packages]
 pytest = "*"
