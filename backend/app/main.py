@@ -137,7 +137,7 @@ app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(cms.router, prefix="/api/v1/cms", tags=["CMS"])
 app.include_router(settings.router, prefix="/api/v1/settings", tags=["Settings"])
 app.include_router(uploads.router, prefix="/api/v1/uploads", tags=["Uploads"])
-app.include_router(chatbot.router, prefix="/api/v1/chatbot", tags=["Chatbot"])
+app.include_router(chatbot.router, prefix="/api/v1", tags=["Chatbot"])
 
 
 @app.get("/")

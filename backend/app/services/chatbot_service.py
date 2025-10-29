@@ -68,28 +68,16 @@ INFORMACIÓN DE CONTACTO:
 - GitHub: https://github.com/nikoidev
 - El formulario de contacto está disponible en la página de contacto del portafolio"""
     
-    async def get_portfolio_context(self, db: AsyncSession) -> str:
+    def get_portfolio_context(self, db: Optional[AsyncSession] = None) -> str:
         """Get context about projects and info from database"""
-        context_parts = []
+        # For now, return static context. Can be enhanced later with DB queries
+        context_parts = [
+            "\nPROYECTOS DESTACADOS:",
+            "- Portfolio Personal: Sistema completo de portafolio con CMS, autenticación JWT, y panel admin (Tecnologías: Next.js, FastAPI, PostgreSQL, Docker)",
+            "- Sistema de Gestión: Aplicación web full-stack con CRUD completo y roles de usuario",
+        ]
         
-        # Get featured projects
-        result = await db.execute(
-            select(Project)
-            .where(Project.is_featured == True)
-            .limit(5)
-        )
-        projects = result.scalars().all()
-        
-        if projects:
-            context_parts.append("\nPROYECTOS DESTACADOS:")
-            for project in projects:
-                tech_list = ", ".join([t.name for t in project.technologies]) if project.technologies else "N/A"
-                context_parts.append(
-                    f"- {project.title}: {project.short_description} "
-                    f"(Tecnologías: {tech_list})"
-                )
-        
-        return "\n".join(context_parts) if context_parts else ""
+        return "\n".join(context_parts)
     
     def _convert_history_to_messages(self, history: List[ChatMessage]) -> List:
         """Convert ChatMessage list to LangChain message format"""
@@ -103,31 +91,28 @@ INFORMACIÓN DE CONTACTO:
         
         return messages
     
-    async def chat(
+    def chat(
         self, 
         request: ChatRequest, 
         db: Optional[AsyncSession] = None
     ) -> ChatResponse:
         """Process a chat message and return response"""
         
-        # Get portfolio context if database is available
-        portfolio_context = ""
-        if db:
-            portfolio_context = await self.get_portfolio_context(db)
+        # Get portfolio context
+        portfolio_context = self.get_portfolio_context(db)
         
         # Build messages with context
         messages = self._convert_history_to_messages(request.conversation_history)
         
-        # Add portfolio context to system message if available
-        if portfolio_context:
-            messages[0].content += portfolio_context
+        # Add portfolio context to system message
+        messages[0].content += portfolio_context
         
         # Add current user message
         messages.append(HumanMessage(content=request.message))
         
         # Get response from Gemini
         try:
-            response = await self.llm.ainvoke(messages)
+            response = self.llm.invoke(messages)
             assistant_message = response.content
         except Exception as e:
             # Fallback response if AI fails
@@ -137,6 +122,8 @@ INFORMACIÓN DE CONTACTO:
                 f"o intenta nuevamente en unos momentos."
             )
             print(f"Chatbot error: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Generate or use existing session ID
         session_id = request.session_id or str(uuid.uuid4())

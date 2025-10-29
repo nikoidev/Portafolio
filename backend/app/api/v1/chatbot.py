@@ -101,12 +101,14 @@ async def chat(
         )
     
     try:
-        # Process chat
-        response = await chatbot_service.chat(chat_request, db)
+        # Process chat (sync call)
+        response = chatbot_service.chat(chat_request, db)
         return response
         
     except Exception as e:
         print(f"Chat error: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error processing your message. Please try again later."
