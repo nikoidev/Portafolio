@@ -5,7 +5,7 @@ from typing import List, Optional, Dict
 from datetime import datetime
 import uuid
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from app.core.config import settings
 from app.schemas.chatbot import ChatMessage, ChatRequest, ChatResponse
 from sqlalchemy.ext.asyncio import AsyncSession

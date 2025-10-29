@@ -2,6 +2,7 @@ import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import { SessionValidator } from '@/components/auth/SessionValidator'
 import { CreateSectionButton } from '@/components/cms/CreateSectionButton'
 import { EditModeToggle } from '@/components/cms/EditModeToggle'
+import ChatWidget from '@/components/chatbot/ChatWidget'
 import { EditModeProvider } from '@/contexts/EditModeContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import '@/styles/globals.css'
@@ -86,6 +87,7 @@ export default function RootLayout({
             </div>
             <EditModeToggle />
             <CreateSectionButton />
+            <ChatWidget />
             <Toaster position="top-right" richColors />
           </EditModeProvider>
         </ThemeProvider>

@@ -25,6 +25,7 @@ reportlab = "*"
 python-slugify = "*"
 langchain = "*"
 langchain-google-genai = "*"
+langchain-core = "*"
 
 [dev-packages]
 pytest = "*"
