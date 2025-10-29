@@ -28,6 +28,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.0",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.0",
@@ -46,6 +47,7 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.0.0",
+    "uuid": "^13.0.0",
     "zod": "^3.25.76",
     "zustand": "^4.5.7"
   },
