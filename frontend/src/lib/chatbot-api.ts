@@ -47,23 +47,20 @@ export interface ChatbotHealth {
  * Send a message to the chatbot
  */
 export async function sendChatMessage(request: ChatRequest): Promise<ChatResponse> {
-  const response = await api.post<ChatResponse>('/api/v1/chatbot/chat', request);
-  return response.data;
+  return api.post<ChatResponse>('/api/v1/chatbot/chat', request);
 }
 
 /**
  * Get chatbot information
  */
 export async function getChatbotInfo(): Promise<ChatbotInfo> {
-  const response = await api.get<ChatbotInfo>('/api/v1/chatbot/info');
-  return response.data;
+  return api.get<ChatbotInfo>('/api/v1/chatbot/info');
 }
 
 /**
  * Check chatbot health status
  */
 export async function getChatbotHealth(): Promise<ChatbotHealth> {
-  const response = await api.get<ChatbotHealth>('/api/v1/chatbot/health');
-  return response.data;
+  return api.get<ChatbotHealth>('/api/v1/chatbot/health');
 }
 
