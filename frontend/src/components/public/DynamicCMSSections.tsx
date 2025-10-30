@@ -156,17 +156,233 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
                     </section>
                 );
 
+            case 'image-gallery':
+                return (
+                    <section className="py-20 px-4">
+                        <div className="container mx-auto">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {section.content?.images && Array.isArray(section.content.images) && section.content.images.map((image: any, idx: number) => (
+                                    <div key={idx} className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+                                        {image.url ? (
+                                            <img
+                                                src={image.url}
+                                                alt={image.alt || image.title || `Image ${idx + 1}`}
+                                                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-64 bg-muted flex items-center justify-center">
+                                                <span className="text-muted-foreground">No image</span>
+                                            </div>
+                                        )}
+                                        {(image.title || image.description) && (
+                                            <div className="p-4 bg-card">
+                                                {image.title && (
+                                                    <h3 className="font-semibold mb-1">{image.title}</h3>
+                                                )}
+                                                {image.description && (
+                                                    <p className="text-sm text-muted-foreground">{image.description}</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                );
+
+            case 'hero-simple':
+                return (
+                    <section className="py-32 px-4 bg-gradient-to-br from-primary/10 to-primary/5">
+                        <div className="container mx-auto max-w-4xl text-center">
+                            {section.content?.title && (
+                                <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                                    {section.content.title}
+                                </h1>
+                            )}
+                            {section.content?.subtitle && (
+                                <h2 className="text-xl md:text-2xl text-muted-foreground mb-8">
+                                    {section.content.subtitle}
+                                </h2>
+                            )}
+                            {section.content?.description && (
+                                <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                                    {section.content.description}
+                                </p>
+                            )}
+                            {section.content?.button_text && (
+                                <a
+                                    href={section.content?.button_url || '#'}
+                                    className="inline-block px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                >
+                                    {section.content.button_text}
+                                </a>
+                            )}
+                        </div>
+                    </section>
+                );
+
+            case 'list-with-icons':
+                return (
+                    <section className="py-20 px-4">
+                        <div className="container mx-auto max-w-4xl">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {section.content?.items && Array.isArray(section.content.items) && section.content.items.map((item: any, idx: number) => (
+                                    <a
+                                        key={idx}
+                                        href={item.url || '#'}
+                                        className="flex items-start gap-4 p-6 rounded-lg border border-border hover:border-primary transition-colors group"
+                                    >
+                                        {item.icon && (
+                                            <div className="text-4xl">{item.icon}</div>
+                                        )}
+                                        <div className="flex-1">
+                                            <h3 className="font-semibold group-hover:text-primary transition-colors">
+                                                {item.text || `Item ${idx + 1}`}
+                                            </h3>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                );
+
+            case 'testimonials':
+                return (
+                    <section className="py-20 px-4 bg-muted/50">
+                        <div className="container mx-auto max-w-6xl">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {section.content?.testimonials && Array.isArray(section.content.testimonials) && section.content.testimonials.map((testimonial: any, idx: number) => (
+                                    <div key={idx} className="bg-card p-6 rounded-lg shadow-lg">
+                                        <p className="text-muted-foreground mb-4 italic">
+                                            "{testimonial.message || 'No message'}"
+                                        </p>
+                                        <div className="flex items-center gap-3">
+                                            {testimonial.avatar && (
+                                                <img
+                                                    src={testimonial.avatar}
+                                                    alt={testimonial.name}
+                                                    className="w-12 h-12 rounded-full object-cover"
+                                                />
+                                            )}
+                                            <div>
+                                                <p className="font-semibold">{testimonial.name || 'Anonymous'}</p>
+                                                {testimonial.role && (
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {testimonial.role}{testimonial.company ? ` at ${testimonial.company}` : ''}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                );
+
+            case 'stats-section':
+                return (
+                    <section className="py-20 px-4 bg-primary text-primary-foreground">
+                        <div className="container mx-auto max-w-6xl">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                                {section.content?.stats && Array.isArray(section.content.stats) && section.content.stats.map((stat: any, idx: number) => (
+                                    <div key={idx} className="text-center">
+                                        {stat.icon && (
+                                            <div className="text-4xl mb-2">{stat.icon}</div>
+                                        )}
+                                        <div className="text-4xl md:text-5xl font-bold mb-2">
+                                            {stat.value || '0'}
+                                        </div>
+                                        <div className="text-sm md:text-base opacity-90">
+                                            {stat.label || `Stat ${idx + 1}`}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                );
+
             default:
                 // Renderizado genérico para otras plantillas
                 return (
                     <section className="py-20 px-4">
-                        <div className="container mx-auto">
-                            <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-                            <div className="text-muted-foreground">
-                                <pre className="whitespace-pre-wrap">
-                                    {JSON.stringify(section.content, null, 2)}
-                                </pre>
-                            </div>
+                        <div className="container mx-auto max-w-4xl">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            {section.content?.subtitle && (
+                                <h3 className="text-xl md:text-2xl text-muted-foreground mb-8">
+                                    {section.content.subtitle}
+                                </h3>
+                            )}
+                            {section.content?.description && (
+                                <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
+                                    <p className="text-muted-foreground whitespace-pre-wrap">
+                                        {section.content.description}
+                                    </p>
+                                </div>
+                            )}
+                            {section.content?.content && (
+                                <div className="prose prose-lg dark:prose-invert max-w-none">
+                                    <p className="whitespace-pre-wrap">
+                                        {section.content.content}
+                                    </p>
+                                </div>
+                            )}
+                            {/* Botones genéricos */}
+                            {(section.content?.button_text || section.content?.primary_button_text) && (
+                                <div className="flex flex-wrap gap-4 mt-8">
+                                    {section.content?.button_text && (
+                                        <a
+                                            href={section.content?.button_url || '#'}
+                                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                        >
+                                            {section.content.button_text}
+                                        </a>
+                                    )}
+                                    {section.content?.primary_button_text && (
+                                        <a
+                                            href={section.content?.primary_button_url || '#'}
+                                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                        >
+                                            {section.content.primary_button_text}
+                                        </a>
+                                    )}
+                                    {section.content?.secondary_button_text && (
+                                        <a
+                                            href={section.content?.secondary_button_url || '#'}
+                                            className="px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                                        >
+                                            {section.content.secondary_button_text}
+                                        </a>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </section>
                 );
