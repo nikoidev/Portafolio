@@ -160,13 +160,60 @@ export function DynamicCMSSections({ pageKey }: DynamicCMSSectionsProps) {
                 // Renderizado genérico para otras plantillas
                 return (
                     <section className="py-20 px-4">
-                        <div className="container mx-auto">
-                            <h3 className="text-2xl font-bold mb-4">{section.title}</h3>
-                            <div className="text-muted-foreground">
-                                <pre className="whitespace-pre-wrap">
-                                    {JSON.stringify(section.content, null, 2)}
-                                </pre>
-                            </div>
+                        <div className="container mx-auto max-w-4xl">
+                            {section.content?.title && (
+                                <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                                    {section.content.title}
+                                </h2>
+                            )}
+                            {section.content?.subtitle && (
+                                <h3 className="text-xl md:text-2xl text-muted-foreground mb-8">
+                                    {section.content.subtitle}
+                                </h3>
+                            )}
+                            {section.content?.description && (
+                                <div className="prose prose-lg dark:prose-invert max-w-none mb-8">
+                                    <p className="text-muted-foreground whitespace-pre-wrap">
+                                        {section.content.description}
+                                    </p>
+                                </div>
+                            )}
+                            {section.content?.content && (
+                                <div className="prose prose-lg dark:prose-invert max-w-none">
+                                    <p className="whitespace-pre-wrap">
+                                        {section.content.content}
+                                    </p>
+                                </div>
+                            )}
+                            {/* Botones genéricos */}
+                            {(section.content?.button_text || section.content?.primary_button_text) && (
+                                <div className="flex flex-wrap gap-4 mt-8">
+                                    {section.content?.button_text && (
+                                        <a
+                                            href={section.content?.button_url || '#'}
+                                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                        >
+                                            {section.content.button_text}
+                                        </a>
+                                    )}
+                                    {section.content?.primary_button_text && (
+                                        <a
+                                            href={section.content?.primary_button_url || '#'}
+                                            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                                        >
+                                            {section.content.primary_button_text}
+                                        </a>
+                                    )}
+                                    {section.content?.secondary_button_text && (
+                                        <a
+                                            href={section.content?.secondary_button_url || '#'}
+                                            className="px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                                        >
+                                            {section.content.secondary_button_text}
+                                        </a>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </section>
                 );
