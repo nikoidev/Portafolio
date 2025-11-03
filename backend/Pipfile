@@ -9,7 +9,6 @@ uvicorn = {extras = ["standard"], version = "*"}
 sqlalchemy = "*"
 alembic = "*"
 psycopg2-binary = "*"
-asyncpg = "*"
 python-multipart = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = "==1.7.4"
@@ -26,6 +25,7 @@ python-slugify = "*"
 langchain = "*"
 langchain-google-genai = "*"
 langchain-core = "*"
+asyncpg = "*"
 
 [dev-packages]
 pytest = "*"
