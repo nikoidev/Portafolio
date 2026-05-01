@@ -31,6 +31,15 @@ export const skillsData = {
 
 export const experienceData = [
   {
+    company: "Proyecto propio",
+    role: "Fundador & Desarrollador Full-Stack",
+    startDate: "2026-03-01",
+    period: "Mar 2026 - Actualidad",
+    description:
+      "Diseño y desarrollo de un SaaS multi-tenant compuesto por una API, una aplicación de gestión interna y sitios públicos para los clientes finales. Trabajo end-to-end: arquitectura, modelo de datos, autenticación con RBAC, aislamiento por tenant, módulo CMS, infraestructura y despliegue. Stack: FastAPI + Next.js, PostgreSQL gestionado, almacenamiento de objetos compatible con S3, Docker, CI/CD con GitHub Actions e integración de agentes IA (MCP) en el flujo de desarrollo.",
+    technologies: ["FastAPI", "Next.js", "PostgreSQL", "Docker", "Multi-tenant", "RBAC", "CI/CD", "MCP"],
+  },
+  {
     company: "Empresa de Construcción e Instalaciones",
     role: "Desarrollador Full-Stack Freelance",
     period: "Oct 2025 - Feb 2026",
