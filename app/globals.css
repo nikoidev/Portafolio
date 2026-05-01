@@ -6,19 +6,19 @@
 :root {
   /* Vibrant light theme with blue accents */
   --background: oklch(0.97 0.008 250);
-  --foreground: oklch(0.18 0.03 250);
+  --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.03 250);
+  --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.03 250);
+  --popover-foreground: oklch(0.15 0 0);
   --primary: oklch(0.50 0.20 260);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.96 0.015 250);
-  --secondary-foreground: oklch(0.25 0.05 260);
+  --secondary-foreground: oklch(0.15 0 0);
   --muted: oklch(0.96 0.012 250);
-  --muted-foreground: oklch(0.45 0.02 250);
+  --muted-foreground: oklch(0.32 0.01 250);
   --accent: oklch(0.94 0.02 250);
-  --accent-foreground: oklch(0.25 0.05 260);
+  --accent-foreground: oklch(0.15 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.90 0.02 250);
@@ -121,6 +121,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -166,6 +167,7 @@ html {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }

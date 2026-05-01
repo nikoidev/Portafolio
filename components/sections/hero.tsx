@@ -1,10 +1,10 @@
 "use client"
 
-import { ArrowDown } from "lucide-react"
-import { profileData } from "@/lib/data"
-import { Button } from "@/components/ui/button"
-import { TechMarquee } from "@/components/tech-marquee"
 import { SocialIcons } from "@/components/social-icons"
+import { TechMarquee } from "@/components/tech-marquee"
+import { Button } from "@/components/ui/button"
+import { profileData } from "@/lib/data"
+import { ArrowDown } from "lucide-react"
 
 export function HeroSection() {
   const handleScrollTo = (href: string) => {
@@ -17,7 +17,7 @@ export function HeroSection() {
   return (
     <section
       id="inicio"
-      className="min-h-[90vh] flex items-center justify-center pt-20 pb-8"
+      className="flex items-center justify-center pt-28 pb-12"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
@@ -39,7 +39,7 @@ export function HeroSection() {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
             <Button
               size="lg"
               onClick={() => handleScrollTo("#proyectos")}
@@ -64,7 +64,7 @@ export function HeroSection() {
           <SocialIcons />
 
           {/* Scroll indicator */}
-          <div className="mt-8 animate-bounce">
+          <div className="mt-6 animate-bounce">
             <button
               onClick={() => handleScrollTo("#sobre-mi")}
               className="p-2 text-muted-foreground hover:text-foreground transition-colors"
