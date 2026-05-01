@@ -6,10 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
-import { trackCVDownload } from '@/lib/analytics';
-import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import { Download, LogIn, Menu } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { LogIn, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -106,21 +105,31 @@ export function Navbar() {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex md:items-center md:space-x-6">
-                            {enabledNavLinks.map((item: any) => (
-                                <Link
-                                    key={item.text}
-                                    href={item.url}
-                                    className={cn(
-                                        'text-sm font-medium transition-colors hover:text-primary',
-                                        pathname === item.url
-                                            ? 'text-primary'
-                                            : 'text-muted-foreground'
-                                    )}
-                                >
-                                    {item.text}
-                                </Link>
-                            ))}
+                        <div className="hidden md:flex md:items-center md:space-x-1">
+                            {enabledNavLinks.map((item: any) => {
+                                const isActive = pathname === item.url;
+                                return (
+                                    <Link
+                                        key={item.text}
+                                        href={item.url}
+                                        className={cn(
+                                            'relative px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                                            isActive
+                                                ? 'text-brand'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-brand/5'
+                                        )}
+                                    >
+                                        {item.text}
+                                        {isActive && (
+                                            <motion.span
+                                                layoutId="navbar-active"
+                                                className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-4/5 bg-brand rounded-full"
+                                                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                            />
+                                        )}
+                                    </Link>
+                                );
+                            })}
                         </div>
 
                         {/* Desktop Actions */}
@@ -159,17 +168,6 @@ export function Navbar() {
                             {/* Theme Toggle */}
                             <ThemeToggle />
 
-                            {/* CV Download */}
-                            {navData.cv_button?.enabled && (
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => window.open(api.getCVDownloadURL(), '_blank')}
-                                >
-                                    <Download className="mr-2 h-4 w-4" />
-                                    {navData.cv_button.text}
-                                </Button>
-                            )}
 
                             {/* Login Button */}
                             {navData.login_button?.enabled && (
@@ -209,22 +207,25 @@ export function Navbar() {
                                     </Link>
 
                                     {/* Navigation Links */}
-                                    <div className="flex flex-col space-y-4">
-                                        {enabledNavLinks.map((item: any) => (
-                                            <Link
-                                                key={item.text}
-                                                href={item.url}
-                                                onClick={() => setIsOpen(false)}
-                                                className={cn(
-                                                    'text-lg font-medium transition-colors hover:text-primary',
-                                                    pathname === item.url
-                                                        ? 'text-primary'
-                                                        : 'text-muted-foreground'
-                                                )}
-                                            >
-                                                {item.text}
-                                            </Link>
-                                        ))}
+                                    <div className="flex flex-col space-y-1">
+                                        {enabledNavLinks.map((item: any) => {
+                                            const isActive = pathname === item.url;
+                                            return (
+                                                <Link
+                                                    key={item.text}
+                                                    href={item.url}
+                                                    onClick={() => setIsOpen(false)}
+                                                    className={cn(
+                                                        'px-3 py-2 rounded-md text-lg font-medium transition-colors',
+                                                        isActive
+                                                            ? 'text-brand bg-brand/5'
+                                                            : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                                                    )}
+                                                >
+                                                    {item.text}
+                                                </Link>
+                                            );
+                                        })}
                                     </div>
 
                                     {/* Divider */}
@@ -250,21 +251,6 @@ export function Navbar() {
                                             </Button>
                                         )}
 
-                                        {/* CV Download */}
-                                        {navData.cv_button?.enabled && (
-                                            <Button
-                                                className="w-full"
-                                                variant="outline"
-                                                onClick={() => {
-                                                    trackCVDownload();
-                                                    window.open(api.getCVDownloadURL(), '_blank');
-                                                    setIsOpen(false);
-                                                }}
-                                            >
-                                                <Download className="mr-2 h-4 w-4" />
-                                                {navData.cv_button.text}
-                                            </Button>
-                                        )}
 
                                         {/* Social Links */}
                                         {enabledSocialLinks.length > 0 && (

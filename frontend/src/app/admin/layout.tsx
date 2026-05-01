@@ -1,7 +1,7 @@
 'use client';
 
 import { Header } from '@/components/shared/Header';
-import { useAuthStore } from '@/store/auth';
+import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -10,35 +10,22 @@ export default function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { isAuthenticated, isLoading, getCurrentUser } = useAuthStore();
-    const router = useRouter();
+    const { status } = useSession();
     const pathname = usePathname();
-
-    // Páginas que no requieren autenticación
-    const publicAdminPages = ['/admin/login'];
-    const isPublicPage = publicAdminPages.includes(pathname);
+    const router = useRouter();
+    const isLoginPage = pathname === '/admin/login';
 
     useEffect(() => {
-        // Solo verificar autenticación si no estamos en página pública
-        if (!isPublicPage) {
-            getCurrentUser();
+        if (!isLoginPage && status === 'unauthenticated') {
+            router.replace('/admin/login');
         }
-    }, [getCurrentUser, isPublicPage]);
+    }, [status, isLoginPage, router]);
 
-    useEffect(() => {
-        // Solo redirigir si no está autenticado Y no está en página pública
-        if (!isLoading && !isAuthenticated && !isPublicPage) {
-            router.push('/admin/login');
-        }
-    }, [isAuthenticated, isLoading, router, isPublicPage]);
-
-    // Si es página pública, renderizar directamente sin verificaciones
-    if (isPublicPage) {
+    if (isLoginPage) {
         return <>{children}</>;
     }
 
-    // Mostrar loading mientras verifica autenticación
-    if (isLoading) {
+    if (status !== 'authenticated') {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -47,11 +34,6 @@ export default function AdminLayout({
                 </div>
             </div>
         );
-    }
-
-    // No mostrar nada si no está autenticado (se redirigirá)
-    if (!isAuthenticated) {
-        return null;
     }
 
     return (

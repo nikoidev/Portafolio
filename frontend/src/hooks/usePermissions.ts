@@ -1,121 +1,25 @@
-import { useAuthStore } from '@/store/auth';
-import { useMemo } from 'react';
+'use client'
 
-export type Permission =
-    // Usuarios
-    | 'create_user'
-    | 'read_user'
-    | 'update_user'
-    | 'delete_user'
-    | 'manage_roles'
-    // Proyectos
-    | 'create_project'
-    | 'read_project'
-    | 'update_project'
-    | 'delete_project'
-    | 'publish_project'
-    // CV
-    | 'update_cv'
-    | 'generate_cv_pdf'
-    // Archivos
-    | 'upload_file'
-    | 'delete_file'
-    // CMS
-    | 'create_content'
-    | 'read_content'
-    | 'update_content'
-    | 'delete_content'
-    // Sistema
-    | 'view_analytics'
-    | 'manage_settings';
+import { useSession } from 'next-auth/react'
+
+export type Permission = string
 
 /**
- * Hook para verificar permisos del usuario actual
+ * Hook simplificado — con un solo admin todas las verificaciones
+ * son equivalentes a "¿está autenticado?".
  */
 export function usePermissions() {
-    const { user } = useAuthStore();
+    const { status } = useSession()
+    const isAdmin = status === 'authenticated'
 
-    const permissions = useMemo(() => {
-        return new Set(user?.permissions || []);
-    }, [user?.permissions]);
-
-    /**
-     * Verificar si el usuario tiene un permiso específico
-     */
-    const hasPermission = (permission: Permission): boolean => {
-        return permissions.has(permission);
-    };
-
-    /**
-     * Verificar si el usuario tiene TODOS los permisos especificados
-     */
-    const hasAllPermissions = (...requiredPermissions: Permission[]): boolean => {
-        return requiredPermissions.every(perm => permissions.has(perm));
-    };
-
-    /**
-     * Verificar si el usuario tiene AL MENOS UNO de los permisos especificados
-     */
-    const hasAnyPermission = (...requiredPermissions: Permission[]): boolean => {
-        return requiredPermissions.some(perm => permissions.has(perm));
-    };
-
-    /**
-     * Verificar si es un rol específico
-     */
-    const isRole = (role: string): boolean => {
-        return user?.role === role;
-    };
-
-    /**
-     * Verificar si puede editar (tiene algún permiso de edición)
-     */
-    const canEdit = (): boolean => {
-        return hasAnyPermission(
-            'update_project',
-            'update_cv',
-            'update_content',
-            'update_user'
-        );
-    };
-
-    /**
-     * Verificar si puede crear (tiene algún permiso de creación)
-     */
-    const canCreate = (): boolean => {
-        return hasAnyPermission(
-            'create_project',
-            'create_content',
-            'create_user'
-        );
-    };
-
-    /**
-     * Verificar si puede eliminar (tiene algún permiso de eliminación)
-     */
-    const canDelete = (): boolean => {
-        return hasAnyPermission(
-            'delete_project',
-            'delete_content',
-            'delete_user',
-            'delete_file'
-        );
-    };
-
-    /**
-     * Verificar si es solo visualizador (solo permisos de lectura)
-     */
-    const isViewerOnly = (): boolean => {
-        return user?.role === 'viewer' || (!canEdit() && !canCreate() && !canDelete());
-    };
-
-    /**
-     * Verificar roles específicos
-     */
-    const isSuperAdmin = user?.role === 'super_admin';
-    const isAdmin = user?.role === 'admin';
-    const isEditor = user?.role === 'editor';
-    const isViewer = user?.role === 'viewer';
+    const hasPermission = (_permission: Permission): boolean => isAdmin
+    const hasAllPermissions = (..._permissions: Permission[]): boolean => isAdmin
+    const hasAnyPermission = (..._permissions: Permission[]): boolean => isAdmin
+    const isRole = (_role: string): boolean => isAdmin
+    const canEdit = (): boolean => isAdmin
+    const canCreate = (): boolean => isAdmin
+    const canDelete = (): boolean => isAdmin
+    const isViewerOnly = (): boolean => !isAdmin
 
     return {
         hasPermission,
@@ -126,12 +30,11 @@ export function usePermissions() {
         canCreate,
         canDelete,
         isViewerOnly,
-        isSuperAdmin,
+        isSuperAdmin: isAdmin,
         isAdmin,
-        isEditor,
-        isViewer,
-        permissions: Array.from(permissions),
-        user,
-    };
+        isEditor: isAdmin,
+        isViewer: !isAdmin,
+        permissions: isAdmin ? ['all'] : [],
+        user: null,
+    }
 }
-

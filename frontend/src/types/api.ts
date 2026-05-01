@@ -4,7 +4,7 @@
 
 // Base types
 export interface BaseEntity {
-    id: number;
+    id: string;
     created_at: string;
     updated_at: string;
 }

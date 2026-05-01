@@ -1,15 +1,18 @@
 'use client';
 
 import { EditableSection } from '@/components/cms/EditableSection';
+import { Reveal } from '@/components/motion/Reveal';
+import { RevealItem } from '@/components/motion/Reveal';
+import { StaggerGroup } from '@/components/motion/StaggerGroup';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useCountUp } from '@/hooks/useCountUp';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
-import { trackCVDownload } from '@/lib/analytics';
-import { api } from '@/lib/api';
 import {
     Award,
     BookOpen,
@@ -17,8 +20,6 @@ import {
     Calendar,
     Code,
     Coffee,
-    Download,
-    Loader2,
     Mail,
     MapPin,
     Star,
@@ -234,14 +235,46 @@ export default function AboutClient() {
         coffee: Coffee,
     };
 
+    // Stat con CountUp
+    function AnimatedStat({ stat }: { stat: any }) {
+        const numeric = parseInt(String(stat.value).replace(/\D/g, ''), 10) || 0;
+        const suffix = String(stat.value).replace(/[\d,]/g, '').trim();
+        const { ref, display } = useCountUp(numeric);
+        const IconComponent = iconMap[stat.icon] || Calendar;
+        return (
+            <Card className="text-center hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-brand/30">
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-brand/10 mx-auto mb-3">
+                        <IconComponent className="w-6 h-6 text-brand" />
+                    </div>
+                    <div className="text-2xl font-display font-bold mb-1">
+                        {numeric > 0 ? (
+                            <><span ref={ref}>{display}</span>{suffix}</>
+                        ) : stat.value}
+                    </div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                </CardContent>
+            </Card>
+        );
+    }
+
     const isLoading = heroLoading || bioLoading || statsLoading || personalInfoLoading ||
         skillsLoading || hobbiesLoading || ctaLoading || experienceLoading ||
         educationLoading || testimonialsLoading;
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+                <div className="container mx-auto px-4 py-16">
+                    <div className="text-center mb-16 space-y-4">
+                        <Skeleton className="w-32 h-32 rounded-full mx-auto" />
+                        <Skeleton className="h-10 w-48 mx-auto" />
+                        <Skeleton className="h-6 w-96 mx-auto" />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+                        {[1,2,3,4].map(i => <Skeleton key={i} className="h-32 rounded-xl" />)}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -251,13 +284,25 @@ export default function AboutClient() {
             <div className="container mx-auto px-4 py-16">
                 {/* Hero Section */}
                 <EditableSection pageKey="about" sectionKey="hero" onContentUpdate={refreshHero}>
+                    <Reveal variant="fade-up">
                     <div className="text-center mb-16">
                         <div className="relative w-32 h-32 mx-auto mb-6">
-                            <div className="w-full h-full rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl font-bold text-white">
-                                {hero.initials}
+                            <div className="w-full h-full rounded-full bg-gradient-to-br from-brand/30 via-brand/10 to-primary/20 flex items-center justify-center ring-4 ring-brand/20 ring-offset-2 ring-offset-background relative overflow-hidden">
+                                <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <pattern id="dots-avatar" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+                                            <circle cx="2" cy="2" r="1.2" fill="currentColor" className="text-brand" />
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#dots-avatar)" />
+                                </svg>
+                                <span className="relative text-3xl font-display font-bold text-brand">
+                                    {hero.initials}
+                                </span>
                             </div>
+                            <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full ring-2 ring-background" />
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                        <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
                             {hero.title}
                         </h1>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -270,17 +315,6 @@ export default function AboutClient() {
                                     Contactar
                                 </Link>
                             </Button>
-                            <Button
-                                variant="outline"
-                                onClick={() => {
-                                    trackCVDownload();
-                                    const downloadUrl = api.getCVDownloadURL();
-                                    window.open(downloadUrl, '_blank');
-                                }}
-                            >
-                                <Download className="w-4 h-4 mr-2" />
-                                Descargar CV
-                            </Button>
                             {/* Social Links con íconos dinámicos */}
                             {hero.social_links && hero.social_links.filter((link: any) => link.enabled).map((link: any, index: number) => (
                                 <Button key={index} asChild variant="outline" size="icon">
@@ -291,26 +325,18 @@ export default function AboutClient() {
                             ))}
                         </div>
                     </div>
+                    </Reveal>
                 </EditableSection>
 
                 {/* Stats */}
                 <EditableSection pageKey="about" sectionKey="stats" onContentUpdate={refreshStats}>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-                        {stats.stats.map((stat: any, index: number) => {
-                            const IconComponent = iconMap[stat.icon] || Calendar;
-                            return (
-                                <Card key={index} className="text-center">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 mx-auto mb-3">
-                                            <IconComponent className="w-6 h-6 text-primary" />
-                                        </div>
-                                        <div className="text-2xl font-bold mb-1">{stat.value}</div>
-                                        <div className="text-sm text-muted-foreground">{stat.label}</div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
+                    <StaggerGroup className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+                        {stats.stats.map((stat: any, index: number) => (
+                            <RevealItem key={index}>
+                                <AnimatedStat stat={stat} />
+                            </RevealItem>
+                        ))}
+                    </StaggerGroup>
                 </EditableSection>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -352,23 +378,23 @@ export default function AboutClient() {
                                     {experience.experience.map((exp: any, index: number) => (
                                         <div key={index} className="relative">
                                             {index < experience.experience.length - 1 && (
-                                                <div className="absolute left-4 top-12 w-px h-full bg-border"></div>
+                                                <div className="absolute left-4 top-10 w-0.5 h-full bg-gradient-to-b from-brand/40 to-transparent"></div>
                                             )}
                                             <div className="flex gap-4">
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex-shrink-0">
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-brand text-brand-foreground text-sm font-display font-bold flex-shrink-0 shadow-glow">
                                                     {index + 1}
                                                 </div>
-                                                <div className="flex-1">
+                                                <div className="flex-1 pb-6">
                                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
                                                         <h3 className="font-semibold">{exp.title}</h3>
-                                                        <Badge variant="outline">{exp.period}</Badge>
+                                                        <Badge variant="outline" className="border-brand/30 text-brand w-fit">{exp.period}</Badge>
                                                     </div>
-                                                    <p className="text-sm text-muted-foreground mb-2">{exp.company}</p>
-                                                    <p className="text-sm mb-3">{exp.description}</p>
+                                                    <p className="text-sm text-brand/70 font-medium mb-2">{exp.company}</p>
+                                                    <p className="text-sm text-muted-foreground mb-3">{exp.description}</p>
                                                     <ul className="text-sm text-muted-foreground space-y-1">
                                                         {exp.achievements.map((achievement: any, i: number) => (
                                                             <li key={i} className="flex items-start gap-2">
-                                                                <Star className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                                                                <Star className="w-3 h-3 text-brand mt-0.5 flex-shrink-0" />
                                                                 {achievement}
                                                             </li>
                                                         ))}
@@ -479,7 +505,7 @@ export default function AboutClient() {
                                                             href={link.url}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-sm hover:text-primary transition-colors"
+                                                            className="text-sm hover:text-brand transition-colors"
                                                         >
                                                             {link.text}
                                                         </a>

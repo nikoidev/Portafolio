@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCMSContent } from '@/hooks/useCMSContent';
-import { trackCVDownload } from '@/lib/analytics';
 import { api } from '@/lib/api';
 import { Project } from '@/types/api';
-import { ArrowUpDown, Filter, Grid, List, Loader2, Search } from 'lucide-react';
+import { ArrowUpDown, Filter, Grid, List, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { ProjectCardSkeleton } from '@/components/public/ProjectCardSkeleton';
 
 export default function ProjectsClient() {
     // CMS Content
@@ -141,9 +141,9 @@ export default function ProjectsClient() {
         return (
             <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
                 <div className="container mx-auto px-4 py-16">
-                    <div className="text-center">
-                        <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
-                        <p className="mt-4 text-muted-foreground">Cargando proyectos...</p>
+                    <div className="h-20 mb-12" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3, 4, 5, 6].map((i) => <ProjectCardSkeleton key={i} />)}
                     </div>
                 </div>
             </div>
@@ -331,16 +331,6 @@ export default function ProjectsClient() {
                                             <a href={(cta as any).button_primary_url || (cta as any).button_url || '/contact'}>
                                                 {(cta as any).button_primary_text || (cta as any).button_text || 'Contactar'}
                                             </a>
-                                        </Button>
-                                        <Button
-                                            variant="secondary"
-                                            size="lg"
-                                            onClick={() => {
-                                                trackCVDownload();
-                                                window.open(api.getCVDownloadURL(), '_blank');
-                                            }}
-                                        >
-                                            {(cta as any).button_secondary_text || 'Descargar CV'}
                                         </Button>
                                     </div>
                                 </CardContent>

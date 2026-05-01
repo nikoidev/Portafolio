@@ -21,25 +21,35 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         return 'light';
     });
 
-    // Apply theme changes to document
+    // Sync initial state — the inline script in layout.tsx already set the class,
+    // this just ensures localStorage matches if somehow they diverge on first render.
     useEffect(() => {
-        const root = document.documentElement;
+        localStorage.setItem('theme', theme);
+    }, []);
 
-        if (theme === 'dark') {
+    const applyTheme = (newTheme: Theme) => {
+        const root = document.documentElement;
+        if (newTheme === 'dark') {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
-
-        localStorage.setItem('theme', theme);
-    }, [theme]);
+        localStorage.setItem('theme', newTheme);
+        setThemeState(newTheme);
+    };
 
     const toggleTheme = () => {
-        setThemeState(prev => prev === 'light' ? 'dark' : 'light');
+        const next = theme === 'light' ? 'dark' : 'light';
+        // View Transitions API for a smooth circular reveal; CSS fallback already in globals.css
+        if (typeof document !== 'undefined' && 'startViewTransition' in document) {
+            (document as any).startViewTransition(() => applyTheme(next));
+        } else {
+            applyTheme(next);
+        }
     };
 
     const setTheme = (newTheme: Theme) => {
-        setThemeState(newTheme);
+        applyTheme(newTheme);
     };
 
     return (

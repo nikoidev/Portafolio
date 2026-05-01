@@ -1,13 +1,17 @@
 'use client';
 
 import { EditableSection } from '@/components/cms/EditableSection';
+import { Reveal } from '@/components/motion/Reveal';
+import { RevealItem } from '@/components/motion/Reveal';
+import { StaggerGroup } from '@/components/motion/StaggerGroup';
 import { Button } from '@/components/ui/button';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useProjectsStore } from '@/store/projects';
-import { ArrowRight, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { ProjectCard } from './ProjectCard';
+import { ProjectCardSkeleton } from './ProjectCardSkeleton';
 
 interface FeaturedProjectsProps {
     canMoveUp?: boolean;
@@ -52,9 +56,9 @@ export function FeaturedProjects({ canMoveUp, canMoveDown, onReorder }: Featured
         return (
             <section className="py-20 bg-accent/5">
                 <div className="container mx-auto px-4">
-                    <div className="text-center">
-                        <Loader2 className="w-8 h-8 animate-spin mx-auto" />
-                        <p className="mt-4 text-muted-foreground">Cargando proyectos...</p>
+                    <div className="h-16 mb-16" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[1, 2, 3].map((i) => <ProjectCardSkeleton key={i} />)}
                     </div>
                 </div>
             </section>
@@ -98,23 +102,25 @@ export function FeaturedProjects({ canMoveUp, canMoveDown, onReorder }: Featured
             <section className="py-20 bg-accent/5">
                 <div className="container mx-auto px-4">
                     {/* Header */}
-                    <div className="text-center mb-16">
+                    <Reveal variant="fade-up" className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
                             {data.title}
                         </h2>
                         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                             {data.description}
                         </p>
-                    </div>
+                    </Reveal>
 
                     {/* Grid de proyectos */}
                     {featuredProjects.length > 0 ? (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                            <StaggerGroup className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                                 {currentProjects.map((project) => (
-                                    <ProjectCard key={project.id} project={project} />
+                                    <RevealItem key={project.id}>
+                                        <ProjectCard project={project} />
+                                    </RevealItem>
                                 ))}
-                            </div>
+                            </StaggerGroup>
 
                             {/* Paginación */}
                             {showPagination && (

@@ -1,39 +1,24 @@
 /**
- * Cliente API para comunicación con el backend
+ * Cliente API — ahora apunta a los Route Handlers del mismo dominio.
+ * baseURL vacío = URLs relativas (funciona en desarrollo y en Vercel).
  */
-import { CV, Token } from '@/types/api';
+import { Project } from '@/types/api';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 class ApiClient {
     private client: AxiosInstance;
-    private token: string | null = null;
-    private baseURL: string;
 
     constructor() {
-        this.baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
         this.client = axios.create({
-            baseURL: this.baseURL,
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            baseURL: '',
+            headers: { 'Content-Type': 'application/json' },
         });
 
-        // Interceptor para añadir token automáticamente
-        this.client.interceptors.request.use((config) => {
-            if (this.token) {
-                config.headers.Authorization = `Bearer ${this.token}`;
-            }
-            return config;
-        });
-
-        // Interceptor para manejo de errores
+        // Manejo de errores 401
         this.client.interceptors.response.use(
             (response) => response,
             (error: AxiosError) => {
                 if (error.response?.status === 401) {
-                    // Token expirado o inválido
-                    this.clearToken();
-                    // Redirigir a login si estamos en el admin
                     if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
                         window.location.href = '/admin/login';
                     }
@@ -41,36 +26,8 @@ class ApiClient {
                 return Promise.reject(error);
             }
         );
-
-        // Cargar token del localStorage al inicializar
-        if (typeof window !== 'undefined') {
-            const savedToken = localStorage.getItem('auth_token');
-            if (savedToken) {
-                this.token = savedToken;
-            }
-        }
     }
 
-    // Gestión de tokens
-    setToken(token: string) {
-        this.token = token;
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', token);
-        }
-    }
-
-    clearToken() {
-        this.token = null;
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('auth_token');
-        }
-    }
-
-    getToken(): string | null {
-        return this.token;
-    }
-
-    // Métodos HTTP genéricos
     async get<T>(url: string, params?: any): Promise<T> {
         const response: AxiosResponse<T> = await this.client.get(url, { params });
         return response.data;
@@ -96,208 +53,85 @@ class ApiClient {
         return response.data;
     }
 
-    // Métodos específicos de autenticación
-    async login(email: string, password: string): Promise<Token> {
-        const formData = new FormData();
-        formData.append('username', email);
-        formData.append('password', password);
-
-        const response = await this.client.post<Token>('/api/v1/auth/login', formData, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        this.setToken(response.data.access_token);
-        return response.data;
-    }
-
-    async logout() {
-        this.clearToken();
-    }
-
-    async getCurrentUser() {
-        return this.get('/api/v1/auth/me');
-    }
-
-    // Métodos para proyectos
+    // Projects
     async getProjects(params?: {
         skip?: number;
         limit?: number;
         featured_only?: boolean;
         search?: string;
         include_unpublished?: boolean;
-    }) {
-        return this.get('/api/v1/projects/', params);
+    }): Promise<Project[]> {
+        return this.get<Project[]>('/api/projects', params);
     }
 
-    async getFeaturedProjects(limit = 6) {
-        return this.get('/api/v1/projects/featured', { limit });
+    async getFeaturedProjects(limit = 6): Promise<Project[]> {
+        return this.get<Project[]>('/api/projects', { featured_only: true, limit });
     }
 
-    async getProject(identifier: string) {
-        return this.get(`/api/v1/projects/${identifier}`);
+    async getProject(identifier: string): Promise<Project> {
+        return this.get<Project>(`/api/projects/${identifier}`);
     }
 
-    async createProject(data: any) {
-        return this.post('/api/v1/projects/', data);
+    async createProject(data: any): Promise<Project> {
+        return this.post<Project>('/api/projects', data);
     }
 
-    async updateProject(id: number, data: any) {
-        return this.put(`/api/v1/projects/${id}`, data);
+    async updateProject(slug: string, data: any): Promise<Project> {
+        return this.put<Project>(`/api/projects/${slug}`, data);
     }
 
-    async deleteProject(id: number) {
-        return this.delete(`/api/v1/projects/${id}`);
+    async deleteProject(slug: string): Promise<void> {
+        return this.delete(`/api/projects/${slug}`);
     }
 
     async getProjectStats() {
-        return this.get('/api/v1/projects/stats');
+        const projects = await this.getProjects({ include_unpublished: true });
+        const total = projects.length;
+        const published = projects.filter((p: any) => p.is_published).length;
+        const featured = projects.filter((p: any) => p.is_featured).length;
+        const totalViews = projects.reduce((sum: number, p: any) => sum + (p.view_count || 0), 0);
+        return { total_projects: total, published_projects: published, featured_projects: featured, total_views: totalViews };
     }
 
-    // ========================================================================
-    // CV Methods
-    // ========================================================================
-
-    /**
-     * Get current CV (Admin only)
-     * Returns 404 if no CV exists
-     */
-    async getCV(): Promise<CV> {
-        return this.get<CV>('/api/v1/cv/');
-    }
-
-    /**
-     * Upload or replace CV (Admin only)
-     * If a CV already exists, it will be replaced
-     */
-    async uploadCV(file: File) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        return fetch(`${this.baseURL}/api/v1/cv/`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${this.getToken()}`,
-            },
-            body: formData,
-        }).then(res => {
-            if (!res.ok) throw new Error('Failed to upload CV');
-            return res.json();
-        });
-    }
-
-    /**
-     * Delete current CV (Admin only)
-     * Returns 404 if no CV exists
-     */
-    async deleteCV() {
-        return this.delete('/api/v1/cv/');
-    }
-
-    /**
-     * Download CV (Public - No authentication required)
-     * Returns the PDF file directly
-     */
-    getCVDownloadURL(): string {
-        return `${this.baseURL}/api/v1/cv/download`;
-    }
-
-    /**
-     * Check if a CV exists (Public - No authentication required)
-     */
-    async checkCVExists(): Promise<{ exists: boolean; message: string }> {
-        return this.get<{ exists: boolean; message: string }>('/api/v1/cv/exists');
-    }
-
-    // Método para crear super admin inicial
-    async createSuperAdmin() {
-        return this.post('/api/v1/auth/create-super-admin');
-    }
-
-    // Mantener compatibilidad con código viejo (deprecated)
-    async createAdminUser() {
-        return this.createSuperAdmin();
-    }
-
-    // Métodos para uploads
+    // Uploads
     async uploadImage(formData: FormData): Promise<{ url: string; filename: string; size: number }> {
-        return this.post<{ url: string; filename: string; size: number }>('/api/v1/uploads/images', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return this.post<{ url: string; filename: string; size: number }>('/api/uploads/image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
     }
 
     async uploadMultipleImages(formData: FormData): Promise<{ images: Array<{ url: string; filename: string; size: number }> }> {
-        return this.post<{ images: Array<{ url: string; filename: string; size: number }> }>('/api/v1/uploads/images/multiple', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return this.post<{ images: Array<{ url: string; filename: string; size: number }> }>('/api/uploads/image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
     }
 
     async uploadFile(formData: FormData): Promise<{ url: string; filename: string; size: number }> {
-        return this.post<{ url: string; filename: string; size: number }>('/api/v1/uploads/files', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return this.post<{ url: string; filename: string; size: number }>('/api/uploads/image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
     }
 
     async uploadVideo(formData: FormData): Promise<{ url: string; filename: string; size: number; thumbnail?: string }> {
-        return this.post<{ url: string; filename: string; size: number; thumbnail?: string }>('/api/v1/uploads/videos', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+        return this.post<{ url: string; filename: string; size: number; thumbnail?: string }>('/api/uploads/image', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
         });
-    }
-
-    async getImages(limit = 50) {
-        return this.get('/api/v1/uploads/images', { limit });
-    }
-
-    async getFiles(fileType = 'files', limit = 50) {
-        return this.get('/api/v1/uploads/files', { file_type: fileType, limit });
-    }
-
-    async deleteImage(filename: string) {
-        return this.delete(`/api/v1/uploads/images/${filename}`);
-    }
-
-    async deleteFile(filename: string, fileType = 'files') {
-        return this.delete(`/api/v1/uploads/files/${filename}?file_type=${fileType}`);
-    }
-
-    async getFileInfo(filename: string, fileType = 'images') {
-        return this.get(`/api/v1/uploads/info/${filename}?file_type=${fileType}`);
     }
 }
 
-// Instancia singleton del cliente API
 export const api = new ApiClient();
 
-// Hook personalizado para manejo de errores
 export const handleApiError = (error: any): string => {
-    if (error.response?.data?.detail) {
-        return error.response.data.detail;
-    }
-    if (error.message) {
-        return error.message;
-    }
+    if (error.response?.data?.error) return error.response.data.error;
+    if (error.response?.data?.detail) return error.response.data.detail;
+    if (error.message) return error.message;
     return 'Ha ocurrido un error inesperado';
 };
 
-// Helper para obtener URL completa de imágenes
+// getImageUrl ya no necesita prefijo de backend — las URLs de Vercel Blob
+// son absolutas. Las rutas relativas siguen funcionando para compatibilidad.
 export const getImageUrl = (url: string): string => {
     if (!url) return '';
-
-    // Si ya es una URL completa, devolverla tal cual
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-    }
-
-    // Si es una ruta relativa, agregar el dominio del backend
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8004';
-    return `${baseUrl}${url}`;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return url; // relative paths served by Next.js
 };

@@ -1,16 +1,20 @@
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
-import { SessionValidator } from '@/components/auth/SessionValidator'
+import { NextAuthProvider } from '@/components/auth/NextAuthProvider'
 import { CreateSectionButton } from '@/components/cms/CreateSectionButton'
 import { EditModeToggle } from '@/components/cms/EditModeToggle'
-import ChatWidget from '@/components/chatbot/ChatWidget'
 import { EditModeProvider } from '@/contexts/EditModeContext'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import '@/styles/globals.css'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Space_Grotesk } from 'next/font/google'
 import { Toaster } from 'sonner'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['400', '500', '600', '700'],
+})
 
 export const metadata: Metadata = {
   title: {
@@ -51,7 +55,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
 }
 
 export default function RootLayout({
@@ -61,7 +65,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="scroll-smooth" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -79,18 +83,18 @@ export default function RootLayout({
           }}
         />
         <AnalyticsProvider />
-        <SessionValidator />
-        <ThemeProvider>
-          <EditModeProvider>
-            <div className="min-h-screen bg-background text-foreground">
-              {children}
-            </div>
-            <EditModeToggle />
-            <CreateSectionButton />
-            <ChatWidget />
-            <Toaster position="top-right" richColors />
-          </EditModeProvider>
-        </ThemeProvider>
+        <NextAuthProvider>
+          <ThemeProvider>
+            <EditModeProvider>
+              <div className="min-h-screen bg-background text-foreground">
+                {children}
+              </div>
+              <EditModeToggle />
+              <CreateSectionButton />
+              <Toaster position="top-right" richColors />
+            </EditModeProvider>
+          </ThemeProvider>
+        </NextAuthProvider>
       </body>
     </html>
   )

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useAuthStore } from '@/store/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -22,29 +22,36 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function AdminLoginPage() {
     const router = useRouter();
-    const { login, isAuthenticated, isLoading, error, clearError } = useAuthStore();
+    const { status } = useSession();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
-        defaultValues: {
-            email: '',
-            password: '',
-        },
+        defaultValues: { email: '', password: '' },
     });
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (status === 'authenticated') {
             router.push('/admin');
         }
-    }, [isAuthenticated, router]);
-
-    useEffect(() => {
-        clearError();
-    }, [clearError]);
+    }, [status, router]);
 
     const onSubmit = async (values: LoginFormValues) => {
-        const success = await login(values.email, values.password);
-        if (success) {
+        setIsLoading(true);
+        setError(null);
+
+        const result = await signIn('credentials', {
+            email: values.email,
+            password: values.password,
+            redirect: false,
+        });
+
+        setIsLoading(false);
+
+        if (result?.error) {
+            setError('Credenciales incorrectas. Inténtalo de nuevo.');
+        } else if (result?.ok) {
             router.push('/admin');
         }
     };
@@ -52,8 +59,8 @@ export default function AdminLoginPage() {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Card className="w-full max-w-md">
+            <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-background via-brand-muted/30 to-background p-4">
+                <Card className="w-full max-w-md shadow-elevated">
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl font-bold">Panel de Administración</CardTitle>
                         <CardDescription>
@@ -70,11 +77,7 @@ export default function AdminLoginPage() {
                                         <FormItem>
                                             <FormLabel>Email</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="admin@portfolio.com"
-                                                    type="email"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="admin@portfolio.com" type="email" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -87,11 +90,7 @@ export default function AdminLoginPage() {
                                         <FormItem>
                                             <FormLabel>Contraseña</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    placeholder="••••••••"
-                                                    type="password"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="••••••••" type="password" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -99,16 +98,10 @@ export default function AdminLoginPage() {
                                 />
 
                                 {error && (
-                                    <div className="text-sm text-destructive text-center">
-                                        {error}
-                                    </div>
+                                    <div className="text-sm text-destructive text-center">{error}</div>
                                 )}
 
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    disabled={isLoading}
-                                >
+                                <Button type="submit" className="w-full" disabled={isLoading}>
                                     {isLoading ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -120,7 +113,6 @@ export default function AdminLoginPage() {
                                 </Button>
                             </form>
                         </Form>
-
                     </CardContent>
                 </Card>
             </div>

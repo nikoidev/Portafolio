@@ -402,7 +402,7 @@ export function SettingsForm({ settings, onSave, onReset }: SettingsFormProps) {
                                             {link.icon && link.icon_type === 'upload' && (
                                                 <div className="p-2 border rounded-lg bg-muted/30">
                                                     <img
-                                                        src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/${link.icon}`}
+                                                        src={link.icon}
                                                         alt={link.name}
                                                         className="w-8 h-8 object-contain"
                                                         onError={(e) => {

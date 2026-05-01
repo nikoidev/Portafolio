@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  hashedPassword String
+  name           String
+  createdAt      DateTime @default(now())
+}
+
+model Project {
+  id                 String   @id @default(cuid())
+  slug               String   @unique
+  title              String
+  description        String
+  shortDescription   String?
+  content            String?
+  githubUrl          String?
+  demoVideoType      String?
+  demoVideoUrl       String?
+  demoVideoThumbnail String?
+  demoImages         Json     @default("[]")
+  technologies       Json     @default("[]")
+  tags               Json     @default("[]")
+  thumbnailUrl       String?
+  isFeatured         Boolean  @default(false)
+  isPublished        Boolean  @default(true)
+  orderIndex         Int      @default(0)
+  viewCount          Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model PageContent {
+  id          String   @id @default(cuid())
+  pageKey     String
+  sectionKey  String
+  title       String
+  description String?
+  content     Json
+  styles      Json?
+  isActive    Boolean  @default(true)
+  isEditable  Boolean  @default(true)
+  orderIndex  Int      @default(0)
+  version     Int      @default(1)
+  updatedAt   DateTime @updatedAt
+
+  @@unique([pageKey, sectionKey])
+}
+
+model Settings {
+  id        String   @id @default("singleton")
+  data      Json
+  updatedAt DateTime @updatedAt
+}

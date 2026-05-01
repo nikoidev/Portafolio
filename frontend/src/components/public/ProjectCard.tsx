@@ -18,7 +18,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
 
     if (variant === 'horizontal') {
         return (
-            <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+            <Card className="group hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 overflow-hidden border-border/60 hover:border-brand/30">
                 <div className="flex flex-col md:flex-row">
                     {/* Imagen o Video del proyecto */}
                     <div className="relative md:w-80 aspect-video md:aspect-square overflow-hidden bg-black">
@@ -63,9 +63,17 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                 />
                             ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                                    <span className="text-4xl font-bold text-muted-foreground">
-                                        {project.title.charAt(0)}
+                                <div className="w-full h-full bg-gradient-to-br from-brand/10 via-background to-primary/10 flex items-center justify-center relative overflow-hidden">
+                                    <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <pattern id={`dots-h-${project.slug}`} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                                                <circle cx="2" cy="2" r="1.5" fill="currentColor" className="text-brand" />
+                                            </pattern>
+                                        </defs>
+                                        <rect width="100%" height="100%" fill={`url(#dots-h-${project.slug})`} />
+                                    </svg>
+                                    <span className="relative text-4xl font-display font-bold text-brand/40">
+                                        {project.title.substring(0, 2).toUpperCase()}
                                     </span>
                                 </div>
                             )
@@ -113,7 +121,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                             {/* Tecnologías */}
                             <div className="flex flex-wrap gap-2">
                                 {project.technologies?.filter(t => t.enabled).slice(0, 6).map((tech, index) => (
-                                    <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 border rounded-md bg-background text-sm">
+                                    <div key={index} className="flex items-center gap-1.5 px-2.5 py-1.5 border border-brand/20 rounded-md bg-brand/5 text-sm text-brand">
                                         {tech.icon && (
                                             <img
                                                 src={tech.icon}
@@ -165,7 +173,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
     }
 
     return (
-        <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+        <Card className="group hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 overflow-hidden border-border/60 hover:border-brand/30">
             {/* Imagen o Video del proyecto */}
             <div className="relative aspect-video overflow-hidden bg-black">
                 {/* Si hay video, mostrarlo */}
@@ -209,9 +217,17 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                     ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                            <span className="text-4xl font-bold text-muted-foreground">
-                                {project.title.charAt(0)}
+                        <div className="w-full h-full bg-gradient-to-br from-brand/10 via-background to-primary/10 flex items-center justify-center relative overflow-hidden">
+                            <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <pattern id={`dots-v-${project.slug}`} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                                        <circle cx="2" cy="2" r="1.5" fill="currentColor" className="text-brand" />
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill={`url(#dots-v-${project.slug})`} />
+                            </svg>
+                            <span className="relative text-4xl font-display font-bold text-brand/40">
+                                {project.title.substring(0, 2).toUpperCase()}
                             </span>
                         </div>
                     )
@@ -248,7 +264,7 @@ export function ProjectCard({ project, showViewCount = true, variant = 'vertical
                 {/* Tecnologías */}
                 <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies?.filter(t => t.enabled).slice(0, 4).map((tech, index) => (
-                        <div key={index} className="flex items-center gap-1.5 px-2.5 py-1 border rounded-md bg-background text-xs">
+                        <div key={index} className="flex items-center gap-1.5 px-2.5 py-1 border border-brand/20 rounded-md bg-brand/5 text-xs text-brand">
                             {tech.icon && (
                                 <img
                                     src={tech.icon}

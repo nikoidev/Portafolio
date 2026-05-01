@@ -2,7 +2,7 @@
 
 import { useEditMode } from '@/contexts/EditModeContext';
 import { usePermissions } from '@/hooks/usePermissions';
-import { useAuthStore } from '@/store/auth';
+import { useSession } from 'next-auth/react';
 import { Plus } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -19,7 +19,9 @@ const ROUTE_TO_PAGE_KEY: Record<string, string> = {
 export function CreateSectionButton() {
     const { isEditMode } = useEditMode();
     const { hasPermission } = usePermissions();
-    const { isAuthenticated, isValidating, token } = useAuthStore();
+    const { status } = useSession();
+    const isAuthenticated = status === 'authenticated';
+    const isValidating = status === 'loading';
     const pathname = usePathname();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,7 +33,7 @@ export function CreateSectionButton() {
 
     // No mostrar el botón si no estamos en modo edición, no es una página editable, o no tiene permisos
     // También ocultar mientras valida la sesión
-    if (isValidating || !isAuthenticated || !token || !isEditMode || !pageKey || !canCreateContent) {
+    if (isValidating || !isAuthenticated || !isEditMode || !pageKey || !canCreateContent) {
         return null;
     }
 

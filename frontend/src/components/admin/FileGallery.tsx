@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { api } from '@/lib/api';
+import axios from 'axios';
 import { Copy, Download, Eye, File, Image as ImageIcon, Loader2, Search, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -43,16 +43,8 @@ export function FileGallery({
     const loadFiles = async () => {
         setIsLoading(true);
         try {
-            const endpoint = fileType === 'images'
-                ? '/api/v1/uploads/images'
-                : `/api/v1/uploads/files?file_type=${fileType}`;
-
-            const response = await api.get(endpoint) as any;
-            const fileList = fileType === 'images'
-                ? response.data?.images || response
-                : response.data?.files || response;
-
-            setFiles(fileList || []);
+            const response = await axios.get('/api/uploads/list');
+            setFiles(response.data || []);
         } catch (error) {
             console.error('Error loading files:', error);
             setFiles([]);
@@ -62,29 +54,12 @@ export function FileGallery({
     };
 
     const deleteFile = async (filename: string) => {
-        if (!confirm('¿Estás seguro de que quieres eliminar este archivo?')) {
-            return;
-        }
-
-        setDeleteLoading(filename);
-        try {
-            const endpoint = fileType === 'images'
-                ? `/api/v1/uploads/images/${filename}`
-                : `/api/v1/uploads/files/${filename}?file_type=${fileType}`;
-
-            await api.delete(endpoint);
-            setFiles(prev => prev.filter(f => f.filename !== filename));
-        } catch (error: any) {
-            alert(error.response?.data?.detail || 'Error al eliminar archivo');
-        } finally {
-            setDeleteLoading(null);
-        }
+        if (!confirm('Para eliminar archivos usa el panel de Vercel Blob.')) return;
+        setFiles(prev => prev.filter(f => f.filename !== filename));
     };
 
     const copyUrl = (url: string) => {
-        const fullUrl = `${window.location.origin}${url}`;
-        navigator.clipboard.writeText(fullUrl);
-        // TODO: Mostrar toast de confirmación
+        navigator.clipboard.writeText(url);
         alert('URL copiada al portapapeles');
     };
 

@@ -8,32 +8,23 @@ import { useEffect } from 'react';
 
 export default function EditProjectPage() {
     const params = useParams();
-    const projectId = parseInt(params.id as string);
+    // The [id] segment now holds the project slug (cuid or slug string)
+    const projectSlug = params.id as string;
 
-    const {
-        projects,
-        currentProject,
-        isLoading,
-        fetchProject,
-        updateProject
-    } = useProjectsStore();
+    const { projects, currentProject, isLoading, fetchProject, updateProject } = useProjectsStore();
 
     useEffect(() => {
-        // Intentar encontrar el proyecto en la lista actual primero
-        const existingProject = projects.find(p => p.id === projectId);
-        if (existingProject) {
-            // Si ya tenemos el proyecto, no necesitamos hacer otra petición
-            return;
+        const existing = projects.find(p => p.id === projectSlug || p.slug === projectSlug);
+        if (!existing) {
+            fetchProject(projectSlug);
         }
+    }, [projectSlug, projects, fetchProject]);
 
-        // Si no lo tenemos, hacer fetch del proyecto específico
-        fetchProject(projectId.toString());
-    }, [projectId, projects, fetchProject]);
-
-    const project = projects.find(p => p.id === projectId) || currentProject;
+    const project = projects.find(p => p.id === projectSlug || p.slug === projectSlug) || currentProject;
 
     const handleSubmit = async (data: any) => {
-        return await updateProject(projectId, data);
+        const slug = project?.slug ?? projectSlug;
+        return await updateProject(slug, data);
     };
 
     if (isLoading || !project) {
@@ -49,16 +40,9 @@ export default function EditProjectPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-3xl font-bold">Editar Proyecto</h1>
-                <p className="text-muted-foreground">
-                    Modificar "{project.title}"
-                </p>
+                <p className="text-muted-foreground">Modificar "{project.title}"</p>
             </div>
-
-            <ProjectForm
-                project={project}
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-            />
+            <ProjectForm project={project} onSubmit={handleSubmit} isLoading={isLoading} />
         </div>
     );
 }

@@ -47,17 +47,10 @@ export default function SettingsPage() {
     };
 
     const handleReset = async () => {
-        try {
-            const resetData = await settingsApi.resetSettings();
-            setSettings(resetData);
-            toast.success('Configuración reseteada correctamente');
-            // Recargar la página para reflejar los cambios
-            await loadSettings();
-        } catch (err: any) {
-            console.error('Error al resetear configuración:', err);
-            toast.error(err.response?.data?.detail || 'Error al resetear la configuración');
-            throw err;
-        }
+        // Reset is not supported in the new single-JSON backend.
+        // Just reload settings from DB.
+        await loadSettings();
+        toast.success('Configuración recargada');
     };
 
     if (isLoading) {

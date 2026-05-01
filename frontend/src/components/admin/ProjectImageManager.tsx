@@ -18,7 +18,8 @@ interface ProjectImage {
 }
 
 interface ProjectImageManagerProps {
-    projectId: number;
+    projectId: string;
+    projectSlug?: string;
     projectTitle: string;
     currentImages: ProjectImage[];
     onImagesUpdate: (images: ProjectImage[]) => void;
@@ -26,6 +27,7 @@ interface ProjectImageManagerProps {
 
 export function ProjectImageManager({
     projectId,
+    projectSlug,
     projectTitle,
     currentImages,
     onImagesUpdate
@@ -81,7 +83,7 @@ export function ProjectImageManager({
                 const formData = new FormData();
                 formData.append('file', pending.file);
                 formData.append('optimize', 'true');
-                formData.append('project_slug', projectId.toString());
+                formData.append('project_slug', projectSlug ?? projectId);
 
                 const result = await api.uploadImage(formData);
 

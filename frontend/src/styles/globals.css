@@ -33,6 +33,16 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    /* Brand accent — violet */
+    --brand: 262 83% 58%;
+    --brand-foreground: 0 0% 100%;
+    --brand-muted: 262 83% 95%;
+    --brand-muted-foreground: 262 60% 40%;
+
+    /* Shadows */
+    --shadow-elevated: 0 8px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 24px -4px hsl(262 83% 58% / 0.35), 0 0 8px -4px hsl(262 83% 58% / 0.2);
   }
 
   .dark {
@@ -63,6 +73,16 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Brand accent — brighter in dark mode, dark foreground for AA contrast on buttons */
+    --brand: 262 83% 70%;
+    --brand-foreground: 222 84% 5%;
+    --brand-muted: 262 40% 18%;
+    --brand-muted-foreground: 262 60% 75%;
+
+    /* Shadows dark */
+    --shadow-elevated: 0 8px 30px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -4px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 24px -4px hsl(262 83% 65% / 0.4), 0 0 8px -4px hsl(262 83% 65% / 0.25);
   }
 }
 
@@ -117,4 +137,105 @@
       linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
     background-size: 40px 40px;
   }
+
+  /* Punto decorativo de acento */
+  .bg-dot-pattern {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Sombras semánticas */
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33%       { transform: translateY(-12px) rotate(1deg); }
+    66%       { transform: translateY(-6px) rotate(-1deg); }
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50%       { background-position: 100% 50%; }
+  }
+
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--brand) / 0.15) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.5s linear infinite;
+  }
+
+  .animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out both;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out both;
+  }
+
+  /* Theme transition smooth (CSS fallback when View Transitions API unavailable) */
+  html {
+    transition: background-color 0.3s ease, color 0.2s ease;
+  }
+}
+
+/* View Transitions API — circular reveal on theme toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation-name: reveal-theme;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(root) {
+  animation-name: conceal-theme;
+  animation-timing-function: ease-in;
+}
+
+@keyframes reveal-theme {
+  from { opacity: 0; transform: scale(0.97); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes conceal-theme {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.02); }
 }

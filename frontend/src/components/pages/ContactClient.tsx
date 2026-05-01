@@ -3,6 +3,9 @@
 import { EditableSection } from '@/components/cms/EditableSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Reveal } from '@/components/motion/Reveal';
+import { RevealItem } from '@/components/motion/Reveal';
+import { StaggerGroup } from '@/components/motion/StaggerGroup';
 import { useCMSContent } from '@/hooks/useCMSContent';
 import { useGlobalSettings } from '@/hooks/useGlobalSettings';
 import { trackContactAttempt, trackEmailCopy, trackSocialClick } from '@/lib/analytics';
@@ -123,7 +126,7 @@ export default function ContactClient() {
                     icon: isUpload ? 'custom' :
                         (link.name.toLowerCase().includes('linkedin') ? 'linkedin' :
                             link.name.toLowerCase().includes('github') ? 'github' : 'link'),
-                    customIconUrl: isUpload ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${link.icon}` : link.icon,
+                    customIconUrl: link.icon,
                     label: link.name,
                     value: `Conecta en ${link.name}`,
                     href: link.url,
@@ -182,6 +185,7 @@ export default function ContactClient() {
             <div className="container mx-auto px-4 py-16">
                 {/* Header */}
                 <EditableSection pageKey="contact" sectionKey="header" onContentUpdate={refreshHeader}>
+                    <Reveal variant="fade-up">
                     <div className="text-center mb-16">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">
                             {header.title}
@@ -190,12 +194,13 @@ export default function ContactClient() {
                             {header.subtitle}
                         </p>
                     </div>
+                    </Reveal>
                 </EditableSection>
 
                 {/* Main contact methods */}
                 <EditableSection pageKey="contact" sectionKey="contact_info" onContentUpdate={refreshContactInfo}>
                     <div className="max-w-5xl mx-auto mb-12">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {allContacts.filter((c: any) => c.primary !== false).slice(0, 3).map((contact: any, index: number) => {
                                 const IconComponent = iconMap[contact.icon] || Mail;
                                 const isEmail = contact.icon === 'mail';
@@ -278,7 +283,7 @@ export default function ContactClient() {
                                     </Card>
                                 );
                             })}
-                        </div>
+                        </StaggerGroup>
                     </div>
                 </EditableSection>
 

@@ -3,12 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { usePermissions } from '@/hooks/usePermissions';
-import { useAuthStore } from '@/store/auth';
+import { useSession } from 'next-auth/react';
 import { Edit, Eye } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function EditModeToggle() {
-    const { isAuthenticated, isValidating, token } = useAuthStore();
+    const { status } = useSession();
+    const isAuthenticated = status === 'authenticated';
+    const isValidating = status === 'loading';
     const { isEditMode, toggleEditMode } = useEditMode();
     const { hasPermission } = usePermissions();
     const pathname = usePathname();
@@ -29,7 +31,7 @@ export function EditModeToggle() {
     const canEditContent = hasPermission('update_content');
 
     // No mostrar mientras está validando la sesión para evitar parpadeos
-    if (isValidating || !isAuthenticated || !token || isExcludedPage || !canEditContent) {
+    if (isValidating || !isAuthenticated || isExcludedPage || !canEditContent) {
         return null;
     }
 
