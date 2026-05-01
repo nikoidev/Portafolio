@@ -13,15 +13,13 @@ export function AboutSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
           {/* Heading */}
-          <div className="text-center mb-14">
-            <p className="text-sm uppercase tracking-widest text-muted-foreground font-medium mb-3">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Sobre Mí
-            </p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-balance">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:from-foreground dark:via-foreground dark:to-foreground">
-                Conoce un poco más de mi historia
-              </span>
             </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Conoce un poco más de mi historia y lo que me motiva como desarrollador.
+            </p>
           </div>
 
           {/* Content grid */}

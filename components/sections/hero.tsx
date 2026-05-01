@@ -24,15 +24,11 @@ export function HeroSection() {
           <p className="text-sm uppercase tracking-widest text-muted-foreground mb-4">
             Bienvenido a mi portafolio
           </p>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent dark:text-foreground">
-              {profileData.name}
-            </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance text-foreground">
+            {profileData.name}
           </h1>
-          <p className="text-lg sm:text-xl font-medium mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent dark:text-primary">
-              {profileData.title}
-            </span>
+          <p className="text-lg sm:text-xl font-medium mb-4 text-foreground/80 dark:text-primary">
+            {profileData.title}
           </p>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed mb-8 max-w-2xl mx-auto text-pretty">
             {profileData.shortDescription}
