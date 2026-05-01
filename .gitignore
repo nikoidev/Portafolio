@@ -1,103 +1,54 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-backend/lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Virtual environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-.pipenv/
-
-# FastAPI
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Node.js
+# Dependencies
 node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Build output
+.next/
+out/
+build/
+dist/
+
+# Environment
+.env
+.env*.local
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
+logs/
 
-# Next.js
-.next/
-out/
-build/
-.vercel/
-
-# Environment variables
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# IDEs
-.vscode/
-.idea/
+# Editors / OS
+.DS_Store
+Thumbs.db
 *.swp
 *.swo
 *~
+.idea/
 
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Vercel
+.vercel/
 
-# Logs
-logs/
-*.log
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# Testing
+coverage/
 
-# Docker
-.dockerignore
-
-# Temporary files
-tmp/
-temp/
-.tmp/
-
-# Uploads
-uploads/
-static/uploads/
-
-# SSL certificates
-*.pem
-*.key
-*.crt
-
-# Backup files
-*.bak
-*.backup
+# v0 sandbox (kept just in case)
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+next.user-config.*
